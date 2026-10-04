@@ -560,7 +560,6 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .sketch .c .fb { height: 12px; flex: none; border-radius: 4px; background: transparent; border: 1px dashed var(--dash); }
 .sketch .c .fb.on { border: 1.5px solid var(--k); background: color-mix(in srgb, var(--k) 22%, var(--surface)); }
 
-@container content (max-width: 520px) { 
 /* margin rails: two stacked ad tiles per side (2 × 2 across the page) */
 .rail-box { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 8px; height: 600px; }
 .rail-head { display: flex; justify-content: space-between; padding: 0 4px; font: 500 11px/1 var(--mono); color: var(--muted); }
