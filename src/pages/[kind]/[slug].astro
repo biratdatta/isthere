@@ -4,28 +4,25 @@ import Odometer from '../../components/Odometer.astro';
 import Waitlist from '../../components/Waitlist.astro';
 import PromptBlock from '../../components/PromptBlock.astro';
 import InstallBlock from '../../components/InstallBlock.astro';
-import { CATEGORIES, formatPrice, getEntry, keyOf, relatedEntries, siblings, verdictLabel } from '../../lib/apps';
-import { KINDS, isKind } from '../../lib/kinds';
-import { voteCount, voteCounts } from '../../lib/db';
+import { CATEGORIES, ENTRIES, formatPrice, keyOf, relatedEntries, siblings, verdictLabel, type Entry } from '../../lib/apps';
+import { KINDS } from '../../lib/kinds';
 import { mcpInstalls, pluginInstalls, skillInstalls } from '../../lib/installs';
 import { abs, breadcrumbs, entryDescription, entryPath, entryTitle, faqFor, faqPage } from '../../lib/seo';
 
-const { kind, slug } = Astro.params;
-const e = isKind(kind) ? getEntry(kind, slug ?? '') : undefined;
-if (!e) return Astro.rewrite('/404');
+export function getStaticPaths() {
+  return ENTRIES.map((e) => ({ params: { kind: e.kind, slug: e.slug }, props: { e } }));
+}
 
+const { e } = Astro.props as { e: Entry };
 const site = Astro.site!;
 const k = KINDS[e.kind];
 const c = CATEGORIES[e.category];
 const v = k.verdicts[e.verdict];
 const key = keyOf(e);
-const votes = voteCount(key);
-const counts = voteCounts();
 const related = relatedEntries(e);
 const also = siblings(e);
 const faq = faqFor(e);
 const canonical = abs(site, entryPath(e));
-const voted = Astro.url.searchParams.get('voted');
 
 const shareText = `${entryTitle(e)} Verdict: ${v.label}.`;
 const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(canonical)}`;
@@ -38,10 +35,7 @@ const installs = e.kind === 'mcp' ? mcpInstalls(e) : e.kind === 'skills' ? skill
 const goodsTitle = { prompts: `Build your own ${e.name}`, skills: `Install the ${e.kind === 'skills' ? e.skill.name : ''} skill`, mcp: `Connect ${e.name} to your agent`, plugins: `Install the ${e.kind === 'plugins' ? e.plugin.name : ''} plugin` }[e.kind];
 const goodsEyebrow = { prompts: 'the one-shot prompt', skills: 'the skill', mcp: 'the server', plugins: 'the plugin' }[e.kind];
 const loseTitle = e.kind === 'mcp' ? 'Limitations' : 'What you lose';
-const voteNote =
-  voted === 'ok' ? (k.metric === 'mrr' && e.priceMonthly ? `Counted. +${formatPrice(e.priceMonthly)}/mo destroyed.` : 'Counted. Thanks!') :
-  voted === 'already-voted' ? 'Already counted you today.' :
-  voted === 'rate-limited' ? 'Easy there. Try again later.' : 'One vote per person per day. No account needed.';
+const voteNote = 'One vote per person per day. No account needed.';
 ---
 <Base title={entryTitle(e)} description={entryDescription(e)} path={entryPath(e)} ogImage={`/og/${e.kind}/${e.slug}.png`} kind={e.kind} jsonld={[breadcrumbs(site, crumbs), faqPage(faq)]}>
   <div class="wrap">
@@ -101,10 +95,10 @@ const voteNote =
           <form method="post" action={`/api/vote/${e.kind}/${e.slug}`} data-vote={key} data-price={k.metric === 'mrr' ? e.priceMonthly ?? 0 : 0}>
             <button class="btn btn-primary vote-btn" type="submit">
               <span>{k.metric === 'mrr' ? '🪦' : '🔌'} {k.vote}</span>
-              <Odometer value={votes} label={`${votes} people ${k.voted}`} />
+              <Odometer value={0} label={`0 people ${k.voted}`} countKey={key} />
             </button>
           </form>
-          <p class={`vote-note ${voted ? 'flash' : ''}`} role="status" aria-live="polite" data-vote-note>{voteNote}</p>
+          <p class="vote-note" role="status" aria-live="polite" data-vote-note>{voteNote}</p>
           <div class="share-row">
             <a class="btn" href={shareUrl} target="_blank" rel="noopener">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>
@@ -218,7 +212,7 @@ const voteNote =
                 <span class={`badge ${r.verdict}`}>{verdictLabel(r)}</span>
               </div>
               <h3>{entryTitle(r)}</h3>
-              <p>{CATEGORIES[r.category].emoji} {CATEGORIES[r.category].label}{r.priceMonthly !== null && ` · ${formatPrice(r.priceMonthly)}/mo`} · {(counts.get(keyOf(r)) ?? 0).toLocaleString('en-US')} {k.voted}</p>
+              <p>{CATEGORIES[r.category].emoji} {CATEGORIES[r.category].label}{r.priceMonthly !== null && ` · ${formatPrice(r.priceMonthly)}/mo`} · <span data-count-key={keyOf(r)}>0</span> {k.voted}</p>
             </a>
           ))}
         </div>

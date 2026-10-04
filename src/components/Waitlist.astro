@@ -2,13 +2,8 @@
 interface Props {
   source?: string;
 }
-const { source = Astro.url.pathname } = Astro.props;
-const status = Astro.url.searchParams.get('waitlist');
-const msg =
-  status === 'added' ? "You're on the list. We'll email you once, when it ships." :
-  status === 'exists' ? "You're already on the list. Nice." :
-  status === 'invalid' ? 'That email looks off. Try again?' :
-  status === 'limited' ? 'Too many tries. Give it a minute.' : '';
+const { source = 'home' } = Astro.props;
+// The ?waitlist=… status after a no-JS submit is shown by main.ts.
 ---
 <section id="waitlist" class="reveal">
   <div class="waitlist">
@@ -27,7 +22,7 @@ const msg =
         <input type="hidden" name="source" value={source} />
         <button class="btn btn-primary" type="submit"><span class="idle">Join</span><span class="ok">✓ In</span></button>
       </form>
-      <p class={`wl-msg ${status === 'added' || status === 'exists' ? 'ok' : status ? 'err' : ''}`} role="status" aria-live="polite">{msg}</p>
+      <p class="wl-msg" role="status" aria-live="polite"></p>
     </div>
   </div>
 </section>

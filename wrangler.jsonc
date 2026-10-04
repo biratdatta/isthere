@@ -1,0 +1,23 @@
+// Cloudflare Workers config. Astro's adapter fills in the entrypoint and static assets.
+// Docs: https://docs.astro.build/en/guides/integrations-guide/cloudflare/
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "isthere",
+  "compatibility_date": "2026-09-01",
+
+  // D1 database for votes, waitlist, rate limits, favicon cache and analytics.
+  // No database_id: Wrangler creates the database on the first deploy and links it.
+  // The tables are created automatically on first use (see src/lib/db.ts).
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "isthere",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Serve the site on your domain (Cloudflare creates the DNS record and certificate).
+  "routes": [{ "pattern": "isthere.biratdatta.tech", "custom_domain": true }],
+
+  "observability": { "enabled": true }
+}

@@ -239,8 +239,12 @@ if (list) {
   const empty = $('[data-empty]');
   const emptyQ = $('[data-empty-q]');
   const param = $('[data-chip-param]')?.dataset.chipParam ?? 'cat';
-  let cat = chips.find((c) => c.getAttribute('aria-pressed') === 'true')?.dataset.chip ?? '';
-  $('[data-cat-hidden]')?.remove();
+  // Pages are prerendered, so ?q= and ?cat= / ?kind= are applied here.
+  const params = new URLSearchParams(location.search);
+  input.value = (params.get('q') ?? '').slice(0, 80);
+  let cat = params.get(param) ?? '';
+  if (!chips.some((c) => c.dataset.chip === cat)) cat = '';
+  chips.forEach((c) => c.setAttribute('aria-pressed', String((c.dataset.chip ?? '') === cat)));
 
   const apply = () => {
     const q = input.value.trim().toLowerCase();
@@ -283,6 +287,97 @@ if (list) {
       apply();
     })
   );
+  if (input.value || cat) apply();
+}
+
+/* ---------- live numbers (pages are static; counts come from D1 via /api/counts) ---------- */
+interface Totals {
+  mrr: number;
+  mrr24h: number;
+  votes: number;
+  votes24h: number;
+}
+interface Snapshot {
+  counts: Record<string, number>;
+  totals: Record<string, Totals>;
+}
+
+function applyCounts(data: Snapshot) {
+  const count = (key: string) => data.counts[key] ?? 0;
+
+  // Entry vote buttons and any other odometer bound to an entry.
+  $$('[data-odo-key]').forEach((el) => setOdo(el, count(el.dataset.odoKey!)));
+  // Plain-number spots: list rows, related cards.
+  $$('[data-count-key]').forEach((el) => (el.textContent = fmt(count(el.dataset.countKey!))));
+  // Tape.
+  $$('[data-tape-key]').forEach((el) => {
+    const n = count(el.dataset.tapeKey!);
+    el.textContent = n ? `${el.dataset.arrow} ${fmt(n)}` : '— 0';
+    el.classList.toggle('flat', !n);
+  });
+
+  // Tickers.
+  $$('[data-ticker]').forEach((t) => {
+    const totals = data.totals[t.dataset.scope ?? 'all'];
+    if (!totals) return;
+    const odo = $('[data-odometer]', t);
+    if (odo) setOdo(odo, t.dataset.metric === 'users' ? totals.votes : totals.mrr);
+    const set = (k: string, v: number) => $$(`[data-total="${k}"]`, t).forEach((x) => (x.textContent = fmt(v)));
+    set('mrr24h', totals.mrr24h);
+    set('votes', totals.votes);
+    set('votes24h', totals.votes24h);
+    set('mrr12', totals.mrr * 12);
+  });
+
+  // Re-rank lists by votes (ties keep the prerendered order).
+  $$('[data-list]').forEach((ol) => {
+    const items = $$<HTMLLIElement>(':scope > li', ol);
+    items
+      .sort((a, b) => count(b.dataset.key!) - count(a.dataset.key!) || Number(a.dataset.order) - Number(b.dataset.order))
+      .forEach((li, i) => {
+        ol.appendChild(li);
+        const r = $('.rank', li);
+        if (r) r.textContent = String(i + 1).padStart(2, '0');
+      });
+  });
+}
+
+let liveTimer: number | undefined;
+async function loadCounts() {
+  try {
+    const res = await fetch('/api/counts', { headers: { accept: 'application/json' } });
+    if (res.ok) applyCounts(await res.json());
+  } catch {}
+}
+if ($('[data-odo-key], [data-count-key], [data-tape-key], [data-ticker]')) {
+  loadCounts();
+  // Keep the ticker ticking while the tab is visible.
+  liveTimer = window.setInterval(() => !document.hidden && loadCounts(), 30000);
+}
+
+/* ---------- status flags after no-JS form posts (?voted=…, ?waitlist=…) ---------- */
+{
+  const p = new URLSearchParams(location.search);
+  const voted = p.get('voted');
+  const note = $('[data-vote-note]');
+  if (voted && note) {
+    note.textContent =
+      voted === 'ok' ? 'Counted. Thanks!' : voted === 'already-voted' ? 'Already counted you today.' : 'Easy there. Try again later.';
+    note.classList.add('flash');
+  }
+  const wl = p.get('waitlist');
+  const msg = $('.wl-msg');
+  if (wl && msg) {
+    const map: Record<string, [string, boolean]> = {
+      added: ["You're on the list. We'll email you once, when it ships.", true],
+      exists: ["You're already on the list. Nice.", true],
+      invalid: ['That email looks off. Try again?', false],
+      limited: ['Too many tries. Give it a minute.', false],
+    };
+    const [text, ok] = map[wl] ?? ['', true];
+    msg.textContent = text;
+    msg.className = `wl-msg ${ok ? 'ok' : 'err'}`;
+  }
 }
 
 /* ---------- keyboard shortcuts ---------- */
@@ -407,6 +502,7 @@ $$<HTMLFormElement>('form[data-vote]').forEach((form) => {
       const res = await fetch(form.action, { method: 'POST', headers: { accept: 'application/json', 'x-requested-with': 'fetch' } });
       const data = await res.json();
       if (typeof data.count === 'number') setOdo(odo, data.count);
+      if (data.ok) loadCounts();
       if (data.ok) {
         btn.dataset.voted = 'true';
         store.set(`voted:${slug}`, String(Date.now()));

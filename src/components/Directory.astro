@@ -4,11 +4,9 @@ import Ticker from './Ticker.astro';
 import EntryList from './EntryList.astro';
 import SearchChips from './SearchChips.astro';
 import Waitlist from './Waitlist.astro';
-import { CATEGORIES, byKind, categoryCounts, type Entry } from '../lib/apps';
+import { byKind, categoryCounts } from '../lib/apps';
 import { KINDS, KIND_ORDER, type Kind } from '../lib/kinds';
-import { totals, voteCounts } from '../lib/db';
 import { breadcrumbs, entryPath, entryTitle, itemList } from '../lib/seo';
-import { keyOf } from '../lib/apps';
 
 interface Props {
   kind: Kind;
@@ -16,15 +14,9 @@ interface Props {
 const { kind } = Astro.props;
 const k = KINDS[kind];
 const entries = byKind(kind);
-const counts = voteCounts();
-const t = totals(entries, counts);
-const q = (Astro.url.searchParams.get('q') ?? '').trim().slice(0, 80);
-const catParam = Astro.url.searchParams.get('cat') ?? '';
-const cat = CATEGORIES[catParam] ? catParam : '';
 const byVerdict = { yes: 0, kinda: 0, no: 0 };
 for (const e of entries) byVerdict[e.verdict]++;
 
-const ranked: Entry[] = [...entries].sort((a, b) => (counts.get(keyOf(b)) ?? 0) - (counts.get(keyOf(a)) ?? 0));
 const site = Astro.site!;
 const title = `Is there ${k.article} ${k.word} for it? ${entries.length} SaaS apps, honest verdicts`;
 const description = `${k.lede} ${entries.length} apps checked: ${byVerdict.yes} ${k.verdicts.yes.label}, ${byVerdict.kinda} ${k.verdicts.kinda.label}, ${byVerdict.no} ${k.verdicts.no.label}.`;
@@ -39,7 +31,7 @@ const others = KIND_ORDER.filter((x) => x !== kind);
   tape={false}
   jsonld={[
     breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: k.plural, path: `/${kind}` }]),
-    itemList(site, `${k.listTitle}: ${k.plural}`, ranked.map((e) => ({ name: entryTitle(e), path: entryPath(e) }))),
+    itemList(site, `${k.listTitle}: ${k.plural}`, entries.map((e) => ({ name: entryTitle(e), path: entryPath(e) }))),
   ]}
 >
   <div class="wrap">
@@ -47,18 +39,18 @@ const others = KIND_ORDER.filter((x) => x !== kind);
       <span class="eyebrow">{k.emoji} {k.plural.toLowerCase()} directory</span>
       <h1>Is there {k.article} <span class="kind-word">{k.word}</span> for it<span class="q">?</span></h1>
       <p class="lede">{k.lede}</p>
-      <SearchChips action={`/${kind}`} q={q} filter={cat} param="cat" chips={categoryCounts(entries)} total={entries.length} placeholder={`search ${k.plural.toLowerCase()}: ${entries.slice(0, 2).map((e) => e.name.toLowerCase()).join(', ')}…`} />
+      <SearchChips action={`/${kind}`} param="cat" chips={categoryCounts(entries)} total={entries.length} placeholder={`search ${k.plural.toLowerCase()}: ${entries.slice(0, 2).map((e) => e.name.toLowerCase()).join(', ')}…`} />
       <div class="hero-stats">
         <span><b>{entries.length}</b> apps</span>
         <span><b class="green">{byVerdict.yes}</b> {k.verdicts.yes.label}</span>
         <span><b style="color:var(--amber)">{byVerdict.kinda}</b> {k.verdicts.kinda.label}</span>
         <span><b style="color:var(--red)">{byVerdict.no}</b> {k.verdicts.no.label}</span>
       </div>
-      <Ticker totals={t} counts={counts} entries={entries} metric={k.metric} />
+      <Ticker entries={entries} scope={kind} metric={k.metric} />
     </section>
 
     <section id="list" aria-labelledby="dl-title">
-      <EntryList entries={entries} counts={counts} q={q} filter={cat} filterBy="category">
+      <EntryList entries={entries} filterBy="category">
         <div slot="head">
           <span class="eyebrow">{k.listEyebrow}</span>
           <h2 id="dl-title">{k.listTitle}</h2>

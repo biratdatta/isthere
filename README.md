@@ -1,6 +1,6 @@
 # Is there a skill for it?
 
-Four directories at **isthere.biratdatta.com**, one question per paid SaaS app: is there a ___ for it?
+Four directories at **isthere.biratdatta.tech**, one question per paid SaaS app: is there a ___ for it?
 
 | Directory | Path | Question | Verdicts | Vote |
 | --- | --- | --- | --- | --- |
@@ -16,40 +16,53 @@ DESTROYED** ticker. The same app can appear in several directories, and entries 
 The original site was built from a single prompt, which lives in [`data/rebuild-prompt.md`](data/rebuild-prompt.md)
 and is served at `/rebuild`.
 
-### Domains
-
-- `isthere.biratdatta.com` is canonical (`SITE_URL`).
-- `isthereaskillforit`, `isthereanmcpforit` / `isthereamcpforit`, `isthereapluginforit` and
-  `isthereapromptforit` `.biratdatta.com` are short links: point them at the same server (a wildcard
-  `*.biratdatta.com` DNS record works) and the middleware 301s them to the matching directory.
-  `isthereanmcpforit.biratdatta.com/notion` → `/mcp/notion`.
-- Old `/notion`-style URLs 301 to `/prompts/notion`.
-
 ## Stack
 
-- Astro 7, `output: 'server'`, `@astrojs/node` (standalone)
-- better-sqlite3 for votes, waitlist, rate limits, favicon cache and first-party analytics
+- Astro 7 on **Cloudflare Workers** (`@astrojs/cloudflare`). Every page is prerendered to static HTML;
+  only the API routes (`/api/*`) run in the Worker.
+- **Cloudflare D1** (serverless SQLite) for votes, waitlist, rate limits, favicon cache and first-party analytics.
+  Pages fetch live numbers from `/api/counts` and roll the odometers on load.
 - Vanilla JS (`src/scripts/main.ts`), no client framework
 - JetBrains Mono + Space Grotesk, self-hosted via Fontsource (no Google Fonts requests)
 - OG images rendered at build time with satori + resvg (`scripts/og.mjs`)
 
-## Run it
+Everything fits Cloudflare's free plan: static assets are free and unlimited, and the Worker + D1 free
+allowances (100k requests/day, 5M D1 rows read/day, 100k written/day) are far above what this site needs.
+
+## Run it locally
 
 ```bash
 npm install
-npm run seed:demo   # optional: fake votes so the Death List isn't empty (local only)
+npm run seed:demo   # optional: fake votes in the LOCAL D1 database
 npm run dev         # http://localhost:4321
 ```
 
-Production:
+`npm run dev` uses a local D1 database stored in `.wrangler/`. Tables are created automatically on first use.
 
-```bash
-npm run build       # generates OG images, then builds
-SITE_URL=https://your.domain DB_PATH=/var/lib/skill/site.sqlite npm start
-```
+## Deploy to Cloudflare
 
-See `.env.example` for all settings. Set `TRUST_PROXY=1` behind a reverse proxy so rate limits see real client IPs.
-Keep `DB_PATH` on a persistent volume.
+One-time setup (the domain `biratdatta.tech` must already be active in your Cloudflare account):
+
+1. **Workers & Pages → Create → Import a repository**, pick `biratdatta/isthere`.
+   - Build command: `npm run build`
+   - Deploy command: `npx wrangler deploy`
+2. The first deploy creates the D1 database `isthere` and attaches `isthere.biratdatta.tech`
+   (both come from `wrangler.jsonc`). The tables are created on the first request.
+3. Every `git push` to `main` redeploys.
+
+If a deploy ever complains that the D1 database has no `database_id`, create it yourself with
+`npx wrangler d1 create isthere` and paste the printed id into `wrangler.jsonc`.
+
+Or from your machine: `npx wrangler login` once, then `npm run deploy`.
+
+### Domains
+
+- `isthere.biratdatta.tech` is canonical (`site` in `astro.config.mjs`, `SITE_HOST` in `src/lib/seo.ts`).
+- Short links, done with **Rules → Redirect Rules** in the Cloudflare dashboard (free plan allows 10):
+  for each of `isthereaskillforit`, `isthereanmcpforit`, `isthereamcpforit`, `isthereapluginforit`,
+  `isthereapromptforit` add a proxied DNS record (`AAAA` → `100::`) and a dynamic redirect, e.g.
+  `http.host eq "isthereanmcpforit.biratdatta.tech"` → `concat("https://isthere.biratdatta.tech/mcp", http.request.uri.path)` (301).
+- Old `/notion`-style URLs 301 to `/prompts/notion`.
 
 ## Adding an entry
 
@@ -93,19 +106,20 @@ Install snippets for Claude Code, Codex and Cursor are generated from these fiel
 
 | Feature | Where |
 | --- | --- |
-| Directory config (words, verdict labels, vote meaning, vanity hosts) | `src/lib/kinds.ts` |
+| Directory config (words, verdict labels, vote meaning, short-link hosts) | `src/lib/kinds.ts` |
 | Shared home, directory pages, entry pages | `src/pages/index.astro`, `src/components/Directory.astro`, `src/pages/[kind]/[slug].astro` |
-| Ranked lists, live search, chips | `src/components/EntryList.astro`, `SearchChips.astro`, `src/scripts/main.ts` (server-rendered; `?q=`, `?cat=`, `?kind=` work without JS) |
+| Ranked lists, live search, chips | `src/components/EntryList.astro`, `SearchChips.astro`, `src/scripts/main.ts` (prerendered; `?q=`, `?cat=`, `?kind=` are applied on load, lists re-rank by live votes) |
 | Tickers: Σ price × votes (or "I use this" for MCPs), odometer + tape | `src/components/Ticker.astro`, `Odometer.astro`, `Tape.astro` |
 | Per-agent installs and prompt prefixes | `src/lib/installs.ts`, `src/lib/agents.ts`, `src/components/InstallBlock.astro` |
-| Vanity subdomain redirects, legacy URL redirects | `src/middleware.ts`, `src/pages/[slug].astro` |
-| Votes: 1 per entry per IP per 24h, max 20/hour per IP | `src/lib/db.ts` → `castVote`, keyed `kind:slug` (IPs are salted + hashed, never stored raw; old databases are migrated automatically) |
+| Live numbers for static pages | `src/pages/api/counts.ts` → `snapshot()` in `src/lib/db.ts` |
+| Legacy URL redirects | `src/pages/[slug].astro` |
+| Votes: 1 per entry per IP per 24h, max 20/hour per IP | `src/lib/db.ts` → `castVote`, keyed `kind:slug` (IPs are salted + hashed, never stored raw) |
 | Waitlist: honeypot, dedupe (case-insensitive), 5/hour per IP | `src/pages/api/waitlist.ts` |
-| Favicons proxied server-side and cached in SQLite | `src/pages/api/favicon/[slug].ts` |
+| Favicons proxied server-side and cached in D1 | `src/pages/api/favicon/[slug].ts` |
 | JSON-LD: WebSite+SearchAction, Organization, ItemList, BreadcrumbList, FAQPage | `src/lib/seo.ts` |
 | sitemap.xml, robots.txt | `src/pages/sitemap.xml.ts`, `src/pages/robots.txt.ts` |
 
-All forms and the vote button work without JavaScript (POST + redirect). With JS they upgrade to fetch.
+Content, search engines and the forms work without JavaScript (forms POST + redirect). Live counts need JS.
 
 ## Privacy
 
@@ -114,7 +128,7 @@ Analytics is a single first-party beacon (`/api/hit`) that stores `(day, path, r
 when Do Not Track or Global Privacy Control is on. Query it with:
 
 ```bash
-sqlite3 data/db/site.sqlite "SELECT path, SUM(n) FROM hits GROUP BY path ORDER BY 2 DESC LIMIT 20;"
+npx wrangler d1 execute isthere --remote --command "SELECT path, SUM(n) FROM hits GROUP BY path ORDER BY 2 DESC LIMIT 20;"
 ```
 
 ## Motion

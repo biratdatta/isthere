@@ -12,7 +12,7 @@ export interface KindConfig {
   plural: string; // "Skills"
   emoji: string;
   short: string; // 3-letter tape suffix
-  /** Long-name subdomains that 301 to this directory, e.g. isthereaskillforit.biratdatta.com */
+  /** Long-name subdomains that 301 to this directory, e.g. isthereaskillforit.biratdatta.tech */
   vanity: string[];
   lede: string;
   /** "mrr": price × votes counts as MRR destroyed. "users": votes are just "I use this". */

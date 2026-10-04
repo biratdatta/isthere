@@ -9,7 +9,6 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Tape from '../components/Tape.astro';
 import { SITE_NAME, abs, graph, ldJson, organization, website } from '../lib/seo';
-import { voteCounts } from '../lib/db';
 import { ENTRIES, byKind } from '../lib/apps';
 import type { Kind } from '../lib/kinds';
 
@@ -29,7 +28,6 @@ const site = Astro.site!;
 const canonical = abs(site, path);
 const og = abs(site, ogImage);
 const ld = graph(website(site), organization(site), ...jsonld);
-const counts = tape ? voteCounts() : new Map<string, number>();
 const tapeEntries = kind ? byKind(kind) : ENTRIES;
 ---
 <!doctype html>
@@ -74,7 +72,7 @@ const tapeEntries = kind ? byKind(kind) : ENTRIES;
   <body>
     <a class="sr-only" href="#main">Skip to content</a>
     <Header kind={kind} />
-    {tape && <Tape entries={tapeEntries} counts={counts} showKind={!kind} />}
+    {tape && <Tape entries={tapeEntries} showKind={!kind} />}
     <main id="main">
       <slot />
     </main>

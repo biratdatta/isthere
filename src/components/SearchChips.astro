@@ -7,27 +7,24 @@ interface Chip {
 }
 interface Props {
   action: string;
-  q: string;
-  filter: string;
-  /** Query-string name for the chip filter: "cat" or "kind". */
+  /** Query-string name for the chip filter: "cat" or "kind". main.ts reads ?q= and this on load. */
   param: 'cat' | 'kind';
   chips: Chip[];
   total: number;
   placeholder: string;
 }
-const { action, q, filter, param, chips, total, placeholder } = Astro.props;
+const { action, param, chips, total, placeholder } = Astro.props;
 ---
 <form class="search" role="search" action={action} method="get" data-search-form>
   <span class="prompt" aria-hidden="true">$</span>
   <label for="q" class="sr-only">Search</label>
-  <input id="q" name="q" type="search" value={q} placeholder={placeholder} autocomplete="off" spellcheck="false" data-search />
-  {filter && <input type="hidden" name={param} value={filter} data-cat-hidden />}
+  <input id="q" name="q" type="search" placeholder={placeholder} autocomplete="off" spellcheck="false" data-search />
   <kbd aria-hidden="true">/</kbd>
 </form>
 <div class="chips" role="group" aria-label="Filter" data-chip-param={param}>
-  <a class="chip" href={`${action}#list`} data-chip="" aria-pressed={filter === '' ? 'true' : 'false'}>✨ All <span class="n">{total}</span></a>
+  <a class="chip" href={`${action}#list`} data-chip="" aria-pressed="true">✨ All <span class="n">{total}</span></a>
   {chips.map((c) => (
-    <a class="chip" href={`${action}?${param}=${c.key}#list`} data-chip={c.key} aria-pressed={filter === c.key ? 'true' : 'false'}>
+    <a class="chip" href={`${action}?${param}=${c.key}#list`} data-chip={c.key} aria-pressed="false">
       <span aria-hidden="true">{c.emoji}</span> {c.label} <span class="n">{c.count}</span>
     </a>
   ))}

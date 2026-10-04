@@ -2,7 +2,10 @@
 // Legacy URLs from before the four directories: /notion → /prompts/notion (301).
 import { getEntry } from '../lib/apps';
 
+export const prerender = false;
+
 const slug = Astro.params.slug ?? '';
 if (getEntry('prompts', slug)) return Astro.redirect(`/prompts/${slug}${Astro.url.search}`, 301);
-return Astro.rewrite('/404');
+// An empty 404 makes Astro serve the prerendered 404 page.
+return new Response(null, { status: 404 });
 ---

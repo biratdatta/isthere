@@ -1,6 +1,8 @@
 node_modules/
 dist/
 .astro/
+.wrangler/
+.dev.vars*
 .env
 data/db/
 public/og/

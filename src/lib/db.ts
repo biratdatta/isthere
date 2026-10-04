@@ -1,199 +1,196 @@
-import Database from 'better-sqlite3';
-import crypto from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
+/**
+ * Data layer on Cloudflare D1 (serverless SQLite). Only used by on-demand API routes;
+ * pages are prerendered and fetch live numbers from /api/counts.
+ * Schema lives in migrations/*.sql (apply with `wrangler d1 migrations apply`).
+ */
+import { env } from 'cloudflare:workers';
 import { ENTRIES, keyOf, type Entry } from './apps';
-import { KINDS } from './kinds';
+import { KINDS, KIND_ORDER } from './kinds';
+import schemaSql from '../../migrations/0001_init.sql?raw';
 
-const DB_PATH = process.env.DB_PATH || path.resolve('data/db/site.sqlite');
-
-const SCHEMA = `
-CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS votes (slug TEXT PRIMARY KEY, count INTEGER NOT NULL DEFAULT 0);
-CREATE TABLE IF NOT EXISTS vote_log (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  slug TEXT NOT NULL,
-  ip_hash TEXT NOT NULL,
-  ts INTEGER NOT NULL
-);
-CREATE INDEX IF NOT EXISTS vote_log_ip ON vote_log (ip_hash, slug, ts);
-CREATE INDEX IF NOT EXISTS vote_log_ts ON vote_log (ts);
-CREATE TABLE IF NOT EXISTS rate_events (key TEXT NOT NULL, ts INTEGER NOT NULL);
-CREATE INDEX IF NOT EXISTS rate_events_key ON rate_events (key, ts);
-CREATE TABLE IF NOT EXISTS waitlist (
-  email TEXT PRIMARY KEY,
-  source TEXT,
-  created_at INTEGER NOT NULL
-);
-CREATE TABLE IF NOT EXISTS hits (
-  day TEXT NOT NULL,
-  path TEXT NOT NULL,
-  ref TEXT NOT NULL DEFAULT '',
-  n INTEGER NOT NULL DEFAULT 0,
-  PRIMARY KEY (day, path, ref)
-);
-CREATE TABLE IF NOT EXISTS favicons (
-  domain TEXT PRIMARY KEY,
-  mime TEXT NOT NULL,
-  body BLOB NOT NULL,
-  fetched_at INTEGER NOT NULL
-);
-`;
-
-let _db: Database.Database | undefined;
-
-export function db(): Database.Database {
-  if (_db) return _db;
-  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-  _db = new Database(DB_PATH);
-  _db.pragma('journal_mode = WAL');
-  _db.pragma('busy_timeout = 3000');
-  _db.exec(SCHEMA);
-  migrate(_db);
-  return _db;
+// Minimal D1 typings so this file doesn't depend on generated worker types.
+interface D1Stmt {
+  bind(...values: unknown[]): D1Stmt;
+  first<T = Record<string, unknown>>(): Promise<T | null>;
+  all<T = Record<string, unknown>>(): Promise<{ results: T[] }>;
+  run(): Promise<{ meta: { changes: number } }>;
+}
+interface D1 {
+  prepare(sql: string): D1Stmt;
+  batch(stmts: D1Stmt[]): Promise<unknown[]>;
 }
 
-/** v2: votes are keyed "kind:slug" (four directories). Old keys were bare prompt slugs. */
-function migrate(d: Database.Database) {
-  const row = d.prepare("SELECT value FROM meta WHERE key = 'schema'").get() as { value: string } | undefined;
-  if (Number(row?.value ?? 1) >= 2) return;
-  d.transaction(() => {
-    d.prepare("UPDATE votes SET slug = 'prompts:' || slug WHERE instr(slug, ':') = 0").run();
-    d.prepare("UPDATE vote_log SET slug = 'prompts:' || slug WHERE instr(slug, ':') = 0").run();
-    d.prepare("INSERT INTO meta (key, value) VALUES ('schema', '2') ON CONFLICT(key) DO UPDATE SET value = '2'").run();
-  })();
-}
+const raw = (): D1 => (env as unknown as { DB: D1 }).DB;
 
+/**
+ * The schema is created on first use (CREATE TABLE IF NOT EXISTS), once per Worker
+ * instance, so a fresh D1 database works without a separate migration step.
+ * migrations/0001_init.sql is the same schema, for `wrangler d1 migrations apply`.
+ */
+let ready: Promise<void> | undefined;
+async function conn(): Promise<D1> {
+  const d = raw();
+  ready ??= d
+    .batch(
+      schemaSql
+        .replace(/--.*$/gm, '')
+        .split(';')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((s) => d.prepare(s))
+    )
+    .then(() => undefined)
+    .catch((err) => {
+      ready = undefined;
+      throw err;
+    });
+  await ready;
+  return d;
+}
 const now = () => Math.floor(Date.now() / 1000);
 
 /* ---------- salt + ip hashing (raw IPs are never stored) ---------- */
 
 let _salt: string | undefined;
-export function salt(): string {
+async function salt(): Promise<string> {
   if (_salt) return _salt;
-  const row = db().prepare('SELECT value FROM meta WHERE key = ?').get('ip_salt') as { value: string } | undefined;
-  if (row) return (_salt = row.value);
-  const fresh = crypto.randomBytes(32).toString('hex');
-  db().prepare('INSERT OR IGNORE INTO meta (key, value) VALUES (?, ?)').run('ip_salt', fresh);
-  return (_salt = (db().prepare('SELECT value FROM meta WHERE key = ?').get('ip_salt') as { value: string }).value);
+  const fresh = [...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  await (await conn()).prepare('INSERT OR IGNORE INTO meta (key, value) VALUES (?, ?)').bind('ip_salt', fresh).run();
+  const row = await (await conn()).prepare('SELECT value FROM meta WHERE key = ?').bind('ip_salt').first<{ value: string }>();
+  return (_salt = row!.value);
 }
 
-export function hashIp(ip: string): string {
-  return crypto.createHash('sha256').update(salt() + ip).digest('hex').slice(0, 32);
+export async function hashIp(ip: string): Promise<string> {
+  const data = new TextEncoder().encode((await salt()) + ip);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
 }
 
 /* ---------- generic rate limiting ---------- */
 
 /** Returns true if the action is allowed (and records it). */
-export function rateLimit(key: string, windowSec: number, max: number): boolean {
-  const d = db();
-  const since = now() - windowSec;
-  const { c } = d.prepare('SELECT COUNT(*) AS c FROM rate_events WHERE key = ? AND ts > ?').get(key, since) as { c: number };
-  if (c >= max) return false;
-  d.prepare('INSERT INTO rate_events (key, ts) VALUES (?, ?)').run(key, now());
-  if (Math.random() < 0.02) d.prepare('DELETE FROM rate_events WHERE ts < ?').run(now() - 86400 * 2);
+export async function rateLimit(key: string, windowSec: number, max: number): Promise<boolean> {
+  const row = await (await conn())
+    .prepare('SELECT COUNT(*) AS c FROM rate_events WHERE key = ? AND ts > ?')
+    .bind(key, now() - windowSec)
+    .first<{ c: number }>();
+  if ((row?.c ?? 0) >= max) return false;
+  const stmts = [(await conn()).prepare('INSERT INTO rate_events (key, ts) VALUES (?, ?)').bind(key, now())];
+  if (Math.random() < 0.02) stmts.push((await conn()).prepare('DELETE FROM rate_events WHERE ts < ?').bind(now() - 86400 * 2));
+  await (await conn()).batch(stmts);
   return true;
 }
 
 /* ---------- votes ---------- */
 
-export function voteCounts(): Map<string, number> {
-  const rows = db().prepare('SELECT slug, count FROM votes').all() as { slug: string; count: number }[];
-  return new Map(rows.map((r) => [r.slug, r.count]));
+export async function voteCounts(): Promise<Map<string, number>> {
+  const { results } = await (await conn()).prepare('SELECT slug, count FROM votes').all<{ slug: string; count: number }>();
+  return new Map(results.map((r) => [r.slug, r.count]));
 }
 
-export function voteCount(slug: string): number {
-  const row = db().prepare('SELECT count FROM votes WHERE slug = ?').get(slug) as { count: number } | undefined;
+async function voteCount(key: string): Promise<number> {
+  const row = await (await conn()).prepare('SELECT count FROM votes WHERE slug = ?').bind(key).first<{ count: number }>();
   return row?.count ?? 0;
 }
 
-export type VoteResult =
-  | { ok: true; count: number }
-  | { ok: false; reason: 'already-voted' | 'rate-limited'; count: number };
+export type VoteResult = { ok: true; count: number } | { ok: false; reason: 'already-voted' | 'rate-limited'; count: number };
 
-const VOTE_COOLDOWN = 86400; // one vote per app per IP per day
-const VOTE_BURST = { windowSec: 3600, max: 20 }; // per IP across all apps
+const VOTE_COOLDOWN = 86400; // one vote per entry per IP per day
+const VOTE_BURST = { windowSec: 3600, max: 20 }; // per IP across all entries
 
-export function castVote(slug: string, ipHash: string): VoteResult {
-  const d = db();
-  const tx = d.transaction((): VoteResult => {
-    const recent = d
-      .prepare('SELECT 1 FROM vote_log WHERE ip_hash = ? AND slug = ? AND ts > ? LIMIT 1')
-      .get(ipHash, slug, now() - VOTE_COOLDOWN);
-    if (recent) return { ok: false, reason: 'already-voted', count: voteCount(slug) };
-    if (!rateLimit(`vote:${ipHash}`, VOTE_BURST.windowSec, VOTE_BURST.max)) {
-      return { ok: false, reason: 'rate-limited', count: voteCount(slug) };
-    }
-    d.prepare('INSERT INTO vote_log (slug, ip_hash, ts) VALUES (?, ?, ?)').run(slug, ipHash, now());
-    d.prepare('INSERT INTO votes (slug, count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET count = count + 1').run(slug);
-    return { ok: true, count: voteCount(slug) };
-  });
-  return tx();
+/** key is "kind:slug". */
+export async function castVote(key: string, ipHash: string): Promise<VoteResult> {
+  const recent = await (await conn())
+    .prepare('SELECT 1 AS x FROM vote_log WHERE ip_hash = ? AND slug = ? AND ts > ? LIMIT 1')
+    .bind(ipHash, key, now() - VOTE_COOLDOWN)
+    .first();
+  if (recent) return { ok: false, reason: 'already-voted', count: await voteCount(key) };
+  if (!(await rateLimit(`vote:${ipHash}`, VOTE_BURST.windowSec, VOTE_BURST.max))) {
+    return { ok: false, reason: 'rate-limited', count: await voteCount(key) };
+  }
+  await (await conn()).batch([
+    (await conn()).prepare('INSERT INTO vote_log (slug, ip_hash, ts) VALUES (?, ?, ?)').bind(key, ipHash, now()),
+    (await conn()).prepare('INSERT INTO votes (slug, count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET count = count + 1').bind(key),
+  ]);
+  return { ok: true, count: await voteCount(key) };
 }
 
 export interface Totals {
   /** Σ price × votes over directories whose metric is "mrr". */
   mrr: number;
   mrr24h: number;
-  /** All votes in scope. */
   votes: number;
   votes24h: number;
 }
 
-/** Totals over a set of entries (one directory, or everything). Keys are "kind:slug". */
-export function totals(entries: Entry[] = ENTRIES, counts = voteCounts()): Totals {
-  const scope = new Map(entries.map((e) => [keyOf(e), e]));
-  const mrrPrice = (e: Entry | undefined) => (e && KINDS[e.kind].metric === 'mrr' ? e.priceMonthly ?? 0 : 0);
-  let mrr = 0;
-  let votes = 0;
-  for (const [key, n] of counts) {
-    const e = scope.get(key);
-    if (!e) continue;
-    mrr += mrrPrice(e) * n;
-    votes += n;
+const emptyTotals = (): Totals => ({ mrr: 0, mrr24h: 0, votes: 0, votes24h: 0 });
+
+/** Everything the prerendered pages need to show live numbers, in one round trip. */
+export async function snapshot() {
+  const [counts, recent] = await Promise.all([
+    voteCounts(),
+    (await conn())
+      .prepare('SELECT slug, COUNT(*) AS n FROM vote_log WHERE ts > ? GROUP BY slug')
+      .bind(now() - 86400)
+      .all<{ slug: string; n: number }>()
+      .then((r) => new Map(r.results.map((x) => [x.slug, x.n]))),
+  ]);
+  const totals: Record<string, Totals> = { all: emptyTotals() };
+  for (const k of KIND_ORDER) totals[k] = emptyTotals();
+  const add = (e: Entry, n: number, n24: number) => {
+    const price = KINDS[e.kind].metric === 'mrr' ? e.priceMonthly ?? 0 : 0;
+    for (const t of [totals.all, totals[e.kind]]) {
+      t.votes += n;
+      t.votes24h += n24;
+      t.mrr += price * n;
+      t.mrr24h += price * n24;
+    }
+  };
+  for (const e of ENTRIES) add(e, counts.get(keyOf(e)) ?? 0, recent.get(keyOf(e)) ?? 0);
+  for (const t of Object.values(totals)) {
+    t.mrr = Math.round(t.mrr);
+    t.mrr24h = Math.round(t.mrr24h);
   }
-  const recent = db()
-    .prepare('SELECT slug, COUNT(*) AS n FROM vote_log WHERE ts > ? GROUP BY slug')
-    .all(now() - 86400) as { slug: string; n: number }[];
-  let mrr24h = 0;
-  let votes24h = 0;
-  for (const r of recent) {
-    const e = scope.get(r.slug);
-    if (!e) continue;
-    mrr24h += mrrPrice(e) * r.n;
-    votes24h += r.n;
-  }
-  return { mrr: Math.round(mrr), votes, mrr24h: Math.round(mrr24h), votes24h };
+  return { counts: Object.fromEntries(counts), totals };
 }
 
 /* ---------- waitlist ---------- */
 
-export function joinWaitlist(email: string, source: string): 'added' | 'exists' {
-  const r = db()
+export async function joinWaitlist(email: string, source: string): Promise<'added' | 'exists'> {
+  const r = await (await conn())
     .prepare('INSERT OR IGNORE INTO waitlist (email, source, created_at) VALUES (?, ?, ?)')
-    .run(email, source.slice(0, 120), now());
-  return r.changes > 0 ? 'added' : 'exists';
+    .bind(email, source.slice(0, 120), now())
+    .run();
+  return r.meta.changes > 0 ? 'added' : 'exists';
 }
 
 /* ---------- first-party analytics (no cookies, no IPs) ---------- */
 
-export function recordHit(pathname: string, ref: string) {
+export async function recordHit(pathname: string, ref: string) {
   const day = new Date().toISOString().slice(0, 10);
-  db()
+  await (await conn())
     .prepare('INSERT INTO hits (day, path, ref, n) VALUES (?, ?, ?, 1) ON CONFLICT(day, path, ref) DO UPDATE SET n = n + 1')
-    .run(day, pathname.slice(0, 200), ref.slice(0, 120));
+    .bind(day, pathname.slice(0, 200), ref.slice(0, 120))
+    .run();
 }
 
 /* ---------- favicon cache ---------- */
 
-export function getFavicon(domain: string) {
-  return db().prepare('SELECT mime, body, fetched_at FROM favicons WHERE domain = ?').get(domain) as
-    | { mime: string; body: Buffer; fetched_at: number }
-    | undefined;
+export async function getFavicon(domain: string) {
+  const row = await (await conn())
+    .prepare('SELECT mime, body, fetched_at FROM favicons WHERE domain = ?')
+    .bind(domain)
+    .first<{ mime: string; body: ArrayBuffer | number[]; fetched_at: number }>();
+  if (!row) return undefined;
+  const body = row.body instanceof ArrayBuffer ? new Uint8Array(row.body) : new Uint8Array(row.body ?? []);
+  return { mime: row.mime, body, fetched_at: row.fetched_at };
 }
 
-export function putFavicon(domain: string, mime: string, body: Buffer) {
-  db()
-    .prepare('INSERT INTO favicons (domain, mime, body, fetched_at) VALUES (?, ?, ?, ?) ON CONFLICT(domain) DO UPDATE SET mime = excluded.mime, body = excluded.body, fetched_at = excluded.fetched_at')
-    .run(domain, mime, body, now());
+export async function putFavicon(domain: string, mime: string, body: Uint8Array) {
+  await (await conn())
+    .prepare(
+      'INSERT INTO favicons (domain, mime, body, fetched_at) VALUES (?, ?, ?, ?) ON CONFLICT(domain) DO UPDATE SET mime = excluded.mime, body = excluded.body, fetched_at = excluded.fetched_at'
+    )
+    .bind(domain, mime, body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength), now())
+    .run();
 }

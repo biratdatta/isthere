@@ -3,7 +3,9 @@ import { KINDS, KIND_ORDER } from './kinds';
 
 export const SITE_NAME = 'Is there a skill for it?';
 export const SITE_TAGLINE = 'Is there a skill, an MCP, a plugin or a prompt that replaces the SaaS you pay for?';
-export const REPO_URL = process.env.REPO_URL || 'https://github.com/biratdatta/isthere';
+export const REPO_URL = 'https://github.com/biratdatta/isthere';
+/** Canonical host; must match `site` in astro.config.mjs. */
+export const SITE_HOST = 'isthere.biratdatta.tech';
 
 export const abs = (site: URL, p: string) => new URL(p, site).toString();
 export const entryPath = (e: Pick<Entry, 'kind' | 'slug'>) => `/${e.kind}/${e.slug}`;

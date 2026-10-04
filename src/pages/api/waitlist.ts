@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { hashIp, joinWaitlist, rateLimit } from '../../lib/db';
 import { clientIp, json, wantsJson } from '../../lib/request';
 
+export const prerender = false;
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export const POST: APIRoute = async (ctx) => {
@@ -26,7 +28,7 @@ export const POST: APIRoute = async (ctx) => {
   const email = String(form.get('email') ?? '').trim().toLowerCase();
   if (email.length > 254 || !EMAIL_RE.test(email)) return respond('invalid', 400);
 
-  if (!rateLimit(`waitlist:${hashIp(clientIp(ctx))}`, 3600, 5)) return respond('limited', 429);
+  if (!(await rateLimit(`waitlist:${await hashIp(clientIp(ctx))}`, 3600, 5))) return respond('limited', 429);
 
-  return respond(joinWaitlist(email, source));
+  return respond(await joinWaitlist(email, source));
 };
