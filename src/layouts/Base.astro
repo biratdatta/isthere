@@ -13,7 +13,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Rail from '../components/Rail.astro';
-import { SITE_NAME, abs, graph, ldJson, organization, website } from '../lib/seo';
+import { OG_VERSION, SITE_NAME, abs, graph, ldJson, organization, website } from '../lib/seo';
 import type { Kind } from '../lib/kinds';
 
 interface Props {
@@ -31,7 +31,7 @@ interface Props {
 const { title, description, path, ogImage = '/og/index.png', jsonld = [], kind, current, home = false, noindex = false } = Astro.props;
 const site = Astro.site!;
 const canonical = abs(site, path);
-const og = abs(site, ogImage);
+const og = `${abs(site, ogImage)}?v=${OG_VERSION}`;
 const ld = graph(website(site), organization(site), ...jsonld);
 ---
 <!doctype html>

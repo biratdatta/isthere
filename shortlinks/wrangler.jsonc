@@ -1,0 +1,16 @@
+// A tiny redirect-only Worker for the short-link subdomains.
+// Deploying it creates the DNS records and HTTPS certificates for each custom domain automatically.
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "isthere-shortlinks",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "isthereaskillforit.biratdatta.tech", "custom_domain": true },
+    { "pattern": "isthereanmcpforit.biratdatta.tech", "custom_domain": true },
+    { "pattern": "isthereamcpforit.biratdatta.tech", "custom_domain": true },
+    { "pattern": "isthereapluginforit.biratdatta.tech", "custom_domain": true },
+    { "pattern": "isthereapromptforit.biratdatta.tech", "custom_domain": true }
+  ]
+}

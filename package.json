@@ -18,7 +18,8 @@
     "db:migrate:local": "wrangler d1 migrations apply isthere --local",
     "db:migrate:remote": "wrangler d1 migrations apply isthere --remote",
     "check-data": "node scripts/check-data.mjs",
-    "seed:demo": "node scripts/seed-demo.mjs"
+    "seed:demo": "node scripts/seed-demo.mjs",
+    "deploy:shortlinks": "wrangler deploy --config shortlinks/wrangler.jsonc"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.3.3",

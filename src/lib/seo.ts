@@ -9,6 +9,10 @@ export const SITE_HOST = 'isthere.biratdatta.tech';
 
 export const abs = (site: URL, p: string) => new URL(p, site).toString();
 export const entryPath = (e: Pick<Entry, 'kind' | 'slug'>) => `/${e.kind}/${e.slug}`;
+/** Short share link, e.g. https://isthereanmcpforit.biratdatta.tech/github (see shortlinks/). */
+export const shortUrl = (e: Pick<Entry, 'kind' | 'slug'>) => `https://${KINDS[e.kind].vanity[0]}.biratdatta.tech/${e.slug}`;
+/** Changes on every build so X/LinkedIn re-fetch the social card instead of showing a cached one. */
+export const OG_VERSION = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
 
 export function organization(site: URL) {
   return {

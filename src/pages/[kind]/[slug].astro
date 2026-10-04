@@ -7,7 +7,7 @@ import InstallBlock from '../../components/InstallBlock.astro';
 import { CATEGORIES, ENTRIES, formatPrice, keyOf, relatedEntries, siblings, verdictLabel, type Entry } from '../../lib/apps';
 import { KINDS } from '../../lib/kinds';
 import { mcpInstalls, pluginInstalls, skillInstalls } from '../../lib/installs';
-import { abs, breadcrumbs, entryDescription, entryPath, entryTitle, faqFor, faqPage } from '../../lib/seo';
+import { breadcrumbs, entryDescription, entryPath, entryTitle, faqFor, faqPage, shortUrl } from '../../lib/seo';
 
 export function getStaticPaths() {
   return ENTRIES.map((e) => ({ params: { kind: e.kind, slug: e.slug }, props: { e } }));
@@ -22,8 +22,8 @@ const key = keyOf(e);
 const related = relatedEntries(e);
 const also = siblings(e);
 const faq = faqFor(e);
-const canonical = abs(site, entryPath(e));
-const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(`${entryTitle(e)} Verdict: ${v.label}.`)}&url=${encodeURIComponent(canonical)}`;
+const short = shortUrl(e);
+const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(`${entryTitle(e)} Verdict: ${v.label}.`)}&url=${encodeURIComponent(short)}`;
 const crumbs = [
   { name: 'Home', path: '/' },
   { name: k.plural, path: `/${e.kind}` },
@@ -177,7 +177,7 @@ const price = e.priceMonthly;
         <p class="vote-note" role="status" aria-live="polite" data-vote-note>One vote per person per day. No account needed.</p>
         <div class="two">
           <a class="btn" href={shareUrl} target="_blank" rel="noopener"><Icon name="share" size={15} />Share on X</a>
-          <button class="btn" type="button" data-copy-text={canonical}><Icon name="link" size={15} /><span class="idle">Copy link</span><span class="ok">Copied</span></button>
+          <button class="btn" type="button" data-copy-text={short}><Icon name="link" size={15} /><span class="idle">Copy link</span><span class="ok">Copied</span></button>
         </div>
       </div>
       {related.length > 0 && (
