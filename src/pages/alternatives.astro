@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import SuggestAlt from '../components/SuggestAlt.astro';
 import { CATEGORIES, apps, formatPrice, freeAlternatives } from '../lib/apps';
 import { breadcrumbs } from '../lib/seo';
 
@@ -16,6 +17,9 @@ const total = rows.reduce((n, r) => n + r.alts.length, 0);
   <section class="page-title">
     <h1>Don’t want to build it? <span class="hl">Use the free one.</span></h1>
     <p class="muted" style="font-size:18px;max-width:640px">{total} open-source alternatives to {rows.length} paid apps. All $0 to self-host. No votes, no pay-to-list.</p>
+  </section>
+  <section class="card pad">
+    <SuggestAlt apps={apps().map((a) => a.name)} open />
   </section>
   <section class="stack" style="gap:14px">
     {rows.map((r) => (

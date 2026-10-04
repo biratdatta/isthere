@@ -1,0 +1,28 @@
+---
+/** "Suggest a free alternative" form. Pass `app` to lock it to one app, or `apps` to show a picker. */
+import Icon from './Icon.astro';
+interface Props { app?: string; apps?: string[]; open?: boolean }
+const { app, apps = [], open = false } = Astro.props;
+---
+<details class="suggest-alt" open={open} id="suggest">
+  <summary><Icon name="plus" size={15} />Suggest a free alternative{app && ` to ${app}`}</summary>
+  <form class="form" method="post" action="/api/alternatives" data-ajax-form="alternative" style="gap:12px;margin-top:12px">
+    {app ? (
+      <input type="hidden" name="app" value={app} />
+    ) : (
+      <label class="field">Paid app it replaces<input name="app" list="alt-apps" required maxlength="80" placeholder="e.g. Notion" /><datalist id="alt-apps">{apps.map((a) => <option value={a} />)}</datalist></label>
+    )}
+    <div class="grid-auto" style="--min:200px">
+      <label class="field">Name<input name="name" required maxlength="80" placeholder="e.g. AppFlowy" /></label>
+      <label class="field">Link<input name="url" type="url" required maxlength="300" placeholder="https://github.com/…" /></label>
+    </div>
+    <label class="field">What is it?<span class="hint">Optional, one line</span><input name="description" maxlength="200" placeholder="Open-source, self-hosted Notion with offline mode" /></label>
+    <label class="field">Your GitHub handle<span class="hint">Optional, for credit</span><input name="github" maxlength="40" placeholder="octocat" /></label>
+    <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+    <div class="form-foot">
+      <span class="muted" style="font-size:13px">Free or open source only. A person checks it before it’s listed.</span>
+      <button type="submit" class="btn btn-primary btn-sm"><span class="idle">Send suggestion</span><span class="ok">Sent</span></button>
+    </div>
+    <p class="form-msg" role="status" aria-live="polite" data-form-msg></p>
+  </form>
+</details>

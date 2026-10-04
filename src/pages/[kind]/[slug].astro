@@ -4,6 +4,7 @@ import Icon from '../../components/Icon.astro';
 import Odometer from '../../components/Odometer.astro';
 import PromptBlock from '../../components/PromptBlock.astro';
 import InstallBlock from '../../components/InstallBlock.astro';
+import SuggestAlt from '../../components/SuggestAlt.astro';
 import { CATEGORIES, ENTRIES, addedOn, contributorOf, formatPrice, freeAlternatives, keyOf, lastPriceChange, relatedEntries, siblings, verdictLabel, type Entry } from '../../lib/apps';
 import { KINDS } from '../../lib/kinds';
 import { mcpInstalls, pluginInstalls, skillInstalls } from '../../lib/installs';
@@ -184,20 +185,23 @@ const price = e.priceMonthly;
         <p class="credit">Added by <a href={who.url ?? '/contributors'} rel="noopener">@{who.name}</a> · <a href="/contributors">contributors</a></p>
       </div>
 
-      {alts.length > 0 && (
-        <div class="card pad stack" id="alternatives">
-          <span style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
-            <h2 class="section-title">Free alternatives</h2>
-            <span class="muted" style="font-size:13px">Open source, $0 to self-host</span>
-          </span>
+      <div class="card pad stack" id="alternatives">
+        <span style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
+          <h2 class="section-title">Free alternatives</h2>
+          <span class="muted" style="font-size:13px">Open source, $0 to self-host</span>
+        </span>
+        {alts.length > 0 ? (
           <ul class="prior alts">
             {alts.map((p) => (
               <li><a href={p.url} rel="noopener"><span>{p.name}<small>{p.desc ?? p.url.replace(/^https?:\/\//, '')}</small></span><span class="free">$0 · FREE</span><Icon name="external" size={16} /></a></li>
             ))}
           </ul>
-          <a class="more-link" href={`/alternatives#${e.slug}`}>All free alternatives to {e.name} <Icon name="arrow" size={14} /></a>
-        </div>
-      )}
+        ) : (
+          <p class="muted" style="margin:0">None listed yet. Know a free one?</p>
+        )}
+        {alts.length > 0 && <a class="more-link" href={`/alternatives#${e.slug}`}>All free alternatives to {e.name} <Icon name="arrow" size={14} /></a>}
+        <SuggestAlt app={e.name} />
+      </div>
 
       <a class={`card compare-cta`} href={`/compare/${e.slug}`}>
         <span><span class="eyebrow">Compare</span><strong>Every answer for {e.name}, side by side</strong></span>

@@ -18,3 +18,16 @@ CREATE TABLE IF NOT EXISTS app_requests (
 CREATE INDEX IF NOT EXISTS app_requests_votes ON app_requests (status, votes);
 CREATE TABLE IF NOT EXISTS request_log (request_id INTEGER NOT NULL, ip_hash TEXT NOT NULL, ts INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS request_log_ip ON request_log (ip_hash, request_id);
+
+-- Free / open-source alternatives suggested by visitors (reviewed by hand before they're added to data/).
+CREATE TABLE IF NOT EXISTS alt_suggestions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  app TEXT NOT NULL,
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  description TEXT,
+  github TEXT,
+  status TEXT NOT NULL DEFAULT 'new',
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS alt_suggestions_status ON alt_suggestions (status, created_at);

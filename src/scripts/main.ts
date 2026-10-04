@@ -517,6 +517,7 @@ $$<HTMLFormElement>('form[data-vote]').forEach((form) => {
 /* ---------- Submit + Advertise forms (fetch, with a no-JS POST fallback) ---------- */
 const FORM_OK: Record<string, string> = {
   newsletter: 'You’re in. First email lands on Thursday.',
+  alternative: 'Thanks! We’ll check it and add it to the list.',
   submit: 'Thanks! It’s in the review queue. If you left an email, we’ll tell you when it’s live.',
   advertise: 'Request received. We’ll email you to confirm the slot and send payment details.',
 };
@@ -540,7 +541,7 @@ $$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
         say(FORM_OK[kind], true);
         confirmBtn(btn, 3000);
         form.reset();
-        toast(kind === 'submit' ? 'Submitted for review' : kind === 'newsletter' ? 'Subscribed' : 'Request sent');
+        toast(kind === 'submit' ? 'Submitted for review' : kind === 'newsletter' ? 'Subscribed' : kind === 'alternative' ? 'Suggestion sent' : 'Request sent');
       } else {
         say(data.error || 'Something went wrong. Try again?', false);
       }

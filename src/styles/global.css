@@ -755,3 +755,6 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .newsletter .ico-badge { --k: var(--ink-accent); background: transparent; }
 .prior.alts { grid-template-columns: minmax(0, 1fr); }
 .share-preview span { overflow-wrap: anywhere; }
+.suggest-alt summary { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; list-style: none; font-size: 14px; font-weight: 600; color: var(--primary); }
+.suggest-alt summary::-webkit-details-marker { display: none; }
+.suggest-alt[open] summary { color: var(--text); }

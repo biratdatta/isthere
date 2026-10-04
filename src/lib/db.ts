@@ -343,3 +343,12 @@ export async function addAdRequest(x: AdRequest) {
     .bind(x.slot, x.week, x.company, x.url, x.email, x.notes || null, now())
     .run();
 }
+
+/* ---------- suggested free alternatives (reviewed by hand) ---------- */
+
+export async function addAltSuggestion(x: { app: string; name: string; url: string; description: string; github: string }) {
+  await (await conn())
+    .prepare('INSERT INTO alt_suggestions (app, name, url, description, github, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    .bind(x.app, x.name, x.url, x.description || null, x.github || null, now())
+    .run();
+}

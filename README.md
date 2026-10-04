@@ -245,6 +245,12 @@ Open them in the Cloudflare dashboard under **Storage & databases → D1 → ist
 npx wrangler d1 execute isthere --remote --command "SELECT * FROM submissions WHERE status = 'new' ORDER BY created_at DESC"
 ```
 
+Suggested free alternatives land in `alt_suggestions`, newsletter signups in `waitlist`:
+
+```bash
+npx wrangler d1 execute isthere --remote --command "SELECT app, name, url, description, github FROM alt_suggestions WHERE status = 'new'"
+```
+
 </details>
 
 ---
