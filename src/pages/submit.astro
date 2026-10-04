@@ -13,7 +13,7 @@ const verdicts = [
 ---
 <Base
   title="Is there a skill for it? Submit yours"
-  description="Found a skill, MCP server, plugin or prompt that replaces a paid app? Submit it to isthere. Every submission is reviewed before it goes live."
+  description="Found a skill, MCP server, plugin, prompt or agent that replaces a paid app? Submit it to isthere. Every submission is reviewed before it goes live."
   path="/submit"
   current="submit"
   jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Submit', path: '/submit' }])]}
@@ -21,14 +21,14 @@ const verdicts = [
   <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Submit</li></ol></nav>
   <section class="page-title">
     <h1>Add your own <span class="hl">is-there</span>.</h1>
-    <p class="muted" style="font-size:18px;line-height:1.55">Found a skill, MCP server, plugin or prompt that replaces a paid app? Send it in. Every submission is checked by a person before it goes live.</p>
+    <p class="muted" style="font-size:18px;line-height:1.55">Found a skill, MCP server, plugin, prompt or agent that replaces a paid app? Send it in. Every submission is checked by a person before it goes live.</p>
   </section>
 
   <section class="split">
     <form class="card pad form" method="post" action="/api/submit" data-ajax-form="submit">
       <fieldset>
         <legend><span class="step">1</span>Which directory?</legend>
-        <div class="grid-auto" style="--min:150px;gap:10px">
+        <div class="dir-choices-wrap"><div class="dir-choices">
           {KIND_ORDER.map((k, i) => (
             <label class={`tile choice k-${k}`}>
               <span class="top"><Icon name={k} size={24} /><input type="radio" name="directory" value={k} required checked={i === 0} data-dir-radio /></span>
@@ -36,7 +36,7 @@ const verdicts = [
               <span class="d">{KINDS[k].tagline}</span>
             </label>
           ))}
-        </div>
+        </div></div>
       </fieldset>
 
       <fieldset>

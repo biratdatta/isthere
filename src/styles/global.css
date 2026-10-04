@@ -553,3 +553,14 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .agent-meta .muted { font-size: 14px; }
 .agent-cta { display: flex; gap: 8px; flex-wrap: wrap; }
 .agent-ico { color: var(--k); }
+
+/* submit: directory picker. 3 on top, 2 below, all the same height; 2 columns when narrow. */
+.dir-choices-wrap { container-type: inline-size; }
+.dir-choices { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.dir-choices > .choice { grid-column: span 2; justify-content: flex-start; height: 100%; }
+.dir-choices > .choice:nth-last-child(-n + 2) { grid-column: span 3; }
+@container (max-width: 560px) {
+  .dir-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dir-choices > .choice, .dir-choices > .choice:nth-last-child(-n + 2) { grid-column: span 1; }
+  .dir-choices > .choice:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
