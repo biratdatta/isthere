@@ -5,7 +5,7 @@ import { clientIp, json, wantsJson } from '../../lib/request';
 
 export const prerender = false;
 
-const SLOTS = ['left', 'right', 'takeover'];
+const SLOTS = ['left', 'right', 'takeover', 'footer'];
 
 export const POST: APIRoute = async (ctx) => {
   const asJson = wantsJson(ctx.request);
