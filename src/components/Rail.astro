@@ -1,5 +1,5 @@
 ---
-/** A margin rail split into a 2 × 2 grid of ad tiles (76 × 290 each). Hidden below 1320px. */
+/** A margin rail with two stacked ad tiles (160 × 290 each): 4 tiles per page, 2 per side. Hidden below 1320px. */
 interface Props {
   side: 'left' | 'right';
 }
@@ -10,11 +10,11 @@ const prefix = side === 'left' ? 'L' : 'R';
   <div class="rail-box">
     <span class="rail-head"><span>AD</span><span>{side.toUpperCase()}</span></span>
     <div class="rail-grid">
-      {[1, 2, 3, 4].map((n) => (
+      {[1, 2].map((n) => (
         <a href="/advertise?slot=tile" class="rail-tile" aria-label={`Ad tile ${prefix}${n}: advertise here`}>
           <span class="id">{prefix}{n}</span>
-          <span class="art">76<br />×<br />290</span>
-          <span class="p">Your ad</span>
+          <span class="art">160 × 290<br />your creative</span>
+          <span class="p">Advertise here</span>
         </a>
       ))}
     </div>

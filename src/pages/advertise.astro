@@ -5,9 +5,9 @@ import { breadcrumbs } from '../lib/seo';
 
 const site = Astro.site!;
 const slots = [
-  { id: 'tile', name: 'Rail tile', kind: 'skills', size: '76 × 290', where: 'One of 8 tiles beside every page, 4 per side', l: [0], r: [], b: false },
-  { id: 'side', name: 'Full side', kind: 'mcp', size: '4 tiles · 160 × 600', where: 'All 4 tiles on one side of every page', l: [], r: [0, 1, 2, 3], b: false },
-  { id: 'takeover', name: 'Directory takeover', kind: 'plugins', size: '8 tiles', where: 'Every tile on both sides of one directory and its entries', l: [0, 1, 2, 3], r: [0, 1, 2, 3], b: false },
+  { id: 'tile', name: 'Rail tile', kind: 'skills', size: '160 × 290', where: 'One of 4 tiles beside every page, 2 per side', l: [0], r: [], b: false },
+  { id: 'side', name: 'Full side', kind: 'mcp', size: '2 tiles · 160 × 600', where: 'Both tiles on one side of every page', l: [], r: [0, 1], b: false },
+  { id: 'takeover', name: 'Directory takeover', kind: 'plugins', size: 'All 4 tiles', where: 'Every tile on both sides of one directory and its entries', l: [0, 1], r: [0, 1], b: false },
   { id: 'footer', name: 'Footer banner', kind: 'prompts', size: '728 × 90', where: 'Wide banner above the footer on every page', l: [], r: [], b: true },
 ];
 ---
@@ -31,9 +31,9 @@ const slots = [
     {slots.map((s) => (
       <div class={`tile slot k-${s.kind}`}>
         <div class="sketch" aria-hidden="true">
-          <span class="r">{[0, 1, 2, 3].map((j) => <i class={s.l.includes(j) ? 'on' : ''}></i>)}</span>
+          <span class="r">{[0, 1].map((j) => <i class={s.l.includes(j) ? 'on' : ''}></i>)}</span>
           <span class="c"><i style="height:14px;border-radius:999px"></i><i style="height:30px;width:70%"></i><span class="g"><i></i><i></i><i></i><i></i></span><i class={`fb${s.b ? ' on' : ''}`}></i></span>
-          <span class="r">{[0, 1, 2, 3].map((j) => <i class={s.r.includes(j) ? 'on' : ''}></i>)}</span>
+          <span class="r">{[0, 1].map((j) => <i class={s.r.includes(j) ? 'on' : ''}></i>)}</span>
         </div>
         <span style="display:flex;flex-direction:column;gap:6px"><strong>{s.name}</strong><span class="muted" style="font-size:14px;line-height:1.5">{s.where}</span></span>
         <span class="foot"><span>{s.size}</span><b>[YOUR PRICE] / week</b></span>
@@ -57,7 +57,7 @@ const slots = [
         <label class="field" for="a-url">Click-through link<input id="a-url" name="url" type="url" required maxlength="300" placeholder="https://acme.dev" /></label>
       </div>
       <label class="field" for="a-email">Email<span class="hint">Booking confirmation and invoice go here</span><input id="a-email" name="email" type="email" required maxlength="254" placeholder="you@acme.dev" /></label>
-      <label class="field" for="a-notes">Anything else?<span class="hint">Optional. You’ll send the image (76×290 per tile, 728×90 for the footer) once we confirm the slot. Tell us if you want a particular tile, like L1.</span><textarea id="a-notes" name="notes" rows="3" maxlength="1000"></textarea></label>
+      <label class="field" for="a-notes">Anything else?<span class="hint">Optional. You’ll send the image (160×290 per tile, 728×90 for the footer) once we confirm the slot. Tell us if you want a particular tile, like L1.</span><textarea id="a-notes" name="notes" rows="3" maxlength="1000"></textarea></label>
       <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
       <div class="form-foot">
         <span class="muted" style="font-size:13px">We confirm availability before you pay.</span>
