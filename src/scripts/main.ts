@@ -33,13 +33,59 @@ function confirmBtn(btn: HTMLElement, ms = 1800) {
 }
 
 /* ---------- theme ---------- */
+const systemDark = matchMedia('(prefers-color-scheme: dark)');
+const effectiveTheme = () => (document.documentElement.dataset.theme as 'light' | 'dark' | undefined) ?? (systemDark.matches ? 'dark' : 'light');
 function setTheme(t: 'light' | 'dark') {
   document.documentElement.dataset.theme = t;
   store.set('theme', t);
-  $('meta[name="theme-color"]')?.setAttribute('content', t === 'light' ? '#f3efe3' : '#050705');
+  $$('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', t === 'light' ? '#f4f5f8' : '#14171d'));
 }
-$$('[data-theme-toggle]').forEach((b) =>
-  b.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'))
+const toggleTheme = () => setTheme(effectiveTheme() === 'light' ? 'dark' : 'light');
+$$('[data-theme-toggle]').forEach((b) => b.addEventListener('click', toggleTheme));
+
+/* ---------- directories mega menu ---------- */
+const mega = $('[data-mega]');
+const megaToggles = $$('[data-mega-toggle]');
+const setMega = (open: boolean) => {
+  mega?.classList.toggle('open', open);
+  megaToggles.forEach((b) => b.setAttribute('aria-expanded', String(open)));
+};
+megaToggles.forEach((b) =>
+  b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setMega(!mega?.classList.contains('open'));
+  })
+);
+document.addEventListener('click', (e) => {
+  if (mega?.classList.contains('open') && !mega.contains(e.target as Node)) setMega(false);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mega?.classList.contains('open')) {
+    setMega(false);
+    megaToggles[0]?.focus();
+  }
+});
+// Desktop: open on hover too, with a short grace period.
+let megaTimer: number | undefined;
+const desktopToggle = $('.nav-links [data-mega-toggle]');
+if (mega && desktopToggle && matchMedia('(hover: hover)').matches) {
+  const openSoon = () => { clearTimeout(megaTimer); setMega(true); };
+  const closeSoon = () => { clearTimeout(megaTimer); megaTimer = window.setTimeout(() => setMega(false), 220); };
+  desktopToggle.addEventListener('mouseenter', openSoon);
+  desktopToggle.addEventListener('mouseleave', closeSoon);
+  mega.addEventListener('mouseenter', openSoon);
+  mega.addEventListener('mouseleave', closeSoon);
+}
+
+/* ---------- search icon: focus the page search if there is one ---------- */
+$$('[data-search-jump]').forEach((a) =>
+  a.addEventListener('click', (e) => {
+    const s = $<HTMLInputElement>('[data-search]');
+    if (!s) return;
+    e.preventDefault();
+    s.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+    s.focus({ preventScroll: true });
+  })
 );
 
 /* ---------- odometer ---------- */
@@ -101,79 +147,15 @@ if (!('IntersectionObserver' in window) || reduced) {
   odometers.forEach((el) => io.observe(el));
 }
 
-/* ---------- logo typewriter: "> is there a skill for it?" ---------- */
 const article = (w: string) => (/^(MCP|[aeiou])/i.test(w) ? 'an' : 'a');
-const logoWord = $('[data-logo-word]');
-const logo = (() => {
-  if (!logoWord || reduced) return null;
-  const words = logoWord.dataset.logoWord!.split(',');
-  const art = $('[data-logo-article]');
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-  let busy = false;
-  let queued: string | null = null;
-
-  async function typeTo(target: string) {
-    if (busy) {
-      queued = target;
-      return;
-    }
-    busy = true;
-    logoWord!.classList.add('typing');
-    let text = logoWord!.textContent ?? '';
-    while (text.length) {
-      text = text.slice(0, -1);
-      logoWord!.textContent = text;
-      await sleep(45);
-    }
-    if (art) art.textContent = article(target);
-    for (const ch of target) {
-      text += ch;
-      logoWord!.textContent = text;
-      await sleep(85);
-    }
-    logoWord!.classList.remove('typing');
-    busy = false;
-    if (queued && queued !== target) {
-      const q = queued;
-      queued = null;
-      typeTo(q);
-    } else queued = null;
-  }
-
-  /** Runs `laps` full cycles on its own, ending back on the first word. */
-  async function cycle(laps: number) {
-    for (let l = 0; l < laps; l++) {
-      for (let i = 1; i <= words.length; i++) {
-        await sleep(2200);
-        if (document.hidden) continue;
-        await typeTo(words[i % words.length]);
-      }
-    }
-  }
-
-  let running = false;
-  const run = async (laps: number) => {
-    if (running) return;
-    running = true;
-    await cycle(laps);
-    running = false;
-  };
-  // Hovering the logo after it has settled plays one more lap.
-  logoWord.closest('a')?.addEventListener('mouseenter', () => {
-    if (!$('[data-rotate][data-active]')) run(1); // the hero is driving it right now
-  });
-  return { typeTo, run };
-})();
 
 /* ---------- rotating hero word ---------- */
 const rot = $('[data-rotate]');
-// No hero on this page: the logo cycles on its own. On the homepage it follows the hero.
-if (logo && (!rot || reduced)) logo.run(2);
 if (rot && !reduced) {
   const words = rot.dataset.rotate!.split(',');
   const hrefs = (rot.dataset.hrefs ?? '').split(',');
   const heroArticle = $('[data-article]');
-  const pad = () => parseFloat(getComputedStyle(rot).fontSize) * 0.08;
+  const pad = () => parseFloat(getComputedStyle(rot).fontSize) * 0.04;
   const measure = (el: HTMLElement) => `${el.getBoundingClientRect().width + pad()}px`;
   let current = $('.rot-word', rot)!;
   let i = 0;
@@ -189,7 +171,7 @@ if (rot && !reduced) {
     // Lock the current width so the change animates.
     rot.style.width = measure(current);
     const next = document.createElement('span');
-    next.className = 'rot-word abs below';
+    next.className = 'rot-word below';
     next.textContent = word;
     rot.appendChild(next);
     void next.offsetWidth;
@@ -202,10 +184,9 @@ if (rot && !reduced) {
         heroArticle.classList.remove('swap');
       }, 180);
     }
-    logo?.typeTo(word);
     if (hrefs[i]) rot.setAttribute('href', hrefs[i]);
 
-    current.classList.add('abs', 'above');
+    current.classList.add('above');
     next.classList.remove('below');
     rot.style.width = measure(next);
 
@@ -213,7 +194,6 @@ if (rot && !reduced) {
     current = next;
     setTimeout(() => {
       old.remove();
-      current.classList.remove('abs');
       rot.style.width = '';
     }, 650);
 
@@ -309,12 +289,6 @@ function applyCounts(data: Snapshot) {
   $$('[data-odo-key]').forEach((el) => setOdo(el, count(el.dataset.odoKey!)));
   // Plain-number spots: list rows, related cards.
   $$('[data-count-key]').forEach((el) => (el.textContent = fmt(count(el.dataset.countKey!))));
-  // Tape.
-  $$('[data-tape-key]').forEach((el) => {
-    const n = count(el.dataset.tapeKey!);
-    el.textContent = n ? `${el.dataset.arrow} ${fmt(n)}` : '— 0';
-    el.classList.toggle('flat', !n);
-  });
 
   // Tickers.
   $$('[data-ticker]').forEach((t) => {
@@ -342,20 +316,19 @@ function applyCounts(data: Snapshot) {
   });
 }
 
-let liveTimer: number | undefined;
 async function loadCounts() {
   try {
     const res = await fetch('/api/counts', { headers: { accept: 'application/json' } });
     if (res.ok) applyCounts(await res.json());
   } catch {}
 }
-if ($('[data-odo-key], [data-count-key], [data-tape-key], [data-ticker]')) {
+if ($('[data-odo-key], [data-count-key], [data-ticker]')) {
   loadCounts();
   // Keep the ticker ticking while the tab is visible.
-  liveTimer = window.setInterval(() => !document.hidden && loadCounts(), 30000);
+  window.setInterval(() => !document.hidden && loadCounts(), 30000);
 }
 
-/* ---------- status flags after no-JS form posts (?voted=…, ?waitlist=…) ---------- */
+/* ---------- status flag after a no-JS vote (?voted=…) ---------- */
 {
   const p = new URLSearchParams(location.search);
   const voted = p.get('voted');
@@ -364,19 +337,6 @@ if ($('[data-odo-key], [data-count-key], [data-tape-key], [data-ticker]')) {
     note.textContent =
       voted === 'ok' ? 'Counted. Thanks!' : voted === 'already-voted' ? 'Already counted you today.' : 'Easy there. Try again later.';
     note.classList.add('flash');
-  }
-  const wl = p.get('waitlist');
-  const msg = $('.wl-msg');
-  if (wl && msg) {
-    const map: Record<string, [string, boolean]> = {
-      added: ["You're on the list. We'll email you once, when it ships.", true],
-      exists: ["You're already on the list. Nice.", true],
-      invalid: ['That email looks off. Try again?', false],
-      limited: ['Too many tries. Give it a minute.', false],
-    };
-    const [text, ok] = map[wl] ?? ['', true];
-    msg.textContent = text;
-    msg.className = `wl-msg ${ok ? 'ok' : 'err'}`;
   }
 }
 
@@ -392,7 +352,7 @@ document.addEventListener('keydown', (e) => {
       s.select();
     }
   } else if (e.key === 't') {
-    setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+    toggleTheme();
   }
 });
 
@@ -427,8 +387,7 @@ $$('[data-copy-agent]').forEach((btn) =>
     }
     confirmBtn(btn);
     if (hint) hint.textContent = btn.dataset.hint ?? '';
-    const agent = btn.dataset.copyAgent === 'raw' ? 'raw prompt' : `prompt for ${btn.textContent?.replace(/^.*Copy for |✓.*$/g, '').trim()}`;
-    toast(`✓ Copied ${agent}`);
+    toast(btn.dataset.copyAgent === 'raw' ? 'Copied the raw prompt' : `Copied for ${btn.dataset.agentName}`);
   })
 );
 
@@ -460,10 +419,10 @@ $$('[data-tabs]').forEach((root) => {
 
 $$('[data-copy-code]').forEach((btn) =>
   btn.addEventListener('click', async () => {
-    const code = btn.closest('.terminal')?.querySelector('[data-code]')?.textContent ?? '';
+    const code = btn.closest('.code')?.querySelector('[data-code]')?.textContent ?? '';
     if (await copyText(code)) {
       confirmBtn(btn);
-      toast('✓ Copied. Paste it into your agent or terminal');
+      toast('Copied. Paste it into your agent or terminal');
     } else toast('Copy failed: select the text manually');
   })
 );
@@ -472,7 +431,7 @@ $$('[data-copy-text]').forEach((btn) =>
   btn.addEventListener('click', async () => {
     if (await copyText(btn.dataset.copyText ?? location.href)) {
       confirmBtn(btn);
-      toast('✓ Link copied');
+      toast('Link copied');
     }
   })
 );
@@ -508,10 +467,10 @@ $$<HTMLFormElement>('form[data-vote]').forEach((form) => {
         store.set(`voted:${slug}`, String(Date.now()));
         if (price > 0) {
           say(`Counted. +${money(price)}/mo destroyed. Collective total: $${fmt(data.mrr)}/mo.`);
-          toast(`🪦 +${money(price)}/mo MRR destroyed`);
+          toast(`+${money(price)}/mo MRR destroyed`);
         } else {
           say('Counted. Thanks for plugging in.');
-          toast('🔌 Counted');
+          toast('Counted. Thanks!');
         }
         if (!reduced) {
           const p = document.createElement('span');
@@ -539,45 +498,52 @@ $$<HTMLFormElement>('form[data-vote]').forEach((form) => {
   });
 });
 
-/* ---------- waitlist ---------- */
-const WL_MSG: Record<string, [string, boolean]> = {
-  added: ["You're on the list. We'll email you once, when it ships.", true],
-  exists: ["You're already on the list. Nice.", true],
-  invalid: ['That email looks off. Try again?', false],
-  limited: ['Too many tries. Give it a minute.', false],
+/* ---------- Submit + Advertise forms (fetch, with a no-JS POST fallback) ---------- */
+const FORM_OK: Record<string, string> = {
+  submit: 'Thanks! It’s in the review queue. If you left an email, we’ll tell you when it’s live.',
+  advertise: 'Request received. We’ll email you to confirm the slot and send payment details.',
 };
-$$<HTMLFormElement>('form[data-waitlist]').forEach((form) => {
-  const msg = form.parentElement!.querySelector<HTMLElement>('.wl-msg');
+$$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
+  const kind = form.dataset.ajaxForm!;
+  const msg = $('[data-form-msg]', form);
   const btn = $<HTMLButtonElement>('button[type="submit"]', form)!;
+  const say = (text: string, ok: boolean) => {
+    if (!msg) return;
+    msg.textContent = text;
+    msg.className = `form-msg ${ok ? 'ok' : 'err'}`;
+  };
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (btn.disabled) return;
     btn.disabled = true;
     try {
-      const res = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { accept: 'application/json', 'x-requested-with': 'fetch' },
-      });
+      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { accept: 'application/json', 'x-requested-with': 'fetch' } });
       const data = await res.json();
-      const [text, ok] = WL_MSG[data.status] ?? ['Something went wrong.', false];
-      if (msg) {
-        msg.textContent = text;
-        msg.className = `wl-msg ${ok ? 'ok' : 'err'}`;
-      }
-      if (ok) {
-        confirmBtn(btn, 2400);
+      if (data.ok) {
+        say(FORM_OK[kind], true);
+        confirmBtn(btn, 3000);
         form.reset();
+        toast(kind === 'submit' ? 'Submitted for review' : 'Request sent');
+      } else {
+        say(data.error || 'Something went wrong. Try again?', false);
       }
     } catch {
-      if (msg) {
-        msg.textContent = 'Network hiccup. Try again?';
-        msg.className = 'wl-msg err';
-      }
+      say('Network hiccup. Try again?', false);
     } finally {
       btn.disabled = false;
     }
   });
+  // After a no-JS post we land back here with ?sent=…
+  const sent = new URLSearchParams(location.search).get('sent');
+  if (sent) say(sent === 'ok' ? FORM_OK[kind] : sent === 'limited' ? 'Too many tries. Give it an hour.' : 'Something was missing. Check the form and try again.', sent === 'ok');
 });
+
+// /submit?dir=mcp preselects the directory.
+{
+  const dir = new URLSearchParams(location.search).get('dir');
+  const radio = dir ? $<HTMLInputElement>(`[data-dir-radio][value="${CSS.escape(dir)}"]`) : null;
+  if (radio) radio.checked = true;
+}
 
 /* ---------- first-party analytics (cookieless, honors DNT/GPC) ---------- */
 const nav = navigator as Navigator & { globalPrivacyControl?: boolean };

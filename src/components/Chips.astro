@@ -1,0 +1,29 @@
+---
+import Icon from './Icon.astro';
+import type { Kind } from '../lib/kinds';
+
+interface Chip {
+  key: string;
+  label: string;
+  count: number;
+  kind?: Kind;
+}
+interface Props {
+  /** Query-string name: "cat" (directory pages) or "kind" (home). main.ts reads it on load. */
+  param: 'cat' | 'kind';
+  chips: Chip[];
+  total: number;
+  action: string;
+  /** Colour for category chips on a directory page. */
+  kind?: Kind;
+}
+const { param, chips, total, action, kind } = Astro.props;
+---
+<div class="chips" role="group" aria-label="Filter" data-chip-param={param}>
+  <a class={`chip${kind ? ` k-${kind}` : ''}`} href={`${action}#list`} data-chip="" aria-pressed="true">All <span class="n">{total}</span></a>
+  {chips.map((c) => (
+    <a class={`chip k-${c.kind ?? kind ?? ''}`} href={`${action}?${param}=${c.key}#list`} data-chip={c.key} aria-pressed="false">
+      {c.kind && <Icon name={c.kind} size={15} class="ico-k" />}{c.label} <span class="n">{c.count}</span>
+    </a>
+  ))}
+</div>

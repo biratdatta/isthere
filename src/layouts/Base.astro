@@ -1,15 +1,19 @@
 ---
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
-import '@fontsource/jetbrains-mono/700.css';
-import '@fontsource/space-grotesk/500.css';
-import '@fontsource/space-grotesk/700.css';
+import '@fontsource/bricolage-grotesque/600.css';
+import '@fontsource/bricolage-grotesque/700.css';
+import '@fontsource/bricolage-grotesque/800.css';
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/500.css';
+import '@fontsource/geist-sans/600.css';
+import '@fontsource/geist-sans/700.css';
+import '@fontsource/geist-mono/500.css';
+import '@fontsource/geist-mono/600.css';
+import '@fontsource/geist-mono/700.css';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import Tape from '../components/Tape.astro';
+import Rail from '../components/Rail.astro';
 import { SITE_NAME, abs, graph, ldJson, organization, website } from '../lib/seo';
-import { ENTRIES, byKind } from '../lib/apps';
 import type { Kind } from '../lib/kinds';
 
 interface Props {
@@ -18,20 +22,20 @@ interface Props {
   path: string;
   ogImage?: string;
   jsonld?: object[];
-  tape?: boolean;
   kind?: Kind;
+  current?: 'list' | 'submit' | 'advertise';
+  home?: boolean;
   noindex?: boolean;
 }
 
-const { title, description, path, ogImage = '/og/index.png', jsonld = [], tape = true, kind, noindex = false } = Astro.props;
+const { title, description, path, ogImage = '/og/index.png', jsonld = [], kind, current, home = false, noindex = false } = Astro.props;
 const site = Astro.site!;
 const canonical = abs(site, path);
 const og = abs(site, ogImage);
 const ld = graph(website(site), organization(site), ...jsonld);
-const tapeEntries = kind ? byKind(kind) : ENTRIES;
 ---
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,7 +44,8 @@ const tapeEntries = kind ? byKind(kind) : ENTRIES;
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#050705" />
+    <meta name="theme-color" content="#f4f5f8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14171d" media="(prefers-color-scheme: dark)" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={title} />
@@ -71,12 +76,15 @@ const tapeEntries = kind ? byKind(kind) : ENTRIES;
   </head>
   <body>
     <a class="sr-only" href="#main">Skip to content</a>
-    <Header kind={kind} />
-    {tape && <Tape entries={tapeEntries} showKind={!kind} />}
-    <main id="main">
-      <slot />
-    </main>
-    <Footer />
+    <Header kind={kind} current={current} />
+    <div class="shell">
+      <Rail side="left" />
+      <main id="main" class={`content${home ? ' home' : ''}`}>
+        <slot />
+        <Footer />
+      </main>
+      <Rail side="right" />
+    </div>
     <script>
       import '../scripts/main.ts';
     </script>

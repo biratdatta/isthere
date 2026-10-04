@@ -1,35 +1,30 @@
 ---
-/** Agent tabs, each with a copyable snippet. Works without JS (all panels shown). */
+/** Agent tabs, each with a copyable snippet. Without JS all panels show. */
+import Icon from './Icon.astro';
 import type { InstallOption } from '../lib/installs';
 
 interface Props {
   options: InstallOption[];
-  filename?: string;
 }
-const { options, filename } = Astro.props;
+const { options } = Astro.props;
 const uid = `ib-${Math.random().toString(36).slice(2, 8)}`;
+const label = (o: InstallOption) => (o.lang === 'json' ? 'mcp.json' : o.lang === 'text' ? `${o.agent} · in-session` : `${o.agent} · terminal`);
 ---
-<div class="install" data-tabs>
+<div class="stack" data-tabs>
   {options.length > 1 && (
     <div class="tabs" role="tablist" aria-label="Choose your agent">
       {options.map((o, i) => (
-        <button class="tab" type="button" role="tab" id={`${uid}-t-${o.id}`} aria-controls={`${uid}-p-${o.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={o.id}>
-          {o.agent}
-        </button>
+        <button class="tab" type="button" role="tab" id={`${uid}-t-${o.id}`} aria-controls={`${uid}-p-${o.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={o.id}>{o.agent}</button>
       ))}
     </div>
   )}
   {options.map((o, i) => (
     <div class="tab-panel" role={options.length > 1 ? 'tabpanel' : undefined} id={`${uid}-p-${o.id}`} aria-labelledby={options.length > 1 ? `${uid}-t-${o.id}` : undefined} data-panel={o.id} data-hidden={i === 0 ? undefined : 'true'}>
-      <div class="terminal">
-        <div class="term-bar">
-          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span>{filename ?? (o.lang === 'json' ? 'mcp.json' : o.lang === 'text' ? `${o.agent} · in-session` : `${o.agent} · terminal`)}</span>
-          <button class="btn btn-sm copy-code" type="button" data-copy-code><span class="idle">⧉ Copy</span><span class="ok">✓ Copied</span></button>
-        </div>
+      <div class="code">
+        <div class="code-bar"><span>{label(o)}</span><button class="btn-copy" type="button" data-copy-code><Icon name="copy" size={13} /><span class="idle">Copy</span><span class="ok">Copied</span></button></div>
         <pre tabindex="0"><code data-code>{o.code}</code></pre>
       </div>
-      {o.note && <p class="copy-hint">{o.note}</p>}
+      {o.note && <p class="hint">{o.note}</p>}
     </div>
   ))}
 </div>

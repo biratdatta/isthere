@@ -2,22 +2,19 @@
 import { REPO_URL } from '../lib/seo';
 ---
 <footer class="site-footer">
-  <div class="wrap">
-    <div class="foot-top">
-      <nav class="foot-links" aria-label="Footer">
-        <a href="/">Home</a>
-        <a href="/skills">Skills</a>
-        <a href="/mcp">MCPs</a>
-        <a href="/plugins">Plugins</a>
-        <a href="/prompts">Prompts</a>
-        <a href={REPO_URL} rel="noopener">Source on GitHub</a>
-        <a href="/sitemap.xml">Sitemap</a>
-      </nav>
-    </div>
-    <p class="muted" style="margin:0">
-      MIT licensed. No accounts, no payments, no cookies, no third-party trackers: one first-party pageview counter that respects Do Not Track.
-      Prices are entry paid tiers, approximate and subject to change; verdicts are opinions. Install commands follow each agent's docs; check before running anything. Corrections welcome as pull requests to <code>data/&lt;directory&gt;/*.json</code>.
-    </p>
-  </div>
+  <span>is<b style="color:var(--primary)">there</b>? · MIT</span>
+  <nav aria-label="Footer">
+    <a href="/skills">Skills</a>
+    <a href="/mcp">MCPs</a>
+    <a href="/plugins">Plugins</a>
+    <a href="/prompts">Prompts</a>
+    <a href="/submit">Submit</a>
+    <a href="/advertise">Advertise</a>
+    <a href={REPO_URL} rel="noopener">GitHub</a>
+  </nav>
+  <p class="fine">
+    No accounts, no cookies, no third-party trackers: one first-party pageview counter that respects Do Not Track.
+    Prices are entry paid tiers, approximate and subject to change; verdicts are opinions. Install commands follow each agent's docs; check before running anything.
+  </p>
 </footer>
 <div class="toast" role="status" aria-live="polite" data-toast></div>

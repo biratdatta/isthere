@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { KINDS, KIND_ORDER } from '../lib/kinds';
+import { REPO_URL, breadcrumbs } from '../lib/seo';
+
+const site = Astro.site!;
+const verdicts = [
+  { v: 'yes', label: 'Yes', sub: 'replaces it' },
+  { v: 'kinda', label: 'Kinda', sub: 'covers the core' },
+  { v: 'no', label: 'Not really', sub: 'helps around the edges' },
+];
+---
+<Base
+  title="Is there a skill for it? Submit yours"
+  description="Found a skill, MCP server, plugin or prompt that replaces a paid app? Submit it to isthere. Every submission is reviewed before it goes live."
+  path="/submit"
+  current="submit"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Submit', path: '/submit' }])]}
+>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Submit</li></ol></nav>
+  <section class="page-title">
+    <h1>Add your own <span class="hl">is-there</span>.</h1>
+    <p class="muted" style="font-size:18px;line-height:1.55">Found a skill, MCP server, plugin or prompt that replaces a paid app? Send it in. Every submission is checked by a person before it goes live.</p>
+  </section>
+
+  <section class="split">
+    <form class="card pad form" method="post" action="/api/submit" data-ajax-form="submit">
+      <fieldset>
+        <legend><span class="step">1</span>Which directory?</legend>
+        <div class="grid-auto" style="--min:150px;gap:10px">
+          {KIND_ORDER.map((k, i) => (
+            <label class={`tile choice k-${k}`}>
+              <span class="top"><Icon name={k} size={24} /><input type="radio" name="directory" value={k} required checked={i === 0} data-dir-radio /></span>
+              <strong>{KINDS[k].plural}</strong>
+              <span class="d">{KINDS[k].tagline}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">2</span>What does it replace?</legend>
+        <div class="grid-auto" style="--min:220px">
+          <label class="field" for="s-app">Paid app<input id="s-app" name="app" type="text" required maxlength="80" placeholder="e.g. Calendly" /></label>
+          <label class="field" for="s-site">Its website<input id="s-site" name="appUrl" type="url" maxlength="200" placeholder="https://calendly.com" /></label>
+        </div>
+        <label class="field" for="s-link">Link to the replacement<span class="hint">Repo, docs page or marketplace listing</span><input id="s-link" name="link" type="url" required maxlength="300" placeholder="https://github.com/…" /></label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">3</span>Your honest verdict</legend>
+        <div class="verdict-pick" role="radiogroup" aria-label="Verdict">
+          {verdicts.map((x) => (
+            <label class={`v-${x.v}`}><input type="radio" name="verdict" value={x.v} required /><span><strong>{x.label}</strong><span>{x.sub}</span></span></label>
+          ))}
+        </div>
+        <label class="field" for="s-lose">What do you lose?<span class="hint">One per line. Be honest; that’s the point of the site.</span><textarea id="s-lose" name="lose" rows="4" maxlength="2000" placeholder={'No mobile app\nTeam features need your own setup'}></textarea></label>
+        <label class="field" for="s-install">Install command or prompt<span class="hint">Optional. We test it before publishing.</span><textarea id="s-install" name="install" rows="3" maxlength="8000" class="codey" placeholder="claude mcp add --transport http …"></textarea></label>
+      </fieldset>
+
+      <fieldset>
+        <legend><span class="step">4</span>Credit (optional)</legend>
+        <div class="grid-auto" style="--min:220px">
+          <label class="field" for="s-gh">GitHub handle<span class="hint">Shown on the entry as credit</span><input id="s-gh" name="github" type="text" maxlength="40" placeholder="@you" /></label>
+          <label class="field" for="s-email">Email<span class="hint">Only to tell you when it’s live</span><input id="s-email" name="email" type="email" maxlength="254" placeholder="you@domain.dev" /></label>
+        </div>
+      </fieldset>
+
+      <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+
+      <div class="form-foot">
+        <span class="muted" style="font-size:13px">No account needed. We don’t publish your email.</span>
+        <button type="submit" class="btn btn-primary btn-lg"><span class="idle">Submit for review</span><span class="ok">Submitted</span><Icon name="arrow" size={16} /></button>
+      </div>
+      <p class="form-msg" role="status" aria-live="polite" data-form-msg></p>
+    </form>
+
+    <aside class="stack sticky" aria-label="How review works">
+      <div class="card stack" style="padding:22px;gap:16px">
+        <span class="eyebrow">What happens next</span>
+        <ol class="steps">
+          <li class="k-skills"><span class="n">1</span><span><strong>A person reviews it</strong><span class="t">Is the replacement real, and is the verdict fair?</span></span></li>
+          <li class="k-mcp"><span class="n">2</span><span><strong>Install steps get tested</strong><span class="t">In Claude Code, Codex and Cursor where they apply.</span></span></li>
+          <li class="k-prompts"><span class="n">3</span><span><strong>It goes live, with credit</strong><span class="t">Your handle on the entry, if you gave one.</span></span></li>
+        </ol>
+      </div>
+      <div class="card stack" style="padding:22px;gap:12px">
+        <span class="eyebrow">Prefer a pull request?</span>
+        <span class="muted" style="font-size:14px;line-height:1.5">Add one JSON file to the repo and open a PR.</span>
+        <code class="code" style="padding:12px 14px;font-size:13px">data/&lt;directory&gt;/your-app.json</code>
+        <a href={REPO_URL} rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:var(--primary)"><Icon name="github" size={16} />Open the repo</a>
+      </div>
+    </aside>
+  </section>
+</Base>

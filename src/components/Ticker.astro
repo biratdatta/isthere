@@ -1,47 +1,33 @@
 ---
 import Odometer from './Odometer.astro';
-import Tape from './Tape.astro';
-import type { Entry } from '../lib/apps';
 
 interface Props {
-  entries: Entry[];
   /** "all" or a directory id; picks which totals from /api/counts to show. */
   scope: string;
   /** "mrr" shows $X/mo destroyed; "users" shows a plain count. */
   metric: 'mrr' | 'users';
-  label?: string;
-  showKind?: boolean;
 }
-const { entries, scope, metric, showKind = false } = Astro.props;
-const label = Astro.props.label ?? (metric === 'mrr' ? 'COLLECTIVE MRR DESTROYED' : 'AGENTS PLUGGED IN');
+const { scope, metric } = Astro.props;
 ---
-<section class="ticker reveal" aria-labelledby="ticker-label" data-ticker data-scope={scope} data-metric={metric}>
-  <div class="ticker-board">
-    <div class="ticker-top">
-      <h2 class="ticker-label" id="ticker-label">{label}</h2>
-      <span class="live">LIVE</span>
-    </div>
-    <div class="ticker-value">
-      {metric === 'mrr' && <span class="cur" aria-hidden="true">$</span>}
-      <Odometer value={0} id="ticker-odo" label={metric === 'mrr' ? '$0 per month' : '0 agents'} />
-      <span class="per">{metric === 'mrr' ? '/mo' : 'agents'}</span>
-    </div>
-    <div class="ticker-meta">
-      {metric === 'mrr' ? (
-        <>
-          <span class="up">▲ $<span data-total="mrr24h">0</span> <span class="muted">24H</span></span>
-          <span><b data-total="votes">0</b> votes</span>
-          <span>annualized <b>$<span data-total="mrr12">0</span></b></span>
-          <span>Σ price × "I replaced this"</span>
-        </>
-      ) : (
-        <>
-          <span class="up">▲ <span data-total="votes24h">0</span> <span class="muted">24H</span></span>
-          <span><b>{entries.length}</b> servers tracked</span>
-          <span>Σ "I use this"</span>
-        </>
-      )}
-    </div>
-  </div>
-  <Tape entries={entries} showKind={showKind} />
-</section>
+<div class="ticker reveal" data-ticker data-scope={scope} data-metric={metric}>
+  <span class="label">{metric === 'mrr' ? 'COLLECTIVE MRR DESTROYED' : 'AGENTS PLUGGED IN'}</span>
+  <span class="value">
+    {metric === 'mrr' && <span aria-hidden="true">$</span>}
+    <Odometer value={0} id={`ticker-${scope}`} label={metric === 'mrr' ? '$0 per month' : '0 agents'} />
+    <span class="per">{metric === 'mrr' ? '/mo' : 'agents'}</span>
+  </span>
+  <span class="meta">
+    {metric === 'mrr' ? (
+      <>
+        <span>▲ $<b data-total="mrr24h">0</b> today</span>
+        <span><b data-total="votes">0</b> votes</span>
+        <span>$<b data-total="mrr12">0</b> a year</span>
+      </>
+    ) : (
+      <>
+        <span>▲ <b data-total="votes24h">0</b> today</span>
+        <span>Σ "I use this"</span>
+      </>
+    )}
+  </span>
+</div>

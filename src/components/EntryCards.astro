@@ -1,0 +1,37 @@
+---
+/** Bento grid of entry cards (directory pages). Same data hooks as EntryList for search, filters and live re-ranking. */
+import Icon from './Icon.astro';
+import { CATEGORIES, formatPrice, keyOf, searchText, verdictLabel, type Entry } from '../lib/apps';
+import { KINDS } from '../lib/kinds';
+import { entryPath } from '../lib/seo';
+
+interface Props {
+  entries: Entry[];
+}
+const { entries } = Astro.props;
+const rank = { yes: 0, kinda: 1, no: 2 } as const;
+const ranked = [...entries].sort((a, b) => rank[a.verdict] - rank[b.verdict] || (b.priceMonthly ?? 0) - (a.priceMonthly ?? 0) || a.name.localeCompare(b.name));
+---
+<ol class="grid-auto" data-list style="--min:300px;list-style:none;margin:0;padding:0">
+  {ranked.map((e, i) => (
+    <li data-search={searchText(e)} data-cat={e.category} data-key={keyOf(e)} data-order={i} style="display:flex">
+      <a class={`card entry-card k-${e.kind} v-${e.verdict}`} href={entryPath(e)} style="flex:1">
+        <span class="head">
+          <span class="letter"><img src={`/api/favicon/${e.slug}`} width="26" height="26" alt="" loading={i < 9 ? 'eager' : 'lazy'} decoding="async" /></span>
+          <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+            <strong>{e.name}</strong>
+            <span class="meta">{e.domain} · {CATEGORIES[e.category].label}</span>
+          </span>
+          <span class="mono muted" style="font-size:12px">#<span class="rank">{String(i + 1).padStart(2, '0')}</span></span>
+        </span>
+        <span class="note">{e.notes}</span>
+        <span class="foot">
+          <span class="badge">{verdictLabel(e)}</span>
+          <span class="k"><Icon name={e.kind} size={14} class="ico-k" /><span data-count-key={keyOf(e)}>0</span>&nbsp;{KINDS[e.kind].voted}</span>
+        </span>
+        <span class="sr-only">{e.priceMonthly === null ? 'usage-based' : `${formatPrice(e.priceMonthly)} per month`}</span>
+      </a>
+    </li>
+  ))}
+</ol>
+<div class="empty" data-empty>Nothing matches <code data-empty-q></code> yet. <a href="/submit" style="color:var(--primary)">Add it →</a></div>

@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
 import Odometer from '../../components/Odometer.astro';
-import Waitlist from '../../components/Waitlist.astro';
 import PromptBlock from '../../components/PromptBlock.astro';
 import InstallBlock from '../../components/InstallBlock.astro';
 import { CATEGORIES, ENTRIES, formatPrice, keyOf, relatedEntries, siblings, verdictLabel, type Entry } from '../../lib/apps';
@@ -23,219 +23,175 @@ const related = relatedEntries(e);
 const also = siblings(e);
 const faq = faqFor(e);
 const canonical = abs(site, entryPath(e));
-
-const shareText = `${entryTitle(e)} Verdict: ${v.label}.`;
-const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(canonical)}`;
+const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(`${entryTitle(e)} Verdict: ${v.label}.`)}&url=${encodeURIComponent(canonical)}`;
 const crumbs = [
   { name: 'Home', path: '/' },
   { name: k.plural, path: `/${e.kind}` },
   { name: e.name, path: entryPath(e) },
 ];
 const installs = e.kind === 'mcp' ? mcpInstalls(e) : e.kind === 'skills' ? skillInstalls(e) : e.kind === 'plugins' ? pluginInstalls(e) : [];
-const goodsTitle = { prompts: `Build your own ${e.name}`, skills: `Install the ${e.kind === 'skills' ? e.skill.name : ''} skill`, mcp: `Connect ${e.name} to your agent`, plugins: `Install the ${e.kind === 'plugins' ? e.plugin.name : ''} plugin` }[e.kind];
-const goodsEyebrow = { prompts: 'the one-shot prompt', skills: 'the skill', mcp: 'the server', plugins: 'the plugin' }[e.kind];
-const loseTitle = e.kind === 'mcp' ? 'Limitations' : 'What you lose';
-const voteNote = 'One vote per person per day. No account needed.';
+const goodsTitle = {
+  prompts: `Build your own ${e.name}`,
+  skills: `Install the ${e.kind === 'skills' ? e.skill.name : ''} skill`,
+  mcp: `Connect ${e.name} to your agent`,
+  plugins: `Install the ${e.kind === 'plugins' ? e.plugin.name : ''} plugin`,
+}[e.kind];
+const titleParts = k.entryTitle(e.name).split(k.word);
+const isMrr = k.metric === 'mrr';
+const price = e.priceMonthly;
 ---
 <Base title={entryTitle(e)} description={entryDescription(e)} path={entryPath(e)} ogImage={`/og/${e.kind}/${e.slug}.png`} kind={e.kind} jsonld={[breadcrumbs(site, crumbs), faqPage(faq)]}>
-  <div class="wrap">
-    <nav class="crumbs" aria-label="Breadcrumb">
-      <ol>
-        <li><a href="/">Home</a></li>
-        <li><a href={`/${e.kind}`}>{k.emoji} {k.plural}</a></li>
-        <li><a href={`/${e.kind}?cat=${e.category}#list`}>{c.label}</a></li>
-        <li><span aria-current="page">{e.name}</span></li>
-      </ol>
-    </nav>
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><a href={`/${e.kind}`}>{k.plural}</a></li>
+      <li><a href={`/${e.kind}?cat=${e.category}#list`}>{c.label}</a></li>
+      <li aria-current="page">{e.name}</li>
+    </ol>
+  </nav>
 
-    <div class="app-hero">
-      <div>
-        <img class="fav-lg" src={`/api/favicon/${e.slug}`} width="56" height="56" alt={`${e.name} logo`} />
-        <h1>{entryTitle(e)}</h1>
-        <div class="meta">
-          <span>{c.emoji} {c.label}</span>
-          {e.priceMonthly !== null && <span>from <b>{formatPrice(e.priceMonthly)}</b>/mo</span>}
-          <a href={`https://${e.domain}`} rel="noopener nofollow">{e.domain} ↗</a>
+  <section class={`split k-${e.kind} v-${e.verdict}`} style="align-items:stretch">
+    <div class="card title-card">
+      <span style="display:flex;align-items:center;gap:14px">
+        <span class="letter lg"><img src={`/api/favicon/${e.slug}`} width="32" height="32" alt={`${e.name} logo`} /></span>
+        <span class="title-meta">
+          <span>{c.label}</span>
+          {price !== null && <><span>·</span><span>from {formatPrice(price)}/mo</span></>}
+          <span>·</span><a href={`https://${e.domain}`} rel="noopener nofollow">{e.domain}</a>
+        </span>
+      </span>
+      <h1>{titleParts.length === 2 ? <>{titleParts[0]}<span class="hl">{k.word}</span>{titleParts[1]}</> : entryTitle(e)}</h1>
+      {also.length > 0 && (
+        <div class="also">
+          <span>Also for {e.name}:</span>
+          {also.map((s) => (
+            <a href={entryPath(s)} class={`k-${s.kind} v-${s.verdict}`}><Icon name={s.kind} size={15} />{KINDS[s.kind].article} {KINDS[s.kind].word}<span class="vv">{verdictLabel(s)}</span></a>
+          ))}
         </div>
-
-        <div class={`verdict ${e.verdict}`}>
-          <div class="label">THE VERDICT</div>
-          <div class="big">{v.label}</div>
-          <p class="headline">{v.headline}</p>
-          <p>{v.blurb}</p>
-        </div>
-
-        {also.length > 0 && (
-          <div class="also">
-            <span class="muted">Also for {e.name}:</span>
-            {also.map((s) => (
-              <a class="chip" href={entryPath(s)}>
-                {KINDS[s.kind].emoji} {KINDS[s.kind].article} {KINDS[s.kind].word} <span class={`badge ${s.verdict}`}>{verdictLabel(s)}</span>
-              </a>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <aside class="side" aria-label="Vote and share">
-        <div class="panel">
-          <h3>{k.metric === 'mrr' ? 'Monthly cost' : `${e.name} costs`}</h3>
-          {k.metric === 'mrr' && e.priceMonthly !== null ? (
-            <div class="price-big"><s>{formatPrice(e.priceMonthly)}</s><span class="arrow">→</span><span class="zero">$0</span></div>
-          ) : (
-            <div class="price-big">{e.priceMonthly === null ? <span style="font-size:22px">usage-based</span> : <>{formatPrice(e.priceMonthly)}<span class="arrow">/mo</span></>}</div>
-          )}
-          <p class="muted" style="font-size:12px;margin:8px 0 0">
-            {e.priceNote ?? (e.priceMonthly !== null ? `${formatPrice(e.priceMonthly * 12)}/yr per seat.` : '')}
-            {e.pricingUrl && <> <a href={e.pricingUrl} rel="noopener nofollow">Pricing ↗</a></>}
-          </p>
-        </div>
-        <div class="panel" style="position:relative">
-          <h3>{k.metric === 'mrr' ? 'Did you do it?' : 'Using it?'}</h3>
-          <form method="post" action={`/api/vote/${e.kind}/${e.slug}`} data-vote={key} data-price={k.metric === 'mrr' ? e.priceMonthly ?? 0 : 0}>
-            <button class="btn btn-primary vote-btn" type="submit">
-              <span>{k.metric === 'mrr' ? '🪦' : '🔌'} {k.vote}</span>
-              <Odometer value={0} label={`0 people ${k.voted}`} countKey={key} />
-            </button>
-          </form>
-          <p class="vote-note" role="status" aria-live="polite" data-vote-note>{voteNote}</p>
-          <div class="share-row">
-            <a class="btn" href={shareUrl} target="_blank" rel="noopener">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.8-6.3L6.4 22H3.3l7.3-8.3L1 2h6.3l4.4 5.8L18.9 2Zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20Z"/></svg>
-              Share on X
-            </a>
-            <button class="btn" type="button" data-copy-text={canonical}><span class="idle">Copy link</span><span class="ok">✓ Copied</span></button>
-          </div>
-        </div>
-      </aside>
+      )}
     </div>
+    <div class="verdict-card">
+      <span class="eyebrow">The verdict</span>
+      <span class="big">{v.label === 'NOT REALLY' ? 'Not really' : v.label.charAt(0) + v.label.slice(1).toLowerCase()}</span>
+      <span style="display:flex;flex-direction:column;gap:6px"><strong>{v.headline}</strong><span class="muted" style="font-size:14px;line-height:1.5">{v.blurb}</span></span>
+    </div>
+  </section>
 
-    <section id="goods" aria-labelledby="goods-title">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">{goodsEyebrow}</span>
-          <h2 id="goods-title">{goodsTitle}</h2>
-        </div>
-        {e.kind === 'mcp' && (
-          <div class="facts">
-            <span class={`badge ${e.server.official ? 'yes' : 'kinda'}`}>{e.server.official ? 'OFFICIAL' : 'COMMUNITY'}</span>
-            <span class="fact">{e.server.transport === 'http' ? 'remote · HTTP' : 'local · stdio'}</span>
-            <span class="fact">auth: {e.server.auth}</span>
-            {(e.server.docsUrl ?? e.server.repoUrl) && <a class="fact" href={e.server.docsUrl ?? e.server.repoUrl} rel="noopener">{e.server.docsUrl ? 'docs' : 'repo'} ↗</a>}
+  <section class={`split k-${e.kind}`}>
+    <div class="stack">
+      <div id="goods" class="card pad stack" style="gap:18px">
+        <span style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px">
+          <h2 class="section-title">{goodsTitle}</h2>
+          {e.kind === 'mcp' && (
+            <span class="facts">
+              <span>{e.server.official ? 'official' : 'community'}</span>
+              <span>{e.server.transport === 'http' ? 'remote · HTTP' : 'local · stdio'}</span>
+              <span>auth: {e.server.auth}</span>
+              {(e.server.docsUrl ?? e.server.repoUrl) && <a href={e.server.docsUrl ?? e.server.repoUrl} rel="noopener">{e.server.docsUrl ? 'docs' : 'repo'} ↗</a>}
+            </span>
+          )}
+          {e.kind === 'skills' && e.skill.sourceUrl && <span class="facts"><a href={e.skill.sourceUrl} rel="noopener">source ↗</a></span>}
+          {e.kind === 'plugins' && <span class="facts"><a href={e.plugin.repoUrl} rel="noopener">{e.plugin.marketplace} ↗</a></span>}
+        </span>
+
+        {e.kind === 'prompts' && <PromptBlock prompt={e.prompt} filename={`${e.slug}.prompt.md`} />}
+        {e.kind !== 'prompts' && <InstallBlock options={installs} />}
+
+        {e.kind === 'skills' && e.skill.skillMd && (
+          <details class="faq" style="margin-top:4px">
+            <summary>Read the SKILL.md (written for this site, MIT)</summary>
+            <div class="code" style="margin-top:12px">
+              <div class="code-bar"><span>{e.skill.name}/SKILL.md</span><button class="btn-copy" type="button" data-copy-code><Icon name="copy" size={13} /><span class="idle">Copy</span><span class="ok">Copied</span></button></div>
+              <pre tabindex="0"><code data-code>{e.skill.skillMd}</code></pre>
+            </div>
+          </details>
+        )}
+
+        {e.kind === 'mcp' && e.tools.length > 0 && (
+          <div class="stack" style="gap:10px">
+            <strong>Tools it exposes</strong>
+            <div class="tool-chips">{e.tools.map((t) => (/^[a-z_-]+$/.test(t) ? <code>{t}</code> : <span>{t}</span>))}</div>
           </div>
         )}
-        {e.kind === 'skills' && e.skill.sourceUrl && <a class="fact" href={e.skill.sourceUrl} rel="noopener">source ↗</a>}
-        {e.kind === 'plugins' && <a class="fact" href={e.plugin.repoUrl} rel="noopener">{e.plugin.marketplace} ↗</a>}
+        {e.kind === 'plugins' && (
+          <div class="stack" style="gap:10px">
+            <strong>What’s inside</strong>
+            <div class="tool-chips">{e.plugin.includes.map((t) => <span>{t}</span>)}</div>
+          </div>
+        )}
       </div>
 
-      {e.kind === 'prompts' && <PromptBlock prompt={e.prompt} filename={`${e.slug}.prompt.md`} />}
-
-      {e.kind !== 'prompts' && <InstallBlock options={installs} />}
-
-      {e.kind === 'skills' && e.skill.skillMd && (
-        <div class="sub-block">
-          <h3 class="sub-title">The SKILL.md <span class="muted">· written for this site, MIT</span></h3>
-          <div class="terminal">
-            <div class="term-bar">
-              <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span>{e.skill.name}/SKILL.md</span>
-              <button class="btn btn-sm copy-code" type="button" data-copy-code><span class="idle">⧉ Copy</span><span class="ok">✓ Copied</span></button>
-            </div>
-            <pre tabindex="0"><code data-code>{e.skill.skillMd}</code></pre>
-          </div>
-        </div>
-      )}
-
-      {e.kind === 'mcp' && e.tools.length > 0 && (
-        <div class="sub-block">
-          <h3 class="sub-title">Tools it exposes</h3>
-          <ul class="tool-list">{e.tools.map((t) => <li><code>{t}</code></li>)}</ul>
-        </div>
-      )}
-
-      {e.kind === 'plugins' && (
-        <div class="sub-block">
-          <h3 class="sub-title">What’s inside</h3>
-          <ul class="tool-list">{e.plugin.includes.map((t) => <li>{t}</li>)}</ul>
-        </div>
-      )}
-    </section>
-
-    <section aria-labelledby="lose-title">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">no free lunch</span>
-          <h2 id="lose-title">{loseTitle}</h2>
-        </div>
-      </div>
-      <ul class="lose-list">
-        {e.whatYouLose.map((item, i) => <li class="reveal" style={`--d:${i * 60}ms`}>{item}</li>)}
-      </ul>
-      <p class="notes reveal" style="margin-top:24px">{e.notes}</p>
-    </section>
-
-    {e.priorArt.length > 0 && (
-      <section aria-labelledby="prior-title">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">see also</span>
-            <h2 id="prior-title">Prior art</h2>
-          </div>
-          <p class="muted" style="margin:0;font-size:13px">Open-source projects that already did the hard part.</p>
-        </div>
-        <ul class="prior">
-          {e.priorArt.map((p, i) => (
-            <li class="reveal" style={`--d:${i * 60}ms`}>
-              <a href={p.url} rel="noopener">
-                <span>{p.name}<small>{p.url.replace(/^https?:\/\//, '')}</small></span>
-                <span class="arrow" aria-hidden="true">↗</span>
-              </a>
-            </li>
-          ))}
+      <div class="card pad stack">
+        <h2 class="section-title">{e.kind === 'mcp' ? 'Limitations' : 'What you lose'}</h2>
+        <ul class="lose">
+          {e.whatYouLose.map((item) => <li><span class="x"><Icon name="x" size={12} /></span>{item}</li>)}
         </ul>
-      </section>
-    )}
-
-    {related.length > 0 && (
-      <section aria-labelledby="related-title">
-        <div class="section-head">
-          <div>
-            <span class="eyebrow">more {k.plural.toLowerCase()}</span>
-            <h2 id="related-title">Related</h2>
-          </div>
-        </div>
-        <div class="cards">
-          {related.map((r, i) => (
-            <a class="card reveal" href={entryPath(r)} style={`--d:${i * 70}ms`}>
-              <div class="card-head">
-                <img src={`/api/favicon/${r.slug}`} width="32" height="32" alt="" loading="lazy" />
-                <span class={`badge ${r.verdict}`}>{verdictLabel(r)}</span>
-              </div>
-              <h3>{entryTitle(r)}</h3>
-              <p>{CATEGORIES[r.category].emoji} {CATEGORIES[r.category].label}{r.priceMonthly !== null && ` · ${formatPrice(r.priceMonthly)}/mo`} · <span data-count-key={keyOf(r)}>0</span> {k.voted}</p>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
-
-    <section aria-labelledby="faq-title">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">faq</span>
-          <h2 id="faq-title">{e.name}, answered</h2>
-        </div>
+        <p class="notes">{e.notes}</p>
       </div>
-      <div class="faq">
+
+      {e.priorArt.length > 0 && (
+        <div class="card pad stack">
+          <h2 class="section-title">Prior art</h2>
+          <ul class="prior">
+            {e.priorArt.map((p) => (
+              <li><a href={p.url} rel="noopener"><span>{p.name}<small>{p.url.replace(/^https?:\/\//, '')}</small></span><Icon name="external" size={16} /></a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div class="card pad faq">
+        <h2 class="section-title" style="margin-bottom:10px">{e.name}, answered</h2>
         {faq.map((f, i) => (
-          <details class="reveal" open={i === 0} style={`--d:${i * 50}ms`}>
+          <details open={i === 0}>
             <summary>{f.q}</summary>
-            <div class="answer"><p style="margin:0">{f.a}</p></div>
+            <p>{f.a}</p>
           </details>
         ))}
       </div>
-    </section>
+    </div>
 
-    <Waitlist source={`${e.kind}/${e.slug}`} />
-  </div>
+    <aside class="stack sticky" aria-label="Price, vote and share">
+      <div class="card pad stack" style="gap:10px;padding:22px">
+        <span class="eyebrow">{isMrr ? 'Monthly cost' : `${e.name} costs`}</span>
+        {price === null ? (
+          <span class="price" style="font-size:24px">usage-based</span>
+        ) : isMrr ? (
+          <span class="price"><s>{formatPrice(price)}</s> <small>→</small> <span class="zero">$0</span></span>
+        ) : (
+          <span class="price">{formatPrice(price)}<small>/mo</small></span>
+        )}
+        <span class="muted" style="font-size:13px">
+          {e.priceNote ?? (price !== null ? `${formatPrice(price * 12)}/yr per seat.` : '')}
+          {e.pricingUrl && <> · <a href={e.pricingUrl} rel="noopener nofollow" style="text-decoration:underline">Pricing ↗</a></>}
+        </span>
+      </div>
+      <div class="card stack" style="gap:12px;padding:22px;position:relative">
+        <span class="eyebrow">{isMrr ? 'Did you do it?' : 'Using it?'}</span>
+        <form method="post" action={`/api/vote/${e.kind}/${e.slug}`} data-vote={key} data-price={isMrr ? price ?? 0 : 0}>
+          <button class="vote-btn" type="submit">
+            <span style="display:inline-flex;align-items:center;gap:8px"><Icon name={e.kind} size={18} /> {k.vote}</span>
+            <Odometer value={0} label={`0 people ${k.voted}`} countKey={key} />
+          </button>
+        </form>
+        <p class="vote-note" role="status" aria-live="polite" data-vote-note>One vote per person per day. No account needed.</p>
+        <div class="two">
+          <a class="btn" href={shareUrl} target="_blank" rel="noopener"><Icon name="share" size={15} />Share on X</a>
+          <button class="btn" type="button" data-copy-text={canonical}><Icon name="link" size={15} /><span class="idle">Copy link</span><span class="ok">Copied</span></button>
+        </div>
+      </div>
+      {related.length > 0 && (
+        <div class="card stack" style="gap:4px;padding:14px">
+          <span class="eyebrow" style="padding:8px 8px 4px">More {k.plural}</span>
+          {related.map((r) => (
+            <a href={entryPath(r)} class={`mini-row v-${r.verdict}`}>
+              <span class="letter sm"><img src={`/api/favicon/${r.slug}`} width="20" height="20" alt="" loading="lazy" /></span>
+              <span style="min-width:0"><strong>{r.name}</strong><span class="m">{CATEGORIES[r.category].label}{r.priceMonthly !== null && ` · ${formatPrice(r.priceMonthly)}/mo`} · <span data-count-key={keyOf(r)}>0</span> {k.voted}</span></span>
+              <span class="badge" style="font-size:9px;padding:5px 8px">{verdictLabel(r)}</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </aside>
+  </section>
 </Base>

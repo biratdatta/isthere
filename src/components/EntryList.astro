@@ -1,47 +1,36 @@
 ---
 /**
- * The ranked list (Death List / Most plugged-in). Prerendered in a sensible default order;
+ * The ranked list as compact rows (home page). Prerendered in a default order;
  * main.ts fetches live counts, re-ranks the rows, and filters as you type.
  */
-import { CATEGORIES, formatPrice, keyOf, searchText, verdictLabel, type Entry } from '../lib/apps';
+import Icon from './Icon.astro';
+import { formatPrice, keyOf, searchText, verdictLabel, type Entry } from '../lib/apps';
 import { KINDS } from '../lib/kinds';
 import { entryPath } from '../lib/seo';
 
 interface Props {
   entries: Entry[];
-  /** What chips filter on: category (directory pages) or kind (home page). */
   filterBy: 'category' | 'kind';
-  showKind?: boolean;
 }
-const { entries, filterBy, showKind = false } = Astro.props;
+const { entries, filterBy } = Astro.props;
 const rank = { yes: 0, kinda: 1, no: 2 } as const;
 const ranked = [...entries].sort((a, b) => rank[a.verdict] - rank[b.verdict] || (b.priceMonthly ?? 0) - (a.priceMonthly ?? 0) || a.name.localeCompare(b.name));
 const facet = (e: Entry) => (filterBy === 'kind' ? e.kind : e.category);
 ---
-<div class="section-head">
-  <slot name="head" />
-  <p class="muted" style="margin:0;font-size:13px" data-result-count aria-live="polite">{ranked.length} of {ranked.length}</p>
-</div>
-<ol class="death-list" data-list>
-  {ranked.map((e, i) => {
-    const c = CATEGORIES[e.category];
-    const k = KINDS[e.kind];
-    return (
-      <li class="reveal" data-search={searchText(e)} data-cat={facet(e)} data-key={keyOf(e)} data-order={i} style={`--d:${Math.min(i, 10) * 40}ms`}>
-        <a class="row" href={entryPath(e)}>
-          <span class="rank">{String(i + 1).padStart(2, '0')}</span>
-          <img class="fav" src={`/api/favicon/${e.slug}`} width="28" height="28" alt="" loading={i < 8 ? 'eager' : 'lazy'} decoding="async" />
-          <span class="name">{e.name}<small>{showKind ? `${k.emoji} ${k.word} · ${e.domain}` : e.domain}</small></span>
-          <span class="cat" data-price={e.priceMonthly === null ? 'usage-based' : `${formatPrice(e.priceMonthly)}/mo`}>{c.emoji} {c.label}</span>
-          <span class="price">{e.priceMonthly === null ? <small>usage</small> : <>{formatPrice(e.priceMonthly)}<small>/mo</small></>}</span>
-          <span class={`badge ${e.verdict}`}>{verdictLabel(e)}</span>
-          <span class="votes"><b data-count-key={keyOf(e)}>0</b><span class="vl"> {k.voted}</span></span>
-        </a>
-      </li>
-    );
-  })}
+<ol class="rows" data-list>
+  {ranked.map((e, i) => (
+    <li data-search={searchText(e)} data-cat={facet(e)} data-key={keyOf(e)} data-order={i}>
+      <a class={`row k-${e.kind} v-${e.verdict}`} href={entryPath(e)}>
+        <span class="rank">{String(i + 1).padStart(2, '0')}</span>
+        <span class="letter sm"><img src={`/api/favicon/${e.slug}`} width="20" height="20" alt="" loading={i < 10 ? 'eager' : 'lazy'} decoding="async" /></span>
+        <span class="who">
+          <strong>{e.name}</strong>
+          <span><Icon name={e.kind} size={13} class="ico-k" />{KINDS[e.kind].plural} · {e.priceMonthly === null ? 'usage-based' : `${formatPrice(e.priceMonthly)}/mo`}</span>
+        </span>
+        <span class="badge">{verdictLabel(e)}</span>
+        <span class="votes" data-count-key={keyOf(e)}>0</span>
+      </a>
+    </li>
+  ))}
 </ol>
-<div class="empty" data-empty>
-  <p>Nothing matches <code data-empty-q></code> yet.</p>
-  <p style="margin:0">Add it: open a PR with a JSON file in <code>data/&lt;directory&gt;/</code>.</p>
-</div>
+<div class="empty" data-empty>Nothing matches <code data-empty-q></code> yet. <a href="/submit" style="color:var(--primary)">Add it →</a></div>

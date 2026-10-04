@@ -1,19 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 ---
 <Base title="Is there a page for it? No. (404)" description="This page does not exist." path="/404" noindex>
-  <div class="wrap">
-    <section class="hero">
-      <span class="eyebrow">error 404</span>
-      <h1>Is there a page for it<span class="q">?</span></h1>
-      <div class="verdict no" style="max-width:640px">
-        <div class="label">THE VERDICT</div>
-        <div class="big">NOT REALLY</div>
-        <p class="headline">Nothing lives at <code data-404-path>this address</code>.</p>
-        <p>Maybe nobody has added that app yet. <a href="/">Back to the directories →</a></p>
-      </div>
-    </section>
-  </div>
+  <section class="split v-no" style="align-items:stretch">
+    <div class="card title-card">
+      <span class="eyebrow">Error 404</span>
+      <h1>Is there a page for it?</h1>
+      <p class="muted">Nothing lives at <code data-404-path>this address</code>. Maybe nobody has added that app yet.</p>
+      <span style="display:flex;flex-wrap:wrap;gap:10px">
+        <a href="/" class="btn btn-primary">Back home <Icon name="arrow" size={14} /></a>
+        <a href="/submit" class="btn">Submit an app</a>
+      </span>
+    </div>
+    <div class="verdict-card">
+      <span class="eyebrow">The verdict</span>
+      <span class="big">Not really</span>
+      <strong>No page here.</strong>
+    </div>
+  </section>
   <script is:inline>
     (function () { var c = document.querySelector('[data-404-path]'); if (c) c.textContent = location.pathname; })();
   </script>

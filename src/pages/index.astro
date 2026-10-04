@@ -1,85 +1,76 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 import Ticker from '../components/Ticker.astro';
-import Waitlist from '../components/Waitlist.astro';
 import EntryList from '../components/EntryList.astro';
-import SearchChips from '../components/SearchChips.astro';
-import { ENTRIES, byKind, verdictLabel } from '../lib/apps';
+import SearchBox from '../components/SearchBox.astro';
+import Chips from '../components/Chips.astro';
+import { ENTRIES, byKind } from '../lib/apps';
 import { KINDS, KIND_ORDER } from '../lib/kinds';
-import { SITE_TAGLINE, directoryItems, entryPath, itemList } from '../lib/seo';
+import { SITE_TAGLINE, directoryItems, itemList } from '../lib/seo';
 
-const chips = KIND_ORDER.map((k) => ({ key: k, label: KINDS[k].plural, emoji: KINDS[k].emoji, count: byKind(k).length }));
+const chips = KIND_ORDER.map((k) => ({ key: k, label: KINDS[k].plural, count: byKind(k).length, kind: k }));
 const rotate = ['skills', 'plugins', 'mcp', 'prompts'] as const;
-// Featured: best verdicts first, then the most expensive subscriptions.
-const rank = { yes: 0, kinda: 1, no: 2 } as const;
-const top = (k: (typeof KIND_ORDER)[number]) =>
-  [...byKind(k)].sort((a, b) => rank[a.verdict] - rank[b.verdict] || (b.priceMonthly ?? 0) - (a.priceMonthly ?? 0)).slice(0, 3);
-
 const title = 'Is there a skill for it? Skills, MCPs, plugins and prompts that replace SaaS';
 const description = `${ENTRIES.length} paid SaaS apps checked across four directories: is there a skill, an MCP server, a plugin or a one-shot prompt that replaces it? Honest verdicts and copy-paste installs for Claude Code, Codex and Cursor.`;
 const site = Astro.site!;
 ---
-<Base title={title} description={description} path="/" tape={false} jsonld={[itemList(site, 'Directories', directoryItems())]}>
-  <div class="wrap">
-    <section class="hero">
-      <span class="eyebrow">four directories, one question</span>
-      <h1>
-        <span class="sr-only">Is there a skill for it?</span>
-        <span aria-hidden="true">Is there <span data-article>a</span> <a class="rot" href="/skills" data-rotate={rotate.map((k) => KINDS[k].word).join(',')} data-hrefs={rotate.map((k) => `/${k}`).join(',')}><span class="rot-word">skill</span></a> for it<span class="q">?</span></span>
-      </h1>
+<Base title={title} description={description} path="/" home jsonld={[itemList(site, 'Directories', directoryItems())]}>
+  <section class="hero">
+    <h1>
+      <span class="sr-only">Is there a skill for it?</span>
+      <span aria-hidden="true">Is there <span data-article>a</span> <a class="rot" href="/skills" data-rotate={rotate.map((k) => KINDS[k].word).join(',')} data-hrefs={rotate.map((k) => `/${k}`).join(',')}><span class="rot-word">skill</span></a> for it?</span>
+    </h1>
+    <div class="hero-side">
       <p class="lede">{SITE_TAGLINE} Honest verdicts, copy-paste installs, and what you actually give up.</p>
-      <SearchChips action="/" param="kind" chips={chips} total={ENTRIES.length} placeholder="notion, pdf, code review, stripe…" />
-      <Ticker entries={ENTRIES} scope="all" metric="mrr" showKind />
-    </section>
+      <SearchBox action="/" placeholder={`Search ${ENTRIES.length} apps: notion, pdf, code review…`} />
+    </div>
+  </section>
 
-    <section aria-labelledby="dirs-title">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">pick your weapon</span>
-          <h2 id="dirs-title">The directories</h2>
-        </div>
+  <section aria-label="Directories" class="dir-grid">
+    {KIND_ORDER.map((k, i) => (
+      <a href={`/${k}`} class={`tile dir-tile k-${k} reveal`} style={`--d:${i * 70}ms`}>
+        <span class="top"><span class="ico-badge"><Icon name={k} size={26} /></span>{byKind(k).length} apps</span>
+        <span>
+          <strong>Is there {KINDS[k].article} {KINDS[k].word} for it?</strong>
+          <p>{KINDS[k].tagline}</p>
+        </span>
+      </a>
+    ))}
+  </section>
+
+  <section id="list" class="board">
+    <Ticker scope="all" metric="mrr" />
+    <div class="card list-card reveal" style="min-width: 0">
+      <div class="list-head">
+        <h2>The Death List</h2>
+        <span class="muted mono" style="font-size:12px" data-result-count aria-live="polite">{ENTRIES.length} of {ENTRIES.length}</span>
       </div>
-      <div class="dir-grid">
-        {KIND_ORDER.map((k, i) => {
-          const list = byKind(k);
-          const kk = KINDS[k];
-          return (
-            <div class="dir reveal" style={`--d:${i * 70}ms`}>
-              <a class="dir-head" href={`/${k}`}>
-                <span class="dir-emoji" aria-hidden="true">{kk.emoji}</span>
-                <span>
-                  <span class="dir-q">Is there {kk.article} <b>{kk.word}</b> for it?</span>
-                  <span class="dir-n">{list.length} apps · {list.filter((e) => e.verdict === 'yes').length} {kk.verdicts.yes.label}</span>
-                </span>
-                <span class="arrow" aria-hidden="true">→</span>
-              </a>
-              <p class="dir-lede">{kk.lede}</p>
-              <ul class="dir-top">
-                {top(k).map((e) => (
-                  <li>
-                    <a href={entryPath(e)}>
-                      <img src={`/api/favicon/${e.slug}`} width="18" height="18" alt="" loading="lazy" />
-                      <span>{e.name}</span>
-                      <span class={`badge ${e.verdict}`}>{verdictLabel(e)}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
+      <div style="padding: 0 10px 12px">
+        <Chips param="kind" chips={chips} total={ENTRIES.length} action="/" />
       </div>
-    </section>
+      <EntryList entries={ENTRIES} filterBy="kind" />
+    </div>
+  </section>
 
-    <section id="list" aria-labelledby="dl-title">
-      <EntryList entries={ENTRIES} filterBy="kind" showKind>
-        <div slot="head">
-          <span class="eyebrow">every directory, ranked by votes</span>
-          <h2 id="dl-title">The Death List</h2>
-        </div>
-      </EntryList>
-    </section>
+  <section class="band dashed reveal" aria-labelledby="add-title">
+    <div>
+      <h2 id="add-title">Add your own is-there.</h2>
+      <p>Four directories, open to everyone. Reviewed before it goes live.</p>
+      <a href="/submit" class="btn btn-primary btn-lg" style="margin-top:20px">Submit one <Icon name="arrow" size={16} /></a>
+    </div>
+    <div class="pick4">
+      {KIND_ORDER.map((k) => (
+        <a href={`/submit?dir=${k}`} class={`tile k-${k}`}><Icon name={k} size={22} />{KINDS[k].plural}</a>
+      ))}
+    </div>
+  </section>
 
-    <Waitlist source="home" />
-  </div>
+  <section class="card ad-band reveal">
+    <span style="display:flex;flex-direction:column;gap:6px">
+      <strong>Advertise in the margins</strong>
+      <span class="muted" style="font-size:14px">Two 160×600 slots beside every page, booked by the week.</span>
+    </span>
+    <a href="/advertise" class="btn">Book a slot <Icon name="arrow" size={14} /></a>
+  </section>
 </Base>

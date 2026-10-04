@@ -1,9 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
 import Ticker from './Ticker.astro';
-import EntryList from './EntryList.astro';
-import SearchChips from './SearchChips.astro';
-import Waitlist from './Waitlist.astro';
+import EntryCards from './EntryCards.astro';
+import SearchBox from './SearchBox.astro';
+import Chips from './Chips.astro';
 import { byKind, categoryCounts } from '../lib/apps';
 import { KINDS, KIND_ORDER, type Kind } from '../lib/kinds';
 import { breadcrumbs, entryPath, entryTitle, itemList } from '../lib/seo';
@@ -16,11 +17,11 @@ const k = KINDS[kind];
 const entries = byKind(kind);
 const byVerdict = { yes: 0, kinda: 0, no: 0 };
 for (const e of entries) byVerdict[e.verdict]++;
-
 const site = Astro.site!;
 const title = `Is there ${k.article} ${k.word} for it? ${entries.length} SaaS apps, honest verdicts`;
 const description = `${k.lede} ${entries.length} apps checked: ${byVerdict.yes} ${k.verdicts.yes.label}, ${byVerdict.kinda} ${k.verdicts.kinda.label}, ${byVerdict.no} ${k.verdicts.no.label}.`;
 const others = KIND_ORDER.filter((x) => x !== kind);
+const cats = categoryCounts(entries).map((c) => ({ key: c.key, label: c.label, count: c.count }));
 ---
 <Base
   title={title}
@@ -28,54 +29,46 @@ const others = KIND_ORDER.filter((x) => x !== kind);
   path={`/${kind}`}
   ogImage={`/og/${kind}.png`}
   kind={kind}
-  tape={false}
   jsonld={[
     breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: k.plural, path: `/${kind}` }]),
     itemList(site, `${k.listTitle}: ${k.plural}`, entries.map((e) => ({ name: entryTitle(e), path: entryPath(e) }))),
   ]}
 >
-  <div class="wrap">
-    <section class="hero">
-      <span class="eyebrow">{k.emoji} {k.plural.toLowerCase()} directory</span>
-      <h1>Is there {k.article} <span class="kind-word">{k.word}</span> for it<span class="q">?</span></h1>
-      <p class="lede">{k.lede}</p>
-      <SearchChips action={`/${kind}`} param="cat" chips={categoryCounts(entries)} total={entries.length} placeholder={`search ${k.plural.toLowerCase()}: ${entries.slice(0, 2).map((e) => e.name.toLowerCase()).join(', ')}…`} />
-      <div class="hero-stats">
-        <span><b>{entries.length}</b> apps</span>
-        <span><b class="green">{byVerdict.yes}</b> {k.verdicts.yes.label}</span>
-        <span><b style="color:var(--amber)">{byVerdict.kinda}</b> {k.verdicts.kinda.label}</span>
-        <span><b style="color:var(--red)">{byVerdict.no}</b> {k.verdicts.no.label}</span>
-      </div>
-      <Ticker entries={entries} scope={kind} metric={k.metric} />
-    </section>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">{k.plural}</li></ol></nav>
 
-    <section id="list" aria-labelledby="dl-title">
-      <EntryList entries={entries} filterBy="category">
-        <div slot="head">
-          <span class="eyebrow">{k.listEyebrow}</span>
-          <h2 id="dl-title">{k.listTitle}</h2>
-        </div>
-      </EntryList>
-    </section>
+  <section class={`hero k-${kind}`}>
+    <div class="page-title">
+      <span class="ico-badge" style="width:60px;height:60px;border-radius:16px;background:color-mix(in srgb, var(--k) var(--tint), var(--surface))"><Icon name={kind} size={30} /></span>
+      <h1>Is there {k.article} <span class="hl">{k.word}</span> for it?</h1>
+      <p class="lede muted" style="font-size:18px;max-width:560px">{k.lede}</p>
+    </div>
+    <div class="stats">
+      <div class="card stat"><b>{entries.length}</b><span>apps checked</span></div>
+      <div class="tile stat k-mcp" style="--k:var(--green)"><b>{byVerdict.yes}</b><span>{k.verdicts.yes.label.toLowerCase()}</span></div>
+      <div class="tile stat" style="--k:var(--amber)"><b>{byVerdict.kinda + byVerdict.no}</b><span>{k.verdicts.kinda.label.toLowerCase()} or {k.verdicts.no.label.toLowerCase()}</span></div>
+    </div>
+  </section>
 
-    <section aria-labelledby="other-title">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">other directories</span>
-          <h2 id="other-title">Not {k.article} {k.word}? Try these.</h2>
-        </div>
-      </div>
-      <div class="cards">
-        {others.map((o, i) => (
-          <a class="card dir-card reveal" href={`/${o}`} style={`--d:${i * 70}ms`}>
-            <span class="step">{KINDS[o].emoji} {byKind(o).length} apps</span>
-            <h3>Is there {KINDS[o].article} {KINDS[o].word} for it?</h3>
-            <p>{KINDS[o].lede}</p>
-          </a>
-        ))}
-      </div>
-    </section>
+  <section id="list" class="stack" style="gap:20px">
+    <div class="toolbar">
+      <SearchBox action={`/${kind}`} placeholder={`Search ${k.plural}…`} label={`Search ${k.plural}`} />
+      <Chips param="cat" chips={cats} total={entries.length} action={`/${kind}`} kind={kind} />
+    </div>
+    <div class="list-head" style="padding:0">
+      <span class="eyebrow">{k.listEyebrow}</span>
+      <span class="muted mono" style="font-size:12px" data-result-count aria-live="polite">{entries.length} of {entries.length}</span>
+    </div>
+    <EntryCards entries={entries} />
+  </section>
 
-    <Waitlist source={kind} />
-  </div>
+  <section class="grid-auto" style="--min:300px;align-items:start">
+    <Ticker scope={kind} metric={k.metric} />
+    {others.map((o) => (
+      <a href={`/${o}`} class={`tile dir-link k-${o}`}>
+        <span class="ico-badge sm"><Icon name={o} size={22} /></span>
+        <span style="display:flex;flex-direction:column;gap:2px"><strong>Is there {KINDS[o].article} {KINDS[o].word} for it?</strong><span class="muted" style="font-size:13px">{byKind(o).length} apps</span></span>
+        <Icon name="arrow" size={18} class="go" />
+      </a>
+    ))}
+  </section>
 </Base>

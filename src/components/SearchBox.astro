@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  action: string;
+  placeholder: string;
+  label?: string;
+}
+const { action, placeholder, label = 'Search apps' } = Astro.props;
+---
+<form class="search" role="search" action={action} method="get" data-search-form>
+  <label for="q" style="display:inline-flex"><Icon name="search" size={18} /><span class="sr-only">{label}</span></label>
+  <input id="q" name="q" type="search" placeholder={placeholder} autocomplete="off" spellcheck="false" data-search />
+  <kbd aria-hidden="true">/</kbd>
+</form>

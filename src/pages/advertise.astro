@@ -1,0 +1,85 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { breadcrumbs } from '../lib/seo';
+
+const site = Astro.site!;
+const slots = [
+  { id: 'left', name: 'Left rail', kind: 'skills', size: '160 × 600', where: 'Sticky beside every page, left side', l: true, r: false },
+  { id: 'right', name: 'Right rail', kind: 'mcp', size: '160 × 600', where: 'Sticky beside every page, right side', l: false, r: true },
+  { id: 'takeover', name: 'Directory takeover', kind: 'plugins', size: '2 × 160 × 600', where: 'Both rails on one directory and all its entries', l: true, r: true },
+];
+---
+<Base
+  title="Is there a skill for it? Advertise in the margins"
+  description="Book a 160×600 ad slot beside every page of isthere, by the week. Static image, one link, no tracking pixels."
+  path="/advertise"
+  current="advertise"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Advertise', path: '/advertise' }])]}
+>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Advertise</li></ol></nav>
+  <section class="hero">
+    <div class="page-title">
+      <h1>Rent the <span class="hl">margins</span>.</h1>
+      <p class="muted" style="font-size:18px;line-height:1.55;max-width:560px">Two ad slots sit beside every page, next to the verdicts people read before they cancel a subscription or install a replacement.</p>
+    </div>
+    <div class="pills"><span>Static image only</span><span>No tracking pixels</span><span>Booked by the week</span></div>
+  </section>
+
+  <section class="grid-auto" aria-label="Ad slots" style="--min:280px">
+    {slots.map((s) => (
+      <div class={`tile slot k-${s.kind}`}>
+        <div class="sketch" aria-hidden="true">
+          <span class={`r${s.l ? ' on' : ''}`}></span>
+          <span class="c"><i style="height:14px;border-radius:999px"></i><i style="height:30px;width:70%"></i><span class="g"><i></i><i></i><i></i><i></i></span></span>
+          <span class={`r${s.r ? ' on' : ''}`}></span>
+        </div>
+        <span style="display:flex;flex-direction:column;gap:6px"><strong>{s.name}</strong><span class="muted" style="font-size:14px;line-height:1.5">{s.where}</span></span>
+        <span class="foot"><span>{s.size}</span><b>[YOUR PRICE] / week</b></span>
+      </div>
+    ))}
+  </section>
+
+  <section class="split">
+    <form class="card pad form" method="post" action="/api/advertise" data-ajax-form="advertise" style="gap:18px">
+      <h2 class="section-title" style="font-size:28px">Book a slot</h2>
+      <div class="grid-auto" style="--min:220px">
+        <label class="field" for="a-slot">Slot
+          <select id="a-slot" name="slot" required>
+            {slots.map((s) => <option value={s.id}>{s.name}</option>)}
+          </select>
+        </label>
+        <label class="field" for="a-week">Starting week<input id="a-week" name="week" type="week" required /></label>
+      </div>
+      <div class="grid-auto" style="--min:220px">
+        <label class="field" for="a-co">Company or product<input id="a-co" name="company" type="text" required maxlength="100" placeholder="Acme Dev Tools" /></label>
+        <label class="field" for="a-url">Click-through link<input id="a-url" name="url" type="url" required maxlength="300" placeholder="https://acme.dev" /></label>
+      </div>
+      <label class="field" for="a-email">Email<span class="hint">Booking confirmation and invoice go here</span><input id="a-email" name="email" type="email" required maxlength="254" placeholder="you@acme.dev" /></label>
+      <label class="field" for="a-notes">Anything else?<span class="hint">Optional. You’ll send the 160×600 image once we confirm the slot.</span><textarea id="a-notes" name="notes" rows="3" maxlength="1000"></textarea></label>
+      <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+      <div class="form-foot">
+        <span class="muted" style="font-size:13px">We confirm availability before you pay.</span>
+        <button type="submit" class="btn btn-primary btn-lg"><span class="idle">Request this slot</span><span class="ok">Request sent</span><Icon name="arrow" size={16} /></button>
+      </div>
+      <p class="form-msg" role="status" aria-live="polite" data-form-msg></p>
+    </form>
+
+    <aside class="stack sticky" aria-label="Ad rules">
+      <div class="card stack" style="padding:22px;gap:14px">
+        <span class="eyebrow">The rules</span>
+        <ul class="checks">
+          <li><Icon name="check" size={18} />One static image and one link. No scripts.</li>
+          <li><Icon name="check" size={18} />No tracking pixels or third-party cookies, same as the rest of the site.</li>
+          <li><Icon name="check" size={18} />Clearly labelled as an ad, never mixed into verdicts.</li>
+          <li><Icon name="check" size={18} />Ads don’t buy a better verdict.</li>
+        </ul>
+      </div>
+      <div class="ticker" style="gap:10px">
+        <span class="label">NEXT OPEN WEEK</span>
+        <strong style="font:700 30px/1.1 var(--display)">[DATE]</strong>
+        <span style="font-size:13px;opacity:.8">Left and right rails, all directories.</span>
+      </div>
+    </aside>
+  </section>
+</Base>

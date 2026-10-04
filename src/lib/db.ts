@@ -6,7 +6,10 @@
 import { env } from 'cloudflare:workers';
 import { ENTRIES, keyOf, type Entry } from './apps';
 import { KINDS, KIND_ORDER } from './kinds';
-import schemaSql from '../../migrations/0001_init.sql?raw';
+import schema1 from '../../migrations/0001_init.sql?raw';
+import schema2 from '../../migrations/0002_submissions.sql?raw';
+
+const schemaSql = `${schema1};\n${schema2}`;
 
 // Minimal D1 typings so this file doesn't depend on generated worker types.
 interface D1Stmt {
@@ -25,7 +28,7 @@ const raw = (): D1 => (env as unknown as { DB: D1 }).DB;
 /**
  * The schema is created on first use (CREATE TABLE IF NOT EXISTS), once per Worker
  * instance, so a fresh D1 database works without a separate migration step.
- * migrations/0001_init.sql is the same schema, for `wrangler d1 migrations apply`.
+ * migrations/*.sql hold the same schema, for `wrangler d1 migrations apply`.
  */
 let ready: Promise<void> | undefined;
 async function conn(): Promise<D1> {
@@ -192,5 +195,44 @@ export async function putFavicon(domain: string, mime: string, body: Uint8Array)
       'INSERT INTO favicons (domain, mime, body, fetched_at) VALUES (?, ?, ?, ?) ON CONFLICT(domain) DO UPDATE SET mime = excluded.mime, body = excluded.body, fetched_at = excluded.fetched_at'
     )
     .bind(domain, mime, body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength), now())
+    .run();
+}
+
+/* ---------- submissions + ad requests (reviewed by hand) ---------- */
+
+export interface Submission {
+  directory: string;
+  app: string;
+  appUrl: string;
+  link: string;
+  verdict: string;
+  lose: string;
+  install: string;
+  github: string;
+  email: string;
+}
+
+export async function addSubmission(x: Submission) {
+  await (await conn())
+    .prepare(
+      'INSERT INTO submissions (directory, app, app_url, link, verdict, lose, install, github, email, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    )
+    .bind(x.directory, x.app, x.appUrl || null, x.link, x.verdict, x.lose || null, x.install || null, x.github || null, x.email || null, now())
+    .run();
+}
+
+export interface AdRequest {
+  slot: string;
+  week: string;
+  company: string;
+  url: string;
+  email: string;
+  notes: string;
+}
+
+export async function addAdRequest(x: AdRequest) {
+  await (await conn())
+    .prepare('INSERT INTO ad_requests (slot, week, company, url, email, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    .bind(x.slot, x.week, x.company, x.url, x.email, x.notes || null, now())
     .run();
 }

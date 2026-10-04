@@ -15,6 +15,8 @@ export interface KindConfig {
   /** Long-name subdomains that 301 to this directory, e.g. isthereaskillforit.biratdatta.tech */
   vanity: string[];
   lede: string;
+  /** One short line for menus and tiles. */
+  tagline: string;
   /** "mrr": price × votes counts as MRR destroyed. "users": votes are just "I use this". */
   metric: 'mrr' | 'users';
   vote: string;
@@ -28,6 +30,7 @@ export interface KindConfig {
 export const KINDS: Record<Kind, KindConfig> = {
   skills: {
     id: 'skills',
+    tagline: 'SKILL.md packs that do the job a subscription used to.',
     word: 'skill',
     article: 'a',
     plural: 'Skills',
@@ -49,6 +52,7 @@ export const KINDS: Record<Kind, KindConfig> = {
   },
   mcp: {
     id: 'mcp',
+    tagline: 'Servers that let your agent drive the app for you.',
     word: 'MCP',
     article: 'an',
     plural: 'MCPs',
@@ -70,6 +74,7 @@ export const KINDS: Record<Kind, KindConfig> = {
   },
   plugins: {
     id: 'plugins',
+    tagline: 'Bundles of skills, commands and connectors that replace a workflow.',
     word: 'plugin',
     article: 'a',
     plural: 'Plugins',
@@ -91,6 +96,7 @@ export const KINDS: Record<Kind, KindConfig> = {
   },
   prompts: {
     id: 'prompts',
+    tagline: 'One-shot build prompts for Claude Code, Codex and Cursor.',
     word: 'prompt',
     article: 'a',
     plural: 'Prompts',

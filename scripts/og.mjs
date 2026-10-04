@@ -13,12 +13,13 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const font = (pkg, file) => fs.readFileSync(path.join(path.dirname(require.resolve(`${pkg}/package.json`)), 'files', file));
 const fonts = [
-  { name: 'Space Grotesk', data: font('@fontsource/space-grotesk', 'space-grotesk-latin-700-normal.woff'), weight: 700, style: 'normal' },
-  { name: 'JetBrains Mono', data: font('@fontsource/jetbrains-mono', 'jetbrains-mono-latin-400-normal.woff'), weight: 400, style: 'normal' },
-  { name: 'JetBrains Mono', data: font('@fontsource/jetbrains-mono', 'jetbrains-mono-latin-700-normal.woff'), weight: 700, style: 'normal' },
+  { name: 'Bricolage Grotesque', data: font('@fontsource/bricolage-grotesque', 'bricolage-grotesque-latin-800-normal.woff'), weight: 700, style: 'normal' },
+  { name: 'Geist Mono', data: font('@fontsource/geist-mono', 'geist-mono-latin-500-normal.woff'), weight: 400, style: 'normal' },
+  { name: 'Geist Mono', data: font('@fontsource/geist-mono', 'geist-mono-latin-700-normal.woff'), weight: 700, style: 'normal' },
 ];
 
-const C = { bg: '#050705', line: '#16241a', text: '#d6e5d6', muted: '#7d927f', green: '#39ff7a', amber: '#ffb02e', red: '#ff5a52' };
+// Bento palette (light), matching src/styles/global.css
+const C = { bg: '#f4f5f8', line: '#e3e6ec', text: '#0e1322', muted: '#525a70', primary: '#1d4fe0', green: '#137a3f', amber: '#9a5b00', red: '#c22a2a' };
 const VERDICT = { yes: ['YES', C.green], kinda: ['KINDA', C.amber], no: ['NOT REALLY', C.red] };
 
 const h = (type, style, children) => ({ type, props: { style: { display: 'flex', ...style }, children } });
@@ -34,16 +35,14 @@ function frame(children) {
       justifyContent: 'space-between',
       padding: '64px 72px',
       background: C.bg,
-      backgroundImage: `radial-gradient(ellipse at 20% 0%, rgba(57,255,122,0.16), transparent 60%), linear-gradient(${C.line} 1px, transparent 1px), linear-gradient(90deg, ${C.line} 1px, transparent 1px)`,
-      backgroundSize: '100% 100%, 48px 48px, 48px 48px',
       color: C.text,
-      fontFamily: 'JetBrains Mono',
+      fontFamily: 'Geist Mono',
     },
     [
-      h('div', { alignItems: 'center', gap: 14, fontSize: 28, fontWeight: 700 }, [
-        h('div', { color: C.green }, '>'),
-        h('div', {}, 'is there a skill for it?'),
-        h('div', { width: 16, height: 30, background: C.green }, ''),
+      h('div', { alignItems: 'baseline', fontFamily: 'Bricolage Grotesque', fontSize: 34, fontWeight: 700, letterSpacing: -1 }, [
+        h('div', {}, 'is'),
+        h('div', { color: C.primary }, 'there'),
+        h('div', {}, '?'),
       ]),
       ...children,
     ]
@@ -66,11 +65,11 @@ function appCard(app, kind) {
   return frame([
     h('div', { flexDirection: 'column', gap: 18 }, [
       h('div', { fontSize: 30, color: C.muted }, lead),
-      h('div', { fontFamily: 'Space Grotesk', fontSize: app.name.length > 16 ? 88 : app.name.length > 11 ? 104 : 128, fontWeight: 700, lineHeight: 1, letterSpacing: -4, color: '#fff' }, big),
+      h('div', { fontFamily: 'Bricolage Grotesque', fontSize: app.name.length > 16 ? 88 : app.name.length > 11 ? 104 : 128, fontWeight: 700, lineHeight: 1, letterSpacing: -4, color: C.text }, big),
     ]),
     h('div', { justifyContent: 'space-between', alignItems: 'flex-end' }, [
       h('div', { alignItems: 'center', gap: 18 }, [
-        h('div', { padding: '14px 26px', border: `4px solid ${color}`, borderRadius: 14, color, fontSize: 56, fontWeight: 700, background: 'rgba(0,0,0,0.35)' }, label),
+        h('div', { padding: '14px 26px', border: `4px solid ${color}`, borderRadius: 14, color, fontSize: 56, fontWeight: 700, background: '#ffffff' }, label),
         h('div', { fontSize: 26, color: C.muted }, kind === 'prompts' ? 'with one AI prompt' : `${k.word} directory`),
       ]),
       app.priceMonthly != null
@@ -85,10 +84,10 @@ function appCard(app, kind) {
 
 function homeCard(count) {
   return frame([
-    h('div', { fontFamily: 'Space Grotesk', fontSize: 84, fontWeight: 700, lineHeight: 1.04, letterSpacing: -3, color: '#fff' }, 'Is there a skill, an MCP, a plugin or a prompt for it?'),
+    h('div', { fontFamily: 'Bricolage Grotesque', fontSize: 84, fontWeight: 700, lineHeight: 1.04, letterSpacing: -3, color: C.text }, 'Is there a skill, an MCP, a plugin or a prompt for it?'),
     h('div', { justifyContent: 'space-between', alignItems: 'flex-end', fontSize: 28 }, [
       h('div', { color: C.muted }, `${count} SaaS apps · 4 directories · honest verdicts`),
-      h('div', { color: C.green, fontWeight: 700, fontSize: 34 }, 'isthere'),
+      h('div', { color: C.primary, fontWeight: 700, fontSize: 34 }, 'isthere.biratdatta.tech'),
     ]),
   ]);
 }
@@ -97,7 +96,7 @@ function kindCard(kind, apps) {
   const k = KINDS[kind];
   const yes = apps.filter((a) => a.verdict === 'yes').length;
   return frame([
-    h('div', { fontFamily: 'Space Grotesk', fontSize: 110, fontWeight: 700, lineHeight: 1.02, letterSpacing: -4, color: '#fff' }, `Is there ${k.article} ${k.word} for it?`),
+    h('div', { fontFamily: 'Bricolage Grotesque', fontSize: 110, fontWeight: 700, lineHeight: 1.02, letterSpacing: -4, color: C.text }, `Is there ${k.article} ${k.word} for it?`),
     h('div', { justifyContent: 'space-between', alignItems: 'flex-end', fontSize: 28 }, [
       h('div', { color: C.muted }, `${apps.length} apps · ${yes} ${k.labels.yes}`),
       h('div', { color: C.green, fontWeight: 700, fontSize: 34 }, `/${kind}`),

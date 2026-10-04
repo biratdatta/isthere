@@ -99,6 +99,20 @@ Install snippets for Claude Code, Codex and Cursor are generated from these fiel
 - `priceMonthly` is the entry paid tier per seat, or `null` when usage-based or unverifiable (explain in `priceNote`). Prices drift; PRs welcome.
 - `npm run check-data` validates every file (also runs in CI). The site refuses to build with invalid data.
 
+## Submissions and ad requests
+
+The Submit page (`/submit`) and Advertise page (`/advertise`) post to `/api/submit` and `/api/advertise`
+(honeypot field, server-side validation, 5 per hour per IP). Rows land in the D1 tables `submissions` and
+`ad_requests` with `status = 'new'`. Read them in the Cloudflare dashboard (**Storage & databases → D1 → isthere**)
+or from a terminal:
+
+```bash
+npx wrangler d1 execute isthere --remote --command "SELECT * FROM submissions WHERE status = 'new' ORDER BY created_at DESC"
+npx wrangler d1 execute isthere --remote --command "SELECT * FROM ad_requests WHERE status = 'new' ORDER BY created_at DESC"
+```
+
+Ad creatives are not uploaded: advertisers send the 160×600 image after you confirm the slot.
+
 ## How things work
 
 | Feature | Where |

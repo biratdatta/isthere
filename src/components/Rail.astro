@@ -1,0 +1,15 @@
+---
+/** A 160×600 ad slot in the page margin. Hidden below 1180px. */
+interface Props {
+  side: 'left' | 'right';
+}
+const { side } = Astro.props;
+---
+<aside class="rail" aria-label="Advertising">
+  <a href="/advertise" class="rail-slot">
+    <span class="top"><span>AD</span><span>{side.toUpperCase()}</span></span>
+    <span class="art">160 × 600<br />your creative</span>
+    <strong>Advertise here</strong>
+    <span class="p">Book this slot by the week</span>
+  </a>
+</aside>
