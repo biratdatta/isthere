@@ -9,8 +9,9 @@ import { KINDS, KIND_ORDER } from './kinds';
 import schema1 from '../../migrations/0001_init.sql?raw';
 import schema2 from '../../migrations/0002_submissions.sql?raw';
 import schema3 from '../../migrations/0003_community.sql?raw';
+import schema4 from '../../migrations/0004_activity.sql?raw';
 
-const schemaSql = `${schema1};\n${schema2};\n${schema3}`;
+const schemaSql = `${schema1};\n${schema2};\n${schema3};\n${schema4}`;
 
 // Minimal D1 typings so this file doesn't depend on generated worker types.
 interface D1Stmt {
@@ -103,7 +104,7 @@ const VOTE_COOLDOWN = 86400; // one vote per entry per IP per day
 const VOTE_BURST = { windowSec: 3600, max: 20 }; // per IP across all entries
 
 /** key is "kind:slug". */
-export async function castVote(key: string, ipHash: string): Promise<VoteResult> {
+export async function castVote(key: string, ipHash: string, country: string | null = null): Promise<VoteResult> {
   const recent = await (await conn())
     .prepare('SELECT 1 AS x FROM vote_log WHERE ip_hash = ? AND slug = ? AND ts > ? LIMIT 1')
     .bind(ipHash, key, now() - VOTE_COOLDOWN)
@@ -115,6 +116,7 @@ export async function castVote(key: string, ipHash: string): Promise<VoteResult>
   await (await conn()).batch([
     (await conn()).prepare('INSERT INTO vote_log (slug, ip_hash, ts) VALUES (?, ?, ?)').bind(key, ipHash, now()),
     (await conn()).prepare('INSERT INTO votes (slug, count) VALUES (?, 1) ON CONFLICT(slug) DO UPDATE SET count = count + 1').bind(key),
+    (await conn()).prepare('INSERT INTO activity (key, country, ts) VALUES (?, ?, ?)').bind(key, country && /^[A-Z]{2}$/.test(country) ? country : null, now()),
   ]);
   return { ok: true, count: await voteCount(key) };
 }
@@ -351,4 +353,24 @@ export async function addAltSuggestion(x: { app: string; name: string; url: stri
     .prepare('INSERT INTO alt_suggestions (app, name, url, description, github, created_at) VALUES (?, ?, ?, ?, ?, ?)')
     .bind(x.app, x.name, x.url, x.description || null, x.github || null, now())
     .run();
+}
+
+/* ---------- footer pulse: live totals, this week's hottest app, recent activity ---------- */
+
+export async function pulse() {
+  const d = await conn();
+  const [snap, hot, recent] = await Promise.all([
+    snapshot(),
+    d.prepare('SELECT slug, COUNT(*) AS n FROM vote_log WHERE ts > ? GROUP BY slug ORDER BY n DESC LIMIT 1').bind(now() - 86400 * 7).first<{ slug: string; n: number }>(),
+    d.prepare('SELECT key, country, ts FROM activity ORDER BY ts DESC LIMIT 8').all<{ key: string; country: string | null; ts: number }>(),
+  ]);
+  if (Math.random() < 0.02) await d.prepare('DELETE FROM activity WHERE ts < ?').bind(now() - 86400 * 30).run();
+  return {
+    mrr: snap.totals.all.mrr,
+    votes: snap.totals.all.votes,
+    counts: snap.counts,
+    hot: hot ? { key: hot.slug, n: hot.n } : null,
+    recent: recent.results.map((r) => ({ key: r.key, c: r.country, ts: r.ts })),
+    now: now(),
+  };
 }

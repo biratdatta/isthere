@@ -369,6 +369,12 @@ document.addEventListener('keydown', (e) => {
     }
   } else if (e.key === 't') {
     toggleTheme();
+  } else if (e.key === 'r' || e.key === 'R') {
+    const next = $('[data-random-next]');
+    if (next) {
+      next.click();
+      $('[data-random]')?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+    }
   }
 });
 
@@ -944,5 +950,94 @@ $$('[data-stack-add]').forEach((btn) => {
         btn.disabled = false;
       }
     });
+  }
+}
+
+/* ---------- footer pulse: live stats, ticker tape, activity, random verdict ---------- */
+{
+  const dataEl = document.getElementById('footer-data');
+  const foot = $('[data-footer]');
+  if (dataEl && foot) {
+    const { names, verdicts } = JSON.parse(dataEl.textContent ?? '{}') as {
+      names: Record<string, { n: string; u: string; w: string }>;
+      verdicts: { t: string; l: string; v: string; u: string; k: string }[];
+    };
+
+    // Random verdict (button or the R key).
+    const link = $<HTMLAnchorElement>('[data-random-link]', foot)!;
+    let last = -1;
+    $('[data-random-next]', foot)?.addEventListener('click', () => {
+      let i = Math.floor(Math.random() * verdicts.length);
+      if (i === last) i = (i + 1) % verdicts.length;
+      last = i;
+      const v = verdicts[i];
+      link.href = v.u;
+      link.className = `rv k-${v.k} v-${v.v}`;
+      $('[data-random-title]', link)!.textContent = v.t;
+      $('[data-random-label]', link)!.textContent = v.l;
+      void link.offsetWidth;
+      link.classList.add('flip');
+    });
+    // Start on a random one rather than always the first.
+    $('[data-random-next]', foot)?.click();
+
+    // "Last verdict added …"
+    $$('[data-ago]', foot).forEach((el) => {
+      const d = new Date(`${el.getAttribute('datetime')}T00:00:00`);
+      const days = Math.round((Date.now() - d.getTime()) / 864e5);
+      el.textContent = days <= 0 ? 'today' : days === 1 ? 'yesterday' : days < 30 ? `${days} days ago` : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+
+    const flag = (c: string | null) => (c && /^[A-Z]{2}$/.test(c) ? String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65)) : '');
+    const ago = (s: number) => (s < 60 ? 'just now' : s < 3600 ? `${Math.floor(s / 60)}m ago` : s < 86400 ? `${Math.floor(s / 3600)}h ago` : `${Math.floor(s / 86400)}d ago`);
+    const list = $('[data-activity]', foot)!;
+
+    type Pulse = { mrr: number; votes: number; counts: Record<string, number>; hot: { key: string; n: number } | null; recent: { key: string; c: string | null; ts: number }[]; now: number };
+    const apply = (p: Pulse) => {
+      const set = (k: string, v: string) => $$(`[data-pulse="${k}"]`, foot).forEach((x) => (x.textContent = v));
+      set('mrr', `$${fmt(p.mrr)}`);
+      set('votes', fmt(p.votes));
+      const hot = $<HTMLAnchorElement>('[data-pulse-hot]', foot);
+      if (hot && p.hot && names[p.hot.key]) {
+        hot.href = names[p.hot.key].u;
+        $('b', hot)!.textContent = names[p.hot.key].n;
+        $('span', hot)!.textContent = `hot this week · ${fmt(p.hot.n)} ↑`;
+      }
+      $$('[data-tape-key]', foot).forEach((el) => (el.textContent = fmt(p.counts[el.dataset.tapeKey!] ?? 0)));
+      const rows = p.recent.filter((r) => names[r.key]).slice(0, 4);
+      if (!rows.length) return;
+      list.replaceChildren(
+        ...rows.map((r) => {
+          const x = names[r.key];
+          const li = document.createElement('li');
+          const who = document.createElement('span');
+          who.textContent = `Someone${r.c ? ` in ${flag(r.c)}` : ''} ${x.w === 'MCP' ? 'plugged in' : 'replaced'}`;
+          const a = document.createElement('a');
+          a.href = x.u;
+          a.textContent = x.n;
+          const via = document.createElement('span');
+          via.textContent = x.w === 'MCP' ? 'via MCP' : `with ${/^[aeiou]/i.test(x.w) ? 'an' : 'a'} ${x.w}`;
+          const tm = document.createElement('time');
+          tm.textContent = ago(Math.max(0, p.now - r.ts));
+          li.append(who, a, via, tm);
+          return li;
+        })
+      );
+    };
+    const load = async () => {
+      try {
+        const res = await fetch('/api/pulse', { headers: { accept: 'application/json' } });
+        if (res.ok) apply(await res.json());
+      } catch {}
+    };
+    // Only fetch once the footer is close to the viewport.
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        load();
+        window.setInterval(() => !document.hidden && load(), 45000);
+      }
+    }, { rootMargin: '600px' });
+    io.observe(foot);
   }
 }

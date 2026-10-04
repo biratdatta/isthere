@@ -12,7 +12,8 @@ export const POST: APIRoute = async (ctx) => {
   const e = isKind(kind) ? getEntry(kind, slug ?? '') : undefined;
   if (!e) return json({ error: 'not-found' }, 404);
 
-  const result = await castVote(keyOf(e), await hashIp(clientIp(ctx)));
+  const country = ((ctx.request as Request & { cf?: { country?: string } }).cf?.country ?? null) as string | null;
+  const result = await castVote(keyOf(e), await hashIp(clientIp(ctx)), country);
 
   if (!wantsJson(ctx.request)) {
     // No-JS fallback: back to the entry page with a status flag.
