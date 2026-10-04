@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS waitlist (
   created_at INTEGER NOT NULL
 );
 
--- First-party, cookieless pageview counts.
+-- Pageview counts per day and path.
 CREATE TABLE IF NOT EXISTS hits (
   day TEXT NOT NULL,
   path TEXT NOT NULL,

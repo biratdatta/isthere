@@ -1,72 +1,104 @@
-# Is there a skill for it?
+<div align="center">
 
-Four directories at **isthere.biratdatta.tech**, one question per paid SaaS app: is there a ___ for it?
+# is<span>there</span>?
 
-| Directory | Path | Question | Verdicts | Vote |
-| --- | --- | --- | --- | --- |
-| 🧠 Skills | `/skills` | Can an Agent Skill (SKILL.md) replace it? | YES / KINDA / NOT REALLY | I replaced this |
-| 🔌 MCPs | `/mcp` | Is there an MCP server so your agent can drive it? | OFFICIAL / COMMUNITY / NOT YET | I use this |
-| 🧩 Plugins | `/plugins` | Can an agent plugin replace the workflow? | YES / KINDA / NOT REALLY | I replaced this |
-| ⌨️ Prompts | `/prompts` | Can one AI coding prompt rebuild it? | YES / KINDA / NOT REALLY | I replaced this |
+### Is there a **skill**, an **MCP**, a **plugin** or a **prompt** for it?
 
-Every entry has a blunt verdict, copy-paste installs for Claude Code, Codex and Cursor, an honest
-"what you lose" list, and a vote counter. Votes on skills, plugins and prompts feed the **COLLECTIVE MRR
-DESTROYED** ticker. The same app can appear in several directories, and entries link to each other.
+The SaaS you pay for every month, checked against what an AI agent can do instead.<br />
+Honest verdicts. Copy-paste installs. What you actually give up.
 
-## Stack
+**[isthere.biratdatta.tech](https://isthere.biratdatta.tech)**
 
-- Astro 7 on **Cloudflare Workers** (`@astrojs/cloudflare`). Every page is prerendered to static HTML;
-  only the API routes (`/api/*`) run in the Worker.
-- **Cloudflare D1** (serverless SQLite) for votes, waitlist, rate limits, favicon cache and first-party analytics.
-  Pages fetch live numbers from `/api/counts` and roll the odometers on load.
-- Vanilla JS (`src/scripts/main.ts`), no client framework
-- JetBrains Mono + Space Grotesk, self-hosted via Fontsource (no Google Fonts requests)
-- OG images rendered at build time with satori + resvg (`scripts/og.mjs`)
+[![MIT License](https://img.shields.io/badge/license-MIT-1d4fe0?style=flat-square)](LICENSE)
+[![Built with Astro](https://img.shields.io/badge/built%20with-Astro-0e1322?style=flat-square&logo=astro)](https://astro.build)
+[![Runs on Cloudflare Workers](https://img.shields.io/badge/runs%20on-Cloudflare%20Workers-f38020?style=flat-square&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-137a3f?style=flat-square)](#-add-an-app-in-2-minutes)
 
-Everything fits Cloudflare's free plan: static assets are free and unlimited, and the Worker + D1 free
-allowances (100k requests/day, 5M D1 rows read/day, 100k written/day) are far above what this site needs.
+</div>
+
+---
+
+## Pick a question
+
+| | Directory | The question | Verdicts | Try it |
+|:-:|---|---|---|---|
+| 🧠 | **[Skills](https://isthere.biratdatta.tech/skills)** | Can an Agent Skill (a `SKILL.md`) do the job? | `YES` · `KINDA` · `NOT REALLY` | [isthereaskillforit…/grammarly](https://isthereaskillforit.biratdatta.tech/grammarly) |
+| 🔌 | **[MCPs](https://isthere.biratdatta.tech/mcp)** | Is there an MCP server so your agent can drive it? | `OFFICIAL` · `COMMUNITY` · `NOT YET` | [isthereanmcpforit…/github](https://isthereanmcpforit.biratdatta.tech/github) |
+| 🧩 | **[Plugins](https://isthere.biratdatta.tech/plugins)** | Can an agent plugin replace the workflow? | `YES` · `KINDA` · `NOT REALLY` | [isthereapluginforit…/coderabbit](https://isthereapluginforit.biratdatta.tech/coderabbit) |
+| ⌨️ | **[Prompts](https://isthere.biratdatta.tech/prompts)** | Can one coding prompt rebuild it? | `YES` · `KINDA` · `NOT REALLY` | [isthereapromptforit…/calendly](https://isthereapromptforit.biratdatta.tech/calendly) |
+
+Every entry comes with install commands for **Claude Code**, **Codex** and **Cursor**, the list of things you lose by switching,
+open-source prior art, and an **"I replaced this"** button that feeds the site's
+**COLLECTIVE MRR DESTROYED** ticker.
+
+> **Short links:** `is-there-a-<thing>-for-it.biratdatta.tech/<app>` takes you straight to the answer.
+> `isthereanmcpforit.biratdatta.tech/notion` → the Notion MCP page.
+
+---
+
+## What's inside
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**For visitors**
+- One search across all four directories
+- Death List ranked by real votes, live MRR ticker
+- Per-agent install tabs with one-click copy
+- Light mode and a calm slate dark mode
+- Submit your own find, or book an ad slot
+
+</td>
+<td width="50%" valign="top">
+
+**Under the hood**
+- [Astro 7](https://astro.build), every page prerendered
+- Cloudflare Workers + D1 for votes and forms
+- Vanilla JS, no client framework
+- Social cards generated at build time
+- Content is plain JSON in `data/`
+
+</td>
+</tr>
+</table>
+
+---
 
 ## Run it locally
 
 ```bash
+git clone https://github.com/biratdatta/isthere.git
+cd isthere
 npm install
-npm run seed:demo   # optional: fake votes in the LOCAL D1 database
-npm run dev         # http://localhost:4321
+npm run seed:demo   # optional: sample votes so lists aren't empty
+npm run dev         # → http://localhost:4321
 ```
 
-`npm run dev` uses a local D1 database stored in `.wrangler/`. Tables are created automatically on first use.
+<details>
+<summary><b>Deploy your own copy</b></summary>
 
-## Deploy to Cloudflare
+1. Create a Cloudflare account and add your domain.
+2. **Workers & Pages → Create → Import a repository**, pick your fork.
+   Build command `npm run build`, deploy command `npx wrangler deploy`.
+3. Change the domain in `wrangler.jsonc`, `astro.config.mjs` (`site`) and `src/lib/seo.ts` (`SITE_HOST`).
+4. Short links (optional): `npx wrangler login`, then `npm run deploy:shortlinks`.
 
-One-time setup (the domain `biratdatta.tech` must already be active in your Cloudflare account):
+Every push to `main` redeploys. The database tables create themselves on first use.
 
-1. **Workers & Pages → Create → Import a repository**, pick `biratdatta/isthere`.
-   - Build command: `npm run build`
-   - Deploy command: `npx wrangler deploy`
-2. The first deploy creates the D1 database `isthere` and attaches `isthere.biratdatta.tech`
-   (both come from `wrangler.jsonc`). The tables are created on the first request.
-3. Every `git push` to `main` redeploys.
+</details>
 
-If a deploy ever complains that the D1 database has no `database_id`, create it yourself with
-`npx wrangler d1 create isthere` and paste the printed id into `wrangler.jsonc`.
+---
 
-Or from your machine: `npx wrangler login` once, then `npm run deploy`.
+## ✍️ Add an app in 2 minutes
 
-### Domains
+Found a tool we're missing? Two ways in:
 
-- `isthere.biratdatta.tech` is canonical (`site` in `astro.config.mjs`, `SITE_HOST` in `src/lib/seo.ts`).
-- Short links, done with **Rules → Redirect Rules** in the Cloudflare dashboard (free plan allows 10):
-  for each of `isthereaskillforit`, `isthereanmcpforit`, `isthereamcpforit`, `isthereapluginforit`,
-  `isthereapromptforit` add a proxied DNS record (`AAAA` → `100::`) and a dynamic redirect, e.g.
-  `http.host eq "isthereanmcpforit.biratdatta.tech"` → `concat("https://isthere.biratdatta.tech/mcp", http.request.uri.path)` (301).
-- Old `/notion`-style URLs 301 to `/prompts/notion`.
+- **No code:** use the form at **[isthere.biratdatta.tech/submit](https://isthere.biratdatta.tech/submit)**.
+- **Pull request:** add one JSON file to `data/<directory>/<app>.json`. Same slug across directories means the pages link to each other.
 
-## Adding an entry
-
-One JSON file per app per directory: `data/<skills|mcp|plugins|prompts>/<slug>.json`. Use the same slug
-for the same app across directories so they cross-link.
-
-Shared fields:
+<details>
+<summary><b>The fields every entry has</b></summary>
 
 ```json
 {
@@ -78,76 +110,150 @@ Shared fields:
   "priceNote": "Plus, billed yearly",
   "pricingUrl": "https://www.notion.com/pricing",
   "verdict": "yes",
-  "whatYouLose": ["…"],
-  "priorArt": [{ "name": "…", "url": "https://…" }],
-  "notes": "…"
+  "whatYouLose": ["Be honest here. It's the point of the site."],
+  "priorArt": [{ "name": "AppFlowy", "url": "https://github.com/AppFlowy-IO/AppFlowy" }],
+  "notes": "One or two plain sentences."
 }
 ```
 
-Plus one directory-specific block:
+`category` must exist in `src/lib/apps.ts`. Use `"priceMonthly": null` for usage-based pricing and explain it in `priceNote`.
 
-- **prompts**: `"prompt": "Build a …"`
-- **skills**: `"skill": { "name": "pdf", "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pdf", "marketplace": "anthropics/skills", "plugin": "document-skills@anthropic-agent-skills" }`,
-  or for a skill written here: `"skill": { "name": "copyedit", "sourceUrl": null, "skillMd": "---\nname: copyedit\n…" }`
-- **mcp**: `"server": { "official": true, "transport": "http", "url": "https://mcp.notion.com/mcp", "auth": "oauth", "docsUrl": "…" }, "tools": ["…"]`
-  (stdio servers use `"command"`, `"args"` and optional `"env": ["API_KEY"]`)
-- **plugins**: `"plugin": { "name": "code-review", "marketplace": "anthropics/claude-plugins-official", "marketplaceName": "claude-plugins-official", "repoUrl": "…", "includes": ["…"] }`
+</details>
 
-Install snippets for Claude Code, Codex and Cursor are generated from these fields in `src/lib/installs.ts`.
+<details>
+<summary><b>🧠 Skills: add a <code>skill</code> block</b></summary>
 
-- `category` must be a key in `CATEGORIES` (`src/lib/apps.ts`), which also holds the chip emoji.
-- `priceMonthly` is the entry paid tier per seat, or `null` when usage-based or unverifiable (explain in `priceNote`). Prices drift; PRs welcome.
-- `npm run check-data` validates every file (also runs in CI). The site refuses to build with invalid data.
+An existing skill from a marketplace:
 
-## Submissions and ad requests
+```json
+"skill": {
+  "name": "pdf",
+  "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pdf",
+  "marketplace": "anthropics/skills",
+  "plugin": "document-skills@anthropic-agent-skills"
+}
+```
 
-The Submit page (`/submit`) and Advertise page (`/advertise`) post to `/api/submit` and `/api/advertise`
-(honeypot field, server-side validation, 5 per hour per IP). Rows land in the D1 tables `submissions` and
-`ad_requests` with `status = 'new'`. Read them in the Cloudflare dashboard (**Storage & databases → D1 → isthere**)
-or from a terminal:
+Or a skill you wrote, inline:
+
+```json
+"skill": { "name": "copyedit", "sourceUrl": null, "skillMd": "---\nname: copyedit\ndescription: …\n---\n# Copyedit…" }
+```
+
+</details>
+
+<details>
+<summary><b>🔌 MCPs: add <code>server</code> and <code>tools</code></b></summary>
+
+```json
+"server": {
+  "official": true,
+  "transport": "http",
+  "url": "https://mcp.notion.com/mcp",
+  "auth": "oauth",
+  "docsUrl": "https://developers.notion.com/guides/mcp/overview"
+},
+"tools": ["notion-search", "notion-fetch", "notion-create-pages"]
+```
+
+Local servers use `"transport": "stdio"` with `"command"`, `"args"` and optional `"env": ["API_KEY"]`.
+
+</details>
+
+<details>
+<summary><b>🧩 Plugins: add a <code>plugin</code> block</b></summary>
+
+```json
+"plugin": {
+  "name": "code-review",
+  "marketplace": "anthropics/claude-plugins-official",
+  "marketplaceName": "claude-plugins-official",
+  "repoUrl": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-review",
+  "includes": ["/code-review command", "4 parallel review agents"]
+}
+```
+
+</details>
+
+<details>
+<summary><b>⌨️ Prompts: add the <code>prompt</code></b></summary>
+
+```json
+"prompt": "Build a self-hosted scheduling page, a Calendly replacement for one person.\n\nStack: …\nFeatures:\n- …\nDone when: …"
+```
+
+Write it so an agent can finish in one session: stack, features, and a clear "done when".
+
+</details>
+
+Then check your file:
+
+```bash
+npm run check-data   # validates every entry (also runs in CI)
+```
+
+The install snippets for each agent are generated from your fields, so you never write them by hand.
+
+---
+
+## Where things live
+
+```text
+data/
+  skills/ mcp/ plugins/ prompts/   one JSON file per app
+src/
+  pages/            home, /[directory], /[directory]/[app], /submit, /advertise
+  components/       nav, tiles, Death List, install tabs, ticker
+  lib/kinds.ts      the four directories: words, verdict labels, colours
+  lib/installs.ts   per-agent install commands
+  styles/global.css the whole design system
+shortlinks/         redirect Worker for the isthere…forit subdomains
+scripts/og.mjs      social card generator
+```
+
+<details>
+<summary><b>Reading form submissions</b></summary>
+
+Submissions and ad requests are stored in the `submissions` and `ad_requests` tables.
+Open them in the Cloudflare dashboard under **Storage & databases → D1 → isthere**, or:
 
 ```bash
 npx wrangler d1 execute isthere --remote --command "SELECT * FROM submissions WHERE status = 'new' ORDER BY created_at DESC"
-npx wrangler d1 execute isthere --remote --command "SELECT * FROM ad_requests WHERE status = 'new' ORDER BY created_at DESC"
 ```
 
-Ad creatives are not uploaded: advertisers send the 160×600 image after you confirm the slot.
+</details>
 
-## How things work
+---
 
-| Feature | Where |
-| --- | --- |
-| Directory config (words, verdict labels, vote meaning, short-link hosts) | `src/lib/kinds.ts` |
-| Shared home, directory pages, entry pages | `src/pages/index.astro`, `src/components/Directory.astro`, `src/pages/[kind]/[slug].astro` |
-| Ranked lists, live search, chips | `src/components/EntryList.astro`, `SearchChips.astro`, `src/scripts/main.ts` (prerendered; `?q=`, `?cat=`, `?kind=` are applied on load, lists re-rank by live votes) |
-| Tickers: Σ price × votes (or "I use this" for MCPs), odometer + tape | `src/components/Ticker.astro`, `Odometer.astro`, `Tape.astro` |
-| Per-agent installs and prompt prefixes | `src/lib/installs.ts`, `src/lib/agents.ts`, `src/components/InstallBlock.astro` |
-| Live numbers for static pages | `src/pages/api/counts.ts` → `snapshot()` in `src/lib/db.ts` |
-| Legacy URL redirects | `src/pages/[slug].astro` |
-| Votes: 1 per entry per IP per 24h, max 20/hour per IP | `src/lib/db.ts` → `castVote`, keyed `kind:slug` (IPs are salted + hashed, never stored raw) |
-| Waitlist: honeypot, dedupe (case-insensitive), 5/hour per IP | `src/pages/api/waitlist.ts` |
-| Favicons proxied server-side and cached in D1 | `src/pages/api/favicon/[slug].ts` |
-| JSON-LD: WebSite+SearchAction, Organization, ItemList, BreadcrumbList, FAQPage | `src/lib/seo.ts` |
-| sitemap.xml, robots.txt | `src/pages/sitemap.xml.ts`, `src/pages/robots.txt.ts` |
+## FAQ
 
-Content, search engines and the forms work without JavaScript (forms POST + redirect). Live counts need JS.
+<details>
+<summary><b>Are the verdicts objective?</b></summary>
 
-## Privacy
+No. They're honest opinions with the trade-offs spelled out. Disagree? Open a PR with your reasoning.
 
-No accounts, no payments, no cookies, no third-party scripts, fonts or icon services in the browser.
-Analytics is a single first-party beacon (`/api/hit`) that stores `(day, path, referrer host, count)`; it is skipped
-when Do Not Track or Global Privacy Control is on. Query it with:
+</details>
 
-```bash
-npx wrangler d1 execute isthere --remote --command "SELECT path, SUM(n) FROM hits GROUP BY path ORDER BY 2 DESC LIMIT 20;"
-```
+<details>
+<summary><b>Are prices up to date?</b></summary>
 
-## Motion
+They're entry paid tiers at the time they were added and drift over time. Each entry links to the vendor's pricing page.
 
-Odometer rolls, hover lifts, press scales, copy confirmations and reveal-on-scroll are CSS transitions driven by
-small vanilla JS. Everything collapses to instant under `prefers-reduced-motion: reduce`, and the scrolling tape
-becomes a static, horizontally scrollable strip.
+</details>
 
-## License
+<details>
+<summary><b>Do ads affect verdicts?</b></summary>
 
-MIT. See [LICENSE](LICENSE). Verdicts are opinions; trademarks belong to their owners.
+Never. Ads are one static image and a link in the page margins, clearly labelled.
+
+</details>
+
+---
+
+<div align="center">
+
+**MIT licensed** · verdicts are opinions · trademarks belong to their owners
+
+If this saved you a subscription, [hit "I replaced this"](https://isthere.biratdatta.tech) and ⭐ the repo.
+
+</div>

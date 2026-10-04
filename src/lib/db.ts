@@ -167,7 +167,7 @@ export async function joinWaitlist(email: string, source: string): Promise<'adde
   return r.meta.changes > 0 ? 'added' : 'exists';
 }
 
-/* ---------- first-party analytics (no cookies, no IPs) ---------- */
+/* ---------- page counter ---------- */
 
 export async function recordHit(pathname: string, ref: string) {
   const day = new Date().toISOString().slice(0, 10);

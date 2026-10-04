@@ -1,0 +1,17 @@
+---
+// The isthere mark: a question mark whose dot is four tiles, one per directory.
+// On a directory page the tiles settle into that directory's colour (see .mark in global.css).
+interface Props { size?: number; class?: string }
+const { size = 30, class: cls = '' } = Astro.props;
+const tiles = [
+  { x: 27, y: 43.5, c: '#4f7cff' },
+  { x: 32.4, y: 43.5, c: '#2fbf71' },
+  { x: 27, y: 48.9, c: '#f05252' },
+  { x: 32.4, y: 48.9, c: '#f5a524' },
+];
+---
+<svg class={`mark ${cls}`} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+  <rect width="64" height="64" rx="16" fill="#0e1322" />
+  <path d="M22.5 22A9.5 9.5 0 1 1 36.5 30.3C33.5 32 32 34 32 37.5V39" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+  {tiles.map((t, i) => <rect class="t" x={t.x} y={t.y} width="4.6" height="4.6" rx="1.2" style={`--c:${t.c};--td:${i * 70}ms`} />)}
+</svg>

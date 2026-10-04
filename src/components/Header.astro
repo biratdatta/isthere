@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import Mark from './Mark.astro';
 import { KINDS, KIND_ORDER, type Kind } from '../lib/kinds';
 import { byKind } from '../lib/apps';
 
@@ -11,7 +12,7 @@ const { kind, current } = Astro.props;
 ---
 <header class="site-header">
   <nav class="pill-nav" aria-label="Main">
-    <a href="/" class="wordmark" aria-label="isthere, home">is<b>there</b>?</a>
+    <a href="/" class="wordmark" data-kind={kind} aria-label="isthere, home"><Mark />is<b>there</b>?</a>
     <div class="nav-links">
       <button type="button" aria-expanded="false" aria-controls="mega" data-mega-toggle aria-current={kind ? 'page' : undefined}>
         Directories <Icon name="chev" size={14} class="chev" />

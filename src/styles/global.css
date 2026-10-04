@@ -109,7 +109,23 @@ code, pre, kbd { font-family: var(--mono); }
   display: flex; align-items: center; gap: 20px; height: 60px; padding: 0 8px 0 20px;
   border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
 }
-.wordmark { display: flex; align-items: baseline; gap: 1px; font: 800 21px/1 var(--display); letter-spacing: -0.03em; white-space: nowrap; }
+.wordmark { display: flex; align-items: center; gap: 1px; font: 800 21px/1 var(--display); letter-spacing: -0.03em; white-space: nowrap; }
+.wordmark .mark { width: 30px; height: 30px; margin-right: 9px; border-radius: 8px; flex: none; transition: transform .25s cubic-bezier(.3,1.6,.5,1); }
+.wordmark:hover .mark { transform: rotate(-8deg) scale(1.06); }
+/* Mark tiles: all four colours by default; on a directory page they settle into that directory's colour. */
+.mark .t { fill: var(--c); transition: fill .45s ease var(--td, 0ms); }
+.wordmark[data-kind='skills'] { --mk: #4f7cff; }
+.wordmark[data-kind='mcp'] { --mk: #2fbf71; }
+.wordmark[data-kind='plugins'] { --mk: #f05252; }
+.wordmark[data-kind='prompts'] { --mk: #f5a524; }
+.wordmark[data-kind] .mark .t { fill: var(--mk); }
+@starting-style { .wordmark[data-kind] .mark .t { fill: var(--c); } }
+/* Preview a directory's colour while hovering its tile. */
+body:has(.k-skills:is(.mega-tile, .dir-tile):hover) .wordmark .mark .t { fill: #4f7cff; transition-delay: 0ms; }
+body:has(.k-mcp:is(.mega-tile, .dir-tile):hover) .wordmark .mark .t { fill: #2fbf71; transition-delay: 0ms; }
+body:has(.k-plugins:is(.mega-tile, .dir-tile):hover) .wordmark .mark .t { fill: #f05252; transition-delay: 0ms; }
+body:has(.k-prompts:is(.mega-tile, .dir-tile):hover) .wordmark .mark .t { fill: #f5a524; transition-delay: 0ms; }
+@media (prefers-reduced-motion: reduce) { .mark .t { transition: none; } }
 .wordmark b { color: var(--primary); font-weight: 800; }
 .wordmark:hover { color: var(--text); }
 .nav-links { display: flex; align-self: stretch; gap: 4px; }

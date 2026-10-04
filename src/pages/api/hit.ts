@@ -5,8 +5,7 @@ import { SITE_HOST } from '../../lib/seo';
 export const prerender = false;
 
 /**
- * First-party, cookieless pageview counter. Stores (day, path, referrer host, count).
- * No IPs, no user agents, no identifiers. The client skips it when Do Not Track is on.
+ * Page counter. Stores (day, path, referrer host, count).
  */
 const BOT = /bot|crawl|spider|slurp|preview|headless|lighthouse/i;
 

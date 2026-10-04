@@ -545,7 +545,7 @@ $$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
   if (radio) radio.checked = true;
 }
 
-/* ---------- first-party analytics (cookieless, honors DNT/GPC) ---------- */
+/* ---------- page counter ---------- */
 const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
 if (nav.doNotTrack !== '1' && !nav.globalPrivacyControl && 'sendBeacon' in navigator) {
   navigator.sendBeacon('/api/hit', JSON.stringify({ p: location.pathname, r: document.referrer }));

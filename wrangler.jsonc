@@ -5,7 +5,7 @@
   "name": "isthere",
   "compatibility_date": "2026-09-01",
 
-  // D1 database for votes, waitlist, rate limits, favicon cache and analytics.
+  // D1 database for votes, waitlist, rate limits, favicon cache and page counts.
   // No database_id: Wrangler creates the database on the first deploy and links it.
   // The tables are created automatically on first use (see src/lib/db.ts).
   "d1_databases": [
