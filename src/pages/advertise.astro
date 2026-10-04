@@ -76,10 +76,30 @@ const slots = [
         </ul>
       </div>
       <div class="ticker" style="gap:10px">
-        <span class="label">NEXT OPEN WEEK</span>
-        <strong style="font:700 30px/1.1 var(--display)">[DATE]</strong>
+        <span class="label">OPEN THIS WEEK</span>
+        <strong style="font:700 30px/1.1 var(--display)" data-this-week>This week</strong>
         <span style="font-size:13px;opacity:.8">Left and right rails, all directories.</span>
       </div>
     </aside>
   </section>
 </Base>
+
+<script is:inline>
+  // "This week" = Monday to Sunday containing today; on Sunday it rolls to the coming week.
+  // Also pre-fills the Starting week field with the same ISO week.
+  (function () {
+    var d = new Date(); d.setHours(0, 0, 0, 0);
+    var dow = (d.getDay() + 6) % 7; // Mon = 0 … Sun = 6
+    var mon = new Date(d); mon.setDate(d.getDate() - dow + (dow === 6 ? 7 : 0));
+    var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    var m = function (x) { return x.toLocaleDateString('en-US', { month: 'short' }); };
+    var label = m(mon) + ' ' + mon.getDate() + ' – ' + (m(sun) === m(mon) ? '' : m(sun) + ' ') + sun.getDate();
+    var el = document.querySelector('[data-this-week]');
+    if (el) el.textContent = label;
+    var t = new Date(mon); t.setDate(mon.getDate() + 3); // ISO week: the Thursday decides the year
+    var y = t.getFullYear(), jan4 = new Date(y, 0, 4);
+    var wk = 1 + Math.round(((t - jan4) / 864e5 - 3 + ((jan4.getDay() + 6) % 7)) / 7);
+    var input = document.getElementById('a-week');
+    if (input && !input.value) { input.value = y + '-W' + String(wk).padStart(2, '0'); input.min = input.value; }
+  })();
+</script>
