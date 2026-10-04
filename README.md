@@ -45,7 +45,7 @@ open-source prior art, and an **"I replaced this"** button that feeds the site's
 
 **For visitors**
 - One search across all five directories
-- Death List ranked by real votes, live MRR ticker
+- Cancel Culture: apps ranked by real "I replaced this" votes, live MRR ticker
 - Per-agent install tabs with one-click copy
 - Light mode and a calm slate dark mode
 - Submit your own find, or book an ad slot
@@ -227,7 +227,7 @@ data/
   skills/ mcp/ plugins/ prompts/ agents/   one JSON file per app
 src/
   pages/            home, /[directory], /[directory]/[app], /submit, /advertise
-  components/       nav, tiles, Death List, install tabs, ticker
+  components/       nav, tiles, Cancel Culture list, install tabs, ticker
   lib/kinds.ts      the five directories: words, verdict labels, colours
   lib/installs.ts   per-agent install commands
   styles/global.css the whole design system

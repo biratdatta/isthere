@@ -306,7 +306,7 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .odo-sep { display: inline-block; opacity: 0.6; }
 .js [data-odometer]:not([data-rolled]) .odo-strip { transform: translateY(0) !important; }
 
-/* ---------- ranked list (Death List) ---------- */
+/* ---------- ranked list (Cancel Culture) ---------- */
 .list-card { display: flex; flex-direction: column; gap: 4px; padding: 14px; }
 .list-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px 10px; }
 .list-head h2 { font-size: 26px; }

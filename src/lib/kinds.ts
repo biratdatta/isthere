@@ -41,7 +41,7 @@ export const KINDS: Record<Kind, KindConfig> = {
     metric: 'mrr',
     vote: 'I replaced this',
     voted: 'replaced',
-    listTitle: 'The Death List',
+    listTitle: 'Cancel Culture',
     listEyebrow: 'ranked by "I replaced this"',
     entryTitle: (n) => `Is there a skill for ${n}?`,
     verdicts: {
@@ -85,7 +85,7 @@ export const KINDS: Record<Kind, KindConfig> = {
     metric: 'mrr',
     vote: 'I replaced this',
     voted: 'replaced',
-    listTitle: 'The Death List',
+    listTitle: 'Cancel Culture',
     listEyebrow: 'ranked by "I replaced this"',
     entryTitle: (n) => `Is there a plugin for ${n}?`,
     verdicts: {
@@ -107,7 +107,7 @@ export const KINDS: Record<Kind, KindConfig> = {
     metric: 'mrr',
     vote: 'I replaced this',
     voted: 'replaced',
-    listTitle: 'The Death List',
+    listTitle: 'Cancel Culture',
     listEyebrow: 'ranked by "I replaced this"',
     entryTitle: (n) => `Can you replace ${n} with one AI prompt?`,
     verdicts: {
@@ -129,7 +129,7 @@ export const KINDS: Record<Kind, KindConfig> = {
     metric: 'mrr',
     vote: 'I replaced this',
     voted: 'replaced',
-    listTitle: 'The Death List',
+    listTitle: 'Cancel Culture',
     listEyebrow: 'ranked by "I replaced this"',
     entryTitle: (n) => `Is there an agent for ${n}?`,
     verdicts: {
