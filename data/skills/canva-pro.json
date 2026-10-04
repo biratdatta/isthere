@@ -7,6 +7,7 @@
   "priceNote": "US$144/year for one person",
   "pricingUrl": "https://www.canva.com/pricing/",
   "verdict": "no",
+  "added": "2026-10-04",
   "skill": {
     "name": "canvas-design",
     "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/canvas-design",

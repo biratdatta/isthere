@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { KINDS, KIND_ORDER } from '../lib/kinds';
+import { breadcrumbs } from '../lib/seo';
+const site = Astro.site!;
+---
+<Base title="Request an app: which SaaS should we check next?" description="Ask for a paid app to be checked for a skill, MCP, plugin, prompt or agent replacement, and vote on what others asked for." path="/requests"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Requests', path: '/requests' }])]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Requests</li></ol></nav>
+  <section class="page-title">
+    <h1>Which app should we <span class="hl">check next?</span></h1>
+    <p class="muted" style="font-size:18px;max-width:600px">Ask for an app, or +1 one that’s already here. The most-wanted get checked first.</p>
+  </section>
+  <section class="split">
+    <div class="card pad stack">
+      <ol class="request-list" data-requests aria-live="polite"><li class="muted">Loading…</li></ol>
+    </div>
+    <aside class="stack sticky">
+      <form class="card pad form" method="post" action="/api/requests" data-request-form style="gap:14px">
+        <h2 class="section-title" style="font-size:22px">Request an app</h2>
+        <label class="field" for="r-name">App name<input id="r-name" name="name" required minlength="2" maxlength="60" placeholder="e.g. Loom" /></label>
+        <label class="field" for="r-dir">Which question?<span class="hint">Optional</span>
+          <select id="r-dir" name="directory"><option value="">Any</option>{KIND_ORDER.map((k) => <option value={k}>Is there {KINDS[k].article} {KINDS[k].word} for it?</option>)}</select>
+        </label>
+        <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <button type="submit" class="btn btn-primary"><Icon name="plus" size={16} /><span class="idle">Request it</span><span class="ok">Requested</span></button>
+        <p class="form-msg" role="status" aria-live="polite" data-form-msg></p>
+      </form>
+      <a class="card pad" href="/submit" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span><strong>Know the answer already?</strong><span class="muted" style="display:block;font-size:13px">Submit it instead.</span></span><Icon name="arrow" size={18} /></a>
+    </aside>
+  </section>
+</Base>

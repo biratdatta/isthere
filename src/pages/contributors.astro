@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { ENTRIES, contributorOf } from '../lib/apps';
+import { KINDS } from '../lib/kinds';
+import { breadcrumbs, entryPath } from '../lib/seo';
+
+const site = Astro.site!;
+const board = new Map<string, { name: string; url?: string; entries: typeof ENTRIES }>();
+for (const e of ENTRIES) {
+  const c = contributorOf(e);
+  const row = board.get(c.name) ?? { name: c.name, url: c.url, entries: [] };
+  row.entries.push(e);
+  board.set(c.name, row);
+}
+const rows = [...board.values()].sort((a, b) => b.entries.length - a.entries.length || a.name.localeCompare(b.name));
+---
+<Base title="Contributors: the people behind the verdicts" description="Everyone who has added an entry to isthere, ranked by entries." path="/contributors"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Contributors', path: '/contributors' }])]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Contributors</li></ol></nav>
+  <section class="hero">
+    <div class="page-title">
+      <h1><span class="hl">Contributors</span></h1>
+      <p class="muted" style="font-size:18px;max-width:560px">Every entry credits the person who added it. Get on the board: submit one with your GitHub handle, or open a pull request.</p>
+    </div>
+    <div style="display:flex;gap:8px;align-self:end"><a class="btn btn-primary" href="/submit"><Icon name="plus" size={16} />Submit one</a><a class="btn" href="/queue">Review queue</a></div>
+  </section>
+  <section class="card pad">
+    <ol class="leaderboard">
+      {rows.map((r, i) => (
+        <li>
+          <span class="rank">{String(i + 1).padStart(2, '0')}</span>
+          <span class="avatar" aria-hidden="true">{r.name.slice(0, 2).toUpperCase()}</span>
+          <span style="flex:1;min-width:0">
+            <a href={r.url ?? `https://github.com/${r.name}`} rel="noopener"><strong>@{r.name}</strong></a>
+            <span class="muted lb-kinds">{Object.entries(r.entries.reduce((m, e) => ({ ...m, [e.kind]: (m[e.kind] ?? 0) + 1 }), {} as Record<string, number>)).map(([k, n]) => `${n} ${KINDS[k as keyof typeof KINDS].plural.toLowerCase()}`).join(' · ')}</span>
+          </span>
+          <b>{r.entries.length}</b>
+        </li>
+      ))}
+    </ol>
+  </section>
+  <section class="card pad stack">
+    <h2 class="section-title">How credit works</h2>
+    <p class="muted">Add <code>"contributor": {'{'} "name": "your-github-handle" {'}'}</code> to the entry’s JSON in your pull request, or put your handle in the Submit form. Entries without one are credited to the maintainer.</p>
+    <p class="muted" style="font-size:13px">Latest: {ENTRIES.slice(-3).map((e, i) => <>{i > 0 && ', '}<a href={entryPath(e)}>{e.name}</a></>)}</p>
+  </section>
+</Base>

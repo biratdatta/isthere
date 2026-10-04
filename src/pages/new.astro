@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { ENTRIES, addedOn, formatPrice, lastPriceChange, verdictLabel } from '../lib/apps';
+import { KINDS } from '../lib/kinds';
+import { breadcrumbs, entryPath } from '../lib/seo';
+
+const site = Astro.site!;
+const fmtDate = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const changes = ENTRIES.map((e) => ({ e, c: lastPriceChange(e) })).filter((x) => x.c).sort((a, b) => b.c!.date.localeCompare(a.c!.date));
+const byDay = new Map<string, typeof ENTRIES>();
+for (const e of [...ENTRIES].sort((a, b) => addedOn(b).localeCompare(addedOn(a)) || a.name.localeCompare(b.name))) byDay.set(addedOn(e), [...(byDay.get(addedOn(e)) ?? []), e]);
+---
+<Base title="What’s new on isthere: new verdicts and price changes" description="New entries and SaaS price changes, newest first. Also available as an RSS feed." path="/new"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'What’s new', path: '/new' }])]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">What’s new</li></ol></nav>
+  <section class="hero">
+    <div class="page-title">
+      <h1>What’s <span class="hl">new</span></h1>
+      <p class="muted" style="font-size:18px;max-width:560px">New verdicts and price changes, newest first.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:end">
+      <a class="btn" href="/feed.xml"><Icon name="rss" size={15} />RSS feed</a>
+      <a class="btn" href="#newsletter">Weekly email</a>
+    </div>
+  </section>
+
+  <section class="card pad stack" id="price-changes">
+    <h2 class="section-title">Price changes</h2>
+    {changes.length ? (
+      <ul class="feed">
+        {changes.map(({ e, c }) => (
+          <li><a href={entryPath(e)}><span class={`price-change ${c!.to !== null && c!.from !== null && c!.to > c!.from ? 'up' : 'down'}`}>{formatPrice(c!.from)} → {formatPrice(c!.to)}</span><strong>{e.name}</strong><span class="muted">{fmtDate(c!.date)}{c!.note && ` · ${c!.note}`}</span></a></li>
+        ))}
+      </ul>
+    ) : (
+      <p class="muted">No price changes recorded yet. When a vendor changes its price, it shows up here and in the feed.</p>
+    )}
+  </section>
+
+  {[...byDay.entries()].map(([day, list]) => (
+    <section class="card pad stack">
+      <h2 class="section-title">{fmtDate(day)} <span class="muted" style="font-size:15px;font-weight:500">· {list.length} new</span></h2>
+      <ul class="feed">
+        {list.map((e) => (
+          <li><a href={entryPath(e)} class={`k-${e.kind} v-${e.verdict}`}><span class="ico-k"><Icon name={e.kind} size={15} /></span><strong>{KINDS[e.kind].entryTitle(e.name)}</strong><span class="badge">{verdictLabel(e)}</span></a></li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Base>

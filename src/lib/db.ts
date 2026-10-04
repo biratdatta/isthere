@@ -8,8 +8,9 @@ import { ENTRIES, keyOf, type Entry } from './apps';
 import { KINDS, KIND_ORDER } from './kinds';
 import schema1 from '../../migrations/0001_init.sql?raw';
 import schema2 from '../../migrations/0002_submissions.sql?raw';
+import schema3 from '../../migrations/0003_community.sql?raw';
 
-const schemaSql = `${schema1};\n${schema2}`;
+const schemaSql = `${schema1};\n${schema2};\n${schema3}`;
 
 // Minimal D1 typings so this file doesn't depend on generated worker types.
 interface D1Stmt {
@@ -154,7 +155,113 @@ export async function snapshot() {
     t.mrr = Math.round(t.mrr);
     t.mrr24h = Math.round(t.mrr24h);
   }
-  return { counts: Object.fromEntries(counts), totals };
+  const verdicts = await verdictCounts();
+  return { counts: Object.fromEntries(counts), totals, verdicts };
+}
+
+/* ---------- agree / disagree with a verdict ---------- */
+
+async function verdictCounts(): Promise<Record<string, [number, number]>> {
+  const { results } = await (await conn()).prepare('SELECT key, agree, disagree FROM verdict_votes').all<{ key: string; agree: number; disagree: number }>();
+  return Object.fromEntries(results.map((r) => [r.key, [r.agree, r.disagree] as [number, number]]));
+}
+
+export type VerdictResult = { ok: boolean; reason?: 'already-voted' | 'rate-limited'; agree: number; disagree: number };
+
+export async function castVerdictVote(key: string, agree: boolean, ipHash: string): Promise<VerdictResult> {
+  const d = await conn();
+  const read = async () => (await d.prepare('SELECT agree, disagree FROM verdict_votes WHERE key = ?').bind(key).first<{ agree: number; disagree: number }>()) ?? { agree: 0, disagree: 0 };
+  const recent = await d.prepare('SELECT 1 AS x FROM verdict_log WHERE ip_hash = ? AND key = ? AND ts > ? LIMIT 1').bind(ipHash, key, now() - 86400 * 30).first();
+  if (recent) return { ok: false, reason: 'already-voted', ...(await read()) };
+  if (!(await rateLimit(`verdict:${ipHash}`, 3600, 30))) return { ok: false, reason: 'rate-limited', ...(await read()) };
+  const col = agree ? 'agree' : 'disagree';
+  await d.batch([
+    d.prepare('INSERT INTO verdict_log (key, ip_hash, agree, ts) VALUES (?, ?, ?, ?)').bind(key, ipHash, agree ? 1 : 0, now()),
+    d.prepare(`INSERT INTO verdict_votes (key, ${col}) VALUES (?, 1) ON CONFLICT(key) DO UPDATE SET ${col} = ${col} + 1`).bind(key),
+  ]);
+  return { ok: true, ...(await read()) };
+}
+
+/* ---------- stats ---------- */
+
+export async function stats() {
+  const d = await conn();
+  const since = (days: number) => now() - 86400 * days;
+  const [snap, week, daily] = await Promise.all([
+    snapshot(),
+    d.prepare('SELECT slug, COUNT(*) AS n FROM vote_log WHERE ts > ? GROUP BY slug ORDER BY n DESC LIMIT 10').bind(since(7)).all<{ slug: string; n: number }>(),
+    d
+      .prepare("SELECT strftime('%Y-%m-%d', ts, 'unixepoch') AS day, COUNT(*) AS n FROM vote_log WHERE ts > ? GROUP BY day ORDER BY day")
+      .bind(since(14))
+      .all<{ day: string; n: number }>(),
+  ]);
+  const top = Object.entries(snap.counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([key, n]) => ({ key, n }));
+  return { totals: snap.totals, top, week: week.results.map((r) => ({ key: r.slug, n: r.n })), daily: daily.results };
+}
+
+/* ---------- public review queue (no emails, no links: just what's waiting) ---------- */
+
+export async function queue() {
+  const { results } = await (await conn())
+    .prepare('SELECT id, directory, app, github, status, created_at FROM submissions ORDER BY created_at DESC LIMIT 50')
+    .all<{ id: number; directory: string; app: string; github: string | null; status: string; created_at: number }>();
+  return results.map((r) => ({
+    id: r.id,
+    directory: r.directory,
+    app: r.app,
+    by: r.github ? r.github.replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/^@/, '').split(/[/?#]/)[0].slice(0, 39) : null,
+    status: r.status,
+    created_at: r.created_at,
+  }));
+}
+
+/* ---------- request an app ---------- */
+
+export const requestSlug = (name: string) =>
+  name
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+
+export async function listRequests() {
+  const { results } = await (await conn())
+    .prepare("SELECT id, slug, name, directory, votes, status, created_at FROM app_requests WHERE status != 'hidden' ORDER BY status = 'done', votes DESC, created_at DESC LIMIT 100")
+    .all<{ id: number; slug: string; name: string; directory: string | null; votes: number; status: string; created_at: number }>();
+  return results;
+}
+
+export type RequestResult = { ok: boolean; reason?: 'already-voted' | 'rate-limited' | 'not-found'; id?: number; votes?: number };
+
+/** Adds a request, or upvotes the existing one with the same normalized name. */
+export async function requestApp(name: string, directory: string | null, ipHash: string): Promise<RequestResult> {
+  const d = await conn();
+  const slug = requestSlug(name);
+  const existing = await d.prepare('SELECT id FROM app_requests WHERE slug = ?').bind(slug).first<{ id: number }>();
+  if (existing) return upvoteRequest(existing.id, ipHash);
+  if (!(await rateLimit(`request:new:${ipHash}`, 3600, 5))) return { ok: false, reason: 'rate-limited' };
+  await d.prepare('INSERT INTO app_requests (slug, name, directory, created_at) VALUES (?, ?, ?, ?)').bind(slug, name, directory, now()).run();
+  const row = await d.prepare('SELECT id, votes FROM app_requests WHERE slug = ?').bind(slug).first<{ id: number; votes: number }>();
+  await d.prepare('INSERT INTO request_log (request_id, ip_hash, ts) VALUES (?, ?, ?)').bind(row!.id, ipHash, now()).run();
+  return { ok: true, id: row!.id, votes: row!.votes };
+}
+
+export async function upvoteRequest(id: number, ipHash: string): Promise<RequestResult> {
+  const d = await conn();
+  const row = await d.prepare('SELECT id, votes FROM app_requests WHERE id = ?').bind(id).first<{ id: number; votes: number }>();
+  if (!row) return { ok: false, reason: 'not-found' };
+  const seen = await d.prepare('SELECT 1 AS x FROM request_log WHERE ip_hash = ? AND request_id = ? LIMIT 1').bind(ipHash, id).first();
+  if (seen) return { ok: false, reason: 'already-voted', id, votes: row.votes };
+  if (!(await rateLimit(`request:vote:${ipHash}`, 3600, 30))) return { ok: false, reason: 'rate-limited', id, votes: row.votes };
+  await d.batch([
+    d.prepare('INSERT INTO request_log (request_id, ip_hash, ts) VALUES (?, ?, ?)').bind(id, ipHash, now()),
+    d.prepare('UPDATE app_requests SET votes = votes + 1 WHERE id = ?').bind(id),
+  ]);
+  return { ok: true, id, votes: row.votes + 1 };
 }
 
 /* ---------- waitlist ---------- */

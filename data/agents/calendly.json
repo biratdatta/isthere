@@ -7,6 +7,8 @@
   "priceNote": "Standard, per seat, billed yearly",
   "pricingUrl": "https://calendly.com/pricing",
   "verdict": "yes",
+  "added": "2026-10-04",
+  "checked": "2026-10-04",
   "agent": {
     "name": "Howie",
     "maker": "3030 Labs",
@@ -29,8 +31,8 @@
   ],
   "priorArt": [
     {
-      "name": "Cal.diy",
-      "url": "https://github.com/calcom/cal.diy"
+      "name": "Cal.com",
+      "url": "https://github.com/calcom/cal.com"
     }
   ],
   "notes": "Howie acts like an assistant you CC, so nobody has to click a link. For small teams that schedule over email, it covers what Calendly does and more."

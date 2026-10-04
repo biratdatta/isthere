@@ -5,6 +5,7 @@
   "category": "productivity",
   "priceMonthly": 4,
   "verdict": "kinda",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Natural-language date parsing that just works in every language",
     "Native apps on every platform with instant sync and reminders",

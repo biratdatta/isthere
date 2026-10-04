@@ -5,6 +5,7 @@
   "category": "analytics",
   "priceMonthly": 32,
   "verdict": "kinda",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Scalable session storage and playback at volume",
     "Aggregated heatmaps across thousands of sessions with sampling",

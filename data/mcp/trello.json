@@ -7,6 +7,7 @@
   "priceNote": "Standard, billed annually ($6 monthly)",
   "pricingUrl": "https://trello.com/pricing",
   "verdict": "yes",
+  "added": "2026-10-04",
   "server": {
     "official": true,
     "transport": "http",

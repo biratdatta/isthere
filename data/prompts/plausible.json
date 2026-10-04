@@ -5,6 +5,7 @@
   "category": "analytics",
   "priceMonthly": 9,
   "verdict": "yes",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Managed ingestion that scales past millions of pageviews without you thinking about it",
     "Maintained bot filtering and referrer spam lists",

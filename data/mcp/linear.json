@@ -6,6 +6,7 @@
   "priceMonthly": 10,
   "pricingUrl": "https://linear.app/pricing",
   "verdict": "yes",
+  "added": "2026-10-04",
   "server": {
     "official": true,
     "transport": "http",

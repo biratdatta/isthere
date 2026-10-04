@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { CATEGORIES, apps, formatPrice, freeAlternatives, keyOf, verdictLabel } from '../../lib/apps';
+import { KINDS, KIND_ORDER } from '../../lib/kinds';
+import { breadcrumbs, entryPath } from '../../lib/seo';
+
+export function getStaticPaths() {
+  return apps().map((a) => ({ params: { slug: a.slug }, props: { a } }));
+}
+type App = ReturnType<typeof apps>[number];
+const { a } = Astro.props as { a: App };
+const site = Astro.site!;
+const first = a.entries[0];
+const price = a.entries.find((e) => e.priceMonthly !== null)?.priceMonthly ?? null;
+const alts = freeAlternatives(a.slug);
+const title = `${a.name}: skill, MCP, plugin, prompt or agent? Every answer compared`;
+const description = `Can you replace ${a.name} with an AI skill, MCP server, plugin, one-shot prompt or agent? ${a.entries.length} of 5 directories have an answer.`;
+---
+<Base title={title} description={description} path={`/compare/${a.slug}`} ogImage={`/og/${first.kind}/${first.slug}.png`}
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Compare', path: `/compare/${a.slug}` }])]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href={`/category/${a.category}`}>{CATEGORIES[a.category].label}</a></li><li aria-current="page">Compare {a.name}</li></ol></nav>
+
+  <section class="card title-card">
+    <span style="display:flex;align-items:center;gap:14px">
+      <span class="letter lg"><img src={`/api/favicon/${a.slug}`} width="32" height="32" alt={`${a.name} logo`} /></span>
+      <span class="title-meta"><span>{CATEGORIES[a.category].label}</span>{price !== null && <><span>·</span><span>from {formatPrice(price)}/mo</span></>}<span>·</span><a href={`https://${a.domain}`} rel="noopener nofollow">{a.domain}</a></span>
+    </span>
+    <h1>Every way to replace <span class="hl">{a.name}</span></h1>
+    <p class="muted" style="font-size:17px;max-width:640px">The same question in all five directories. Pick the one that fits how you work.</p>
+  </section>
+
+  <section class="compare-grid">
+    {KIND_ORDER.map((k) => {
+      const e = a.entries.find((x) => x.kind === k);
+      const K = KINDS[k];
+      return e ? (
+        <a href={entryPath(e)} class={`card compare-cell k-${k} v-${e.verdict}`}>
+          <span class="head"><span class="ico-k"><Icon name={k} size={20} /></span><span class="eyebrow">{K.plural}</span></span>
+          <strong>{K.entryTitle(a.name)}</strong>
+          <span class="badge">{verdictLabel(e)}</span>
+          <span class="note">{e.notes}</span>
+          <span class="foot"><span data-count-key={keyOf(e)}>0</span> {K.voted} <Icon name="arrow" size={14} /></span>
+        </a>
+      ) : (
+        <a href={`/submit?dir=${k}`} class={`card compare-cell empty-cell k-${k}`}>
+          <span class="head"><span class="ico-k"><Icon name={k} size={20} /></span><span class="eyebrow">{K.plural}</span></span>
+          <strong>{K.entryTitle(a.name)}</strong>
+          <span class="badge muted-badge">NOT CHECKED</span>
+          <span class="note">Nobody has checked this yet. Know one? Submit it.</span>
+          <span class="foot">Submit {K.article} {K.word} <Icon name="arrow" size={14} /></span>
+        </a>
+      );
+    })}
+  </section>
+
+  {alts.length > 0 && (
+    <section class="card pad stack">
+      <h2 class="section-title">Free alternatives to {a.name}</h2>
+      <ul class="prior alts">
+        {alts.map((p) => <li><a href={p.url} rel="noopener"><span>{p.name}<small>{p.desc ?? p.url.replace(/^https?:\/\//, '')}</small></span><span class="free">$0 · FREE</span><Icon name="external" size={16} /></a></li>)}
+      </ul>
+    </section>
+  )}
+</Base>

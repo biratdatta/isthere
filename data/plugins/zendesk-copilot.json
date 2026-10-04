@@ -7,6 +7,7 @@
   "priceNote": "Add-on per agent, paid yearly, on top of a Suite plan",
   "pricingUrl": "https://www.zendesk.com/pricing/",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "plugin": {
     "name": "customer-support",
     "marketplace": "anthropics/knowledge-work-plugins",

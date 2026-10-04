@@ -7,6 +7,7 @@
   "priceNote": "Team plan starts at $25/month billed monthly; check the per-developer basis",
   "pricingUrl": "https://snyk.io/plans/",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "plugin": {
     "name": "claude-security",
     "marketplace": "anthropics/claude-plugins-official",

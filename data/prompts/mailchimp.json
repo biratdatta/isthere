@@ -5,6 +5,7 @@
   "category": "marketing",
   "priceMonthly": 13,
   "verdict": "no",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Deliverability: warmed IPs, reputation, feedback loops and bounce handling",
     "Legal compliance tooling (CAN-SPAM, GDPR consent, unsubscribe handling at scale)",

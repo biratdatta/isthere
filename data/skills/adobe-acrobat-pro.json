@@ -7,6 +7,7 @@
   "priceNote": "Annual plan billed monthly; $29.99 month-to-month",
   "pricingUrl": "https://www.adobe.com/acrobat/pricing.html",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "skill": {
     "name": "pdf",
     "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pdf",

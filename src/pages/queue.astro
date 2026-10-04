@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { breadcrumbs } from '../lib/seo';
+const site = Astro.site!;
+---
+<Base title="Review queue: what people have submitted" description="Every submission waiting for review, with credit to the person who sent it." path="/queue"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Review queue', path: '/queue' }])]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Review queue</li></ol></nav>
+  <section class="hero">
+    <div class="page-title">
+      <h1>Review <span class="hl">queue</span></h1>
+      <p class="muted" style="font-size:18px;max-width:560px">What people have sent in, in the open. A person checks each one before it goes live. Links and emails stay private.</p>
+    </div>
+    <a class="btn btn-primary" href="/submit" style="align-self:end"><Icon name="plus" size={16} />Submit one</a>
+  </section>
+  <section class="card pad">
+    <ul class="queue-list" data-queue aria-live="polite"><li class="muted">Loading…</li></ul>
+  </section>
+</Base>

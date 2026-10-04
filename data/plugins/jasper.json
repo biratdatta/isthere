@@ -7,6 +7,7 @@
   "priceNote": "Pro, per seat, billed yearly ($69 monthly)",
   "pricingUrl": "https://www.jasper.ai/pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "plugin": {
     "name": "marketing",
     "marketplace": "anthropics/knowledge-work-plugins",

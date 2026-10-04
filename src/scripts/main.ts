@@ -280,6 +280,16 @@ interface Totals {
 interface Snapshot {
   counts: Record<string, number>;
   totals: Record<string, Totals>;
+  verdicts?: Record<string, [number, number]>;
+}
+
+function showAgree(form: HTMLElement, agree: number, disagree: number) {
+  const total = agree + disagree;
+  const bar = $('[data-agree-bar]', form);
+  const note = $('[data-agree-note]', form);
+  const pct = total ? Math.round((agree / total) * 100) : 0;
+  if (bar) bar.style.width = `${pct}%`;
+  if (note) note.textContent = total ? `${pct}% agree · ${fmt(total)} ${total === 1 ? 'vote' : 'votes'}` : 'Be the first to weigh in.';
 }
 
 function applyCounts(data: Snapshot) {
@@ -289,6 +299,12 @@ function applyCounts(data: Snapshot) {
   $$('[data-odo-key]').forEach((el) => setOdo(el, count(el.dataset.odoKey!)));
   // Plain-number spots: list rows, related cards.
   $$('[data-count-key]').forEach((el) => (el.textContent = fmt(count(el.dataset.countKey!))));
+
+  // Agree / disagree bars on verdict cards.
+  $$('form[data-verdict]').forEach((f) => {
+    const v = data.verdicts?.[f.dataset.verdict!];
+    if (v) showAgree(f, v[0], v[1]);
+  });
 
   // Tickers.
   $$('[data-ticker]').forEach((t) => {
@@ -322,7 +338,7 @@ async function loadCounts() {
     if (res.ok) applyCounts(await res.json());
   } catch {}
 }
-if ($('[data-odo-key], [data-count-key], [data-ticker]')) {
+if ($('[data-odo-key], [data-count-key], [data-ticker], form[data-verdict]')) {
   loadCounts();
   // Keep the ticker ticking while the tab is visible.
   window.setInterval(() => !document.hidden && loadCounts(), 30000);
@@ -500,6 +516,7 @@ $$<HTMLFormElement>('form[data-vote]').forEach((form) => {
 
 /* ---------- Submit + Advertise forms (fetch, with a no-JS POST fallback) ---------- */
 const FORM_OK: Record<string, string> = {
+  newsletter: 'You’re in. First email lands on Thursday.',
   submit: 'Thanks! It’s in the review queue. If you left an email, we’ll tell you when it’s live.',
   advertise: 'Request received. We’ll email you to confirm the slot and send payment details.',
 };
@@ -523,7 +540,7 @@ $$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
         say(FORM_OK[kind], true);
         confirmBtn(btn, 3000);
         form.reset();
-        toast(kind === 'submit' ? 'Submitted for review' : 'Request sent');
+        toast(kind === 'submit' ? 'Submitted for review' : kind === 'newsletter' ? 'Subscribed' : 'Request sent');
       } else {
         say(data.error || 'Something went wrong. Try again?', false);
       }
@@ -534,7 +551,7 @@ $$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
     }
   });
   // After a no-JS post we land back here with ?sent=…
-  const sent = new URLSearchParams(location.search).get('sent');
+  const sent = kind === 'newsletter' ? null : new URLSearchParams(location.search).get('sent');
   if (sent) say(sent === 'ok' ? FORM_OK[kind] : sent === 'limited' ? 'Too many tries. Give it an hour.' : 'Something was missing. Check the form and try again.', sent === 'ok');
 });
 
@@ -549,4 +566,382 @@ $$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
 const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
 if (nav.doNotTrack !== '1' && !nav.globalPrivacyControl && 'sendBeacon' in navigator) {
   navigator.sendBeacon('/api/hit', JSON.stringify({ p: location.pathname, r: document.referrer }));
+}
+
+/* ---------- agree / disagree with a verdict ---------- */
+$$<HTMLFormElement>('form[data-verdict]').forEach((form) => {
+  const key = form.dataset.verdict!;
+  const note = $('[data-agree-note]', form);
+  if (store.get(`agree:${key}`)) form.dataset.done = 'true';
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = (e as SubmitEvent).submitter as HTMLButtonElement | null;
+    const body = new FormData();
+    body.set('agree', btn?.value ?? '1');
+    try {
+      const res = await fetch(form.action, { method: 'POST', body, headers: { accept: 'application/json', 'x-requested-with': 'fetch' } });
+      const data = await res.json();
+      if (typeof data.agree === 'number') showAgree(form, data.agree, data.disagree);
+      form.dataset.done = 'true';
+      store.set(`agree:${key}`, btn?.value ?? '1');
+      if (data.ok) toast('Thanks. Counted.');
+      else if (data.reason === 'already-voted' && note) toast('You already weighed in on this one.');
+      else if (data.reason === 'rate-limited') toast('Easy there. Try again later.');
+    } catch {
+      toast('Network hiccup. Try again?');
+    }
+  });
+});
+
+/* ---------- savings calculator ---------- */
+$$('[data-calc]').forEach((box) => {
+  const price = Number(box.dataset.calc);
+  const input = $<HTMLInputElement>('[data-calc-seats]', box)!;
+  const out = $('[data-calc-out]', box)!;
+  const update = () => {
+    const seats = Math.min(10000, Math.max(1, Math.round(Number(input.value) || 1)));
+    out.textContent = `$${fmt(price * 12 * seats)}`;
+  };
+  input.addEventListener('input', update);
+});
+
+/* ---------- copy a terminal command (Claude Code / Codex) ---------- */
+$$('[data-copy-cmd]').forEach((btn) =>
+  btn.addEventListener('click', async () => {
+    if (await copyText(btn.dataset.copyCmd ?? '')) {
+      confirmBtn(btn);
+      toast(`Copied. Paste it in your terminal to start ${btn.dataset.label}`);
+    } else toast('Copy failed: select the text manually');
+  })
+);
+
+/* ---------- my stack (saved in this browser only) ---------- */
+const STACK_KEY = 'stack';
+const readStack = (): string[] => {
+  try {
+    const v = JSON.parse(store.get(STACK_KEY) ?? '[]');
+    return Array.isArray(v) ? v.filter((x) => typeof x === 'string').slice(0, 200) : [];
+  } catch {
+    return [];
+  }
+};
+const writeStack = (keys: string[]) => {
+  store.set(STACK_KEY, JSON.stringify([...new Set(keys)]));
+  paintStackBadge();
+};
+function paintStackBadge() {
+  const n = readStack().length;
+  $$('[data-stack-badge]').forEach((b) => {
+    b.hidden = n === 0;
+    b.textContent = n > 9 ? '9+' : String(n);
+  });
+}
+paintStackBadge();
+
+$$('[data-stack-add]').forEach((btn) => {
+  const key = btn.dataset.stackAdd!;
+  const paint = () => (readStack().includes(key) ? (btn.dataset.state = 'done') : delete btn.dataset.state);
+  paint();
+  btn.addEventListener('click', () => {
+    const s = readStack();
+    if (s.includes(key)) {
+      writeStack(s.filter((k) => k !== key));
+      toast(`Removed ${btn.dataset.stackName} from your stack`);
+    } else {
+      writeStack([...s, key]);
+      toast(`Added ${btn.dataset.stackName}. See it in My stack`);
+    }
+    paint();
+  });
+});
+
+{
+  const el = document.getElementById('stack-data');
+  if (el) {
+    type Item = { n: string; s: string; k: string; w: string; p: number | null; v: string; l: string; u: string; m: string };
+    const { data, picker } = JSON.parse(el.textContent ?? '{}') as { data: Record<string, Item>; picker: { slug: string; name: string; keys: string[] }[] };
+    // A shared link (?s=notion,calendly) adds those apps.
+    const shared = new URLSearchParams(location.search).get('s');
+    if (shared) {
+      const slugs = shared.split(',').slice(0, 100);
+      const keys = picker.filter((p) => slugs.includes(p.slug)).map((p) => p.keys[0]);
+      writeStack([...readStack(), ...keys]);
+      history.replaceState(null, '', location.pathname);
+    }
+    const list = $('[data-stack-list]')!;
+    const empty = $('[data-stack-empty]')!;
+    const render = () => {
+      // One row per app (slug); show its best answer across directories.
+      const slugs = [...new Set(readStack().map((k) => data[k]?.s).filter(Boolean))];
+      const rank: Record<string, number> = { yes: 0, kinda: 1, no: 2 };
+      let total = 0;
+      let save = 0;
+      list.replaceChildren();
+      for (const slug of slugs) {
+        const app = picker.find((p) => p.slug === slug);
+        if (!app) continue;
+        const answers = app.keys.map((k) => data[k]).filter(Boolean);
+        const best = [...answers].sort((a, b) => rank[a.v] - rank[b.v])[0];
+        const price = answers.find((a) => a.p !== null)?.p ?? 0;
+        total += price;
+        if (best && best.v !== 'no') save += price * 12;
+        const li = document.createElement('li');
+        li.className = `v-${best?.v ?? 'no'}`;
+        const a = document.createElement('a');
+        a.href = `/compare/${slug}`;
+        const name = document.createElement('strong');
+        name.textContent = app.name;
+        const meta = document.createElement('span');
+        meta.className = 'muted';
+        meta.textContent = `${price ? `$${price}/mo` : 'usage-based'} · ${answers.length} answer${answers.length === 1 ? '' : 's'}`;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = best ? `${best.w}: ${best.l}` : '—';
+        a.append(name, meta);
+        const rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'icon-btn';
+        rm.setAttribute('aria-label', `Remove ${app.name}`);
+        rm.textContent = '×';
+        rm.addEventListener('click', () => {
+          writeStack(readStack().filter((k) => !app.keys.includes(k)));
+          render();
+        });
+        li.append(a, badge, rm);
+        list.append(li);
+      }
+      empty.hidden = slugs.length > 0;
+      $('[data-stack-total]')!.textContent = `$${fmt(total)}`;
+      $('[data-stack-save]')!.textContent = `$${fmt(save)}`;
+      $('[data-stack-count]')!.textContent = String(slugs.length);
+    };
+    const pick = $<HTMLInputElement>('[data-stack-pick]')!;
+    const add = () => {
+      const app = picker.find((p) => p.name.toLowerCase() === pick.value.trim().toLowerCase());
+      if (!app) return;
+      writeStack([...readStack(), app.keys[0]]);
+      pick.value = '';
+      render();
+      toast(`Added ${app.name}`);
+    };
+    pick.addEventListener('change', add);
+    pick.addEventListener('keydown', (e) => e.key === 'Enter' && (e.preventDefault(), add()));
+    $('[data-stack-clear]')!.addEventListener('click', () => {
+      writeStack([]);
+      render();
+    });
+    $('[data-stack-share]')!.addEventListener('click', async (e) => {
+      const slugs = [...new Set(readStack().map((k) => data[k]?.s).filter(Boolean))];
+      if (await copyText(`${location.origin}/stack?s=${slugs.join(',')}`)) {
+        confirmBtn(e.currentTarget as HTMLElement);
+        toast('Share link copied');
+      }
+    });
+    render();
+  }
+}
+
+/* ---------- stats page ---------- */
+{
+  const el = document.getElementById('stats-names');
+  if (el) {
+    const names = JSON.parse(el.textContent ?? '{}') as Record<string, { n: string; u: string; w: string; p: number }>;
+    const fill = (ol: HTMLElement, rows: { key: string; n: number }[], unit: string) => {
+      ol.replaceChildren();
+      if (!rows.length) {
+        const li = document.createElement('li');
+        li.className = 'muted';
+        li.textContent = 'No votes yet.';
+        ol.append(li);
+        return;
+      }
+      rows.forEach((r) => {
+        const x = names[r.key];
+        if (!x) return;
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = x.u;
+        a.textContent = `${x.n} `;
+        const k = document.createElement('span');
+        k.className = 'muted';
+        k.textContent = `(${x.w})`;
+        a.append(k);
+        const b = document.createElement('b');
+        b.textContent = `${fmt(r.n)} ${unit}`;
+        li.append(a, b);
+        ol.append(li);
+      });
+    };
+    const load = async () => {
+      try {
+        const res = await fetch('/api/stats', { headers: { accept: 'application/json' } });
+        if (!res.ok) return;
+        const s = await res.json();
+        const all = s.totals.all;
+        const set = (k: string, v: string) => $$(`[data-stat="${k}"]`).forEach((x) => (x.textContent = v));
+        set('mrr', `$${fmt(all.mrr)}`);
+        set('mrr12', `$${fmt(all.mrr * 12)}`);
+        set('votes', fmt(all.votes));
+        set('votes24h', fmt(all.votes24h));
+        for (const [k, t] of Object.entries(s.totals as Record<string, Totals>)) {
+          $$(`[data-kind-votes="${k}"]`).forEach((x) => (x.textContent = fmt(t.votes)));
+          $$(`[data-kind-mrr="${k}"]`).forEach((x) => (x.textContent = fmt(t.mrr)));
+        }
+        fill($('[data-top]')!, s.top, 'votes');
+        fill($('[data-week]')!, s.week, 'this week');
+        // 14-day bar chart.
+        const bars = $('[data-daily]')!;
+        const days: string[] = [];
+        for (let i = 13; i >= 0; i--) days.push(new Date(Date.now() - i * 864e5).toISOString().slice(0, 10));
+        const by = new Map((s.daily as { day: string; n: number }[]).map((d) => [d.day, d.n]));
+        const max = Math.max(1, ...days.map((d) => by.get(d) ?? 0));
+        bars.replaceChildren(
+          ...days.map((d) => {
+            const n = by.get(d) ?? 0;
+            const col = document.createElement('span');
+            col.className = 'bar';
+            col.title = `${d}: ${n} votes`;
+            const fillEl = document.createElement('i');
+            fillEl.style.height = `${Math.max(2, (n / max) * 100)}%`;
+            const lab = document.createElement('small');
+            lab.textContent = d.slice(8);
+            col.append(fillEl, lab);
+            return col;
+          })
+        );
+      } catch {}
+    };
+    load();
+    window.setInterval(() => !document.hidden && load(), 60000);
+  }
+}
+
+/* ---------- public review queue ---------- */
+{
+  const ul = $('[data-queue]');
+  if (ul) {
+    const when = (ts: number) => new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    fetch('/api/queue', { headers: { accept: 'application/json' } })
+      .then((r) => r.json())
+      .then(({ items }: { items: { id: number; directory: string; app: string; by: string | null; status: string; created_at: number }[] }) => {
+        ul.replaceChildren();
+        if (!items.length) {
+          const li = document.createElement('li');
+          li.className = 'muted';
+          li.textContent = 'The queue is empty. Be the first to submit one.';
+          ul.append(li);
+          return;
+        }
+        for (const it of items) {
+          const li = document.createElement('li');
+          li.className = `k-${it.directory}`;
+          const app = document.createElement('strong');
+          app.textContent = it.app;
+          const dir = document.createElement('span');
+          dir.className = 'q-dir';
+          dir.textContent = it.directory;
+          const by = document.createElement('span');
+          by.className = 'muted';
+          by.textContent = `${it.by ? `@${it.by}` : 'anonymous'} · ${when(it.created_at)}`;
+          const st = document.createElement('span');
+          st.className = `q-status s-${it.status}`;
+          st.textContent = it.status === 'new' ? 'waiting' : it.status;
+          li.append(app, dir, by, st);
+          ul.append(li);
+        }
+      })
+      .catch(() => (ul.innerHTML = '<li class="muted">Couldn’t load the queue. Refresh to try again.</li>'));
+  }
+}
+
+/* ---------- request an app ---------- */
+{
+  const ol = $('[data-requests]');
+  if (ol) {
+    type Req = { id: number; name: string; directory: string | null; votes: number; status: string };
+    const render = (items: Req[]) => {
+      ol.replaceChildren();
+      if (!items.length) {
+        const li = document.createElement('li');
+        li.className = 'muted';
+        li.textContent = 'No requests yet. Ask for the first one.';
+        ol.append(li);
+        return;
+      }
+      for (const r of items) {
+        const li = document.createElement('li');
+        if (r.status === 'done') li.className = 'done';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'upvote';
+        btn.setAttribute('aria-label', `Vote for ${r.name}`);
+        if (store.get(`req:${r.id}`)) btn.dataset.voted = 'true';
+        const arrow = document.createElement('span');
+        arrow.textContent = '▲';
+        const n = document.createElement('b');
+        n.textContent = fmt(r.votes);
+        btn.append(arrow, n);
+        btn.addEventListener('click', async () => {
+          btn.disabled = true;
+          try {
+            const res = await fetch(`/api/requests/${r.id}`, { method: 'POST', headers: { accept: 'application/json', 'x-requested-with': 'fetch' } });
+            const d = await res.json();
+            if (typeof d.votes === 'number') n.textContent = fmt(d.votes);
+            if (d.ok || d.reason === 'already-voted') {
+              btn.dataset.voted = 'true';
+              store.set(`req:${r.id}`, '1');
+            }
+            toast(d.ok ? 'Voted' : d.reason === 'already-voted' ? 'Already voted for this one' : 'Try again later');
+          } catch {
+            toast('Network hiccup. Try again?');
+          } finally {
+            btn.disabled = false;
+          }
+        });
+        const name = document.createElement('strong');
+        name.textContent = r.name;
+        const meta = document.createElement('span');
+        meta.className = 'muted';
+        meta.textContent = r.status === 'done' ? 'checked' : r.directory ? `wants ${r.directory}` : 'any directory';
+        const text = document.createElement('span');
+        text.className = 'r-text';
+        text.append(name, meta);
+        li.append(btn, text);
+        ol.append(li);
+      }
+    };
+    const load = () =>
+      fetch('/api/requests', { headers: { accept: 'application/json' } })
+        .then((r) => r.json())
+        .then((d) => render(d.items))
+        .catch(() => (ol.innerHTML = '<li class="muted">Couldn’t load requests. Refresh to try again.</li>'));
+    load();
+    const form = $<HTMLFormElement>('form[data-request-form]');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = $('[data-form-msg]', form);
+      const btn = $<HTMLButtonElement>('button[type="submit"]', form)!;
+      btn.disabled = true;
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { accept: 'application/json', 'x-requested-with': 'fetch' } });
+        const d = await res.json();
+        if (d.ok) {
+          if (d.id) store.set(`req:${d.id}`, '1');
+          form.reset();
+          confirmBtn(btn, 2500);
+          toast('Requested');
+          if (msg) (msg.textContent = 'Added. Thanks!'), (msg.className = 'form-msg ok');
+          load();
+        } else if (msg) {
+          msg.textContent = d.error || 'Something went wrong.';
+          msg.className = 'form-msg err';
+          if (d.reason === 'already-voted') load();
+        }
+      } catch {
+        if (msg) (msg.textContent = 'Network hiccup. Try again?'), (msg.className = 'form-msg err');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
 }

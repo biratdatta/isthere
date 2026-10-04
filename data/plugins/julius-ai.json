@@ -7,6 +7,7 @@
   "priceNote": "Plus, billed yearly ($20 monthly)",
   "pricingUrl": "https://julius.ai/pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "plugin": {
     "name": "data",
     "marketplace": "anthropics/knowledge-work-plugins",

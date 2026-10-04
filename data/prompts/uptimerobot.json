@@ -5,6 +5,7 @@
   "category": "monitoring",
   "priceMonthly": 7,
   "verdict": "kinda",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Checks from many regions so you know it is down for everyone, not just your server",
     "A monitor that does not go down with your own infrastructure",

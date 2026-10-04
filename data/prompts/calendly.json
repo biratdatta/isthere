@@ -5,6 +5,7 @@
   "category": "scheduling",
   "priceMonthly": 10,
   "verdict": "yes",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Round-robin and collective team scheduling out of the box",
     "Native Zoom/Teams link creation without wiring OAuth yourself",

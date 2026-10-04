@@ -7,6 +7,7 @@
   "priceNote": "Pro AI per seat; check whether this is the annual price",
   "pricingUrl": "https://www.usemotion.com/pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "plugin": {
     "name": "productivity",
     "marketplace": "anthropics/knowledge-work-plugins",

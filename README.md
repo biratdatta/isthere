@@ -49,6 +49,10 @@ open-source prior art, and an **"I replaced this"** button that feeds the site's
 - Per-agent install tabs with one-click copy
 - Light mode and a calm slate dark mode
 - Submit your own find, or book an ad slot
+- **My stack**: tick what you pay for, see what you'd save
+- Compare view, category pages and free open-source alternatives
+- Agree/disagree on verdicts, request an app, public review queue
+- What's new + RSS, weekly email, live stats, README badges
 
 </td>
 <td width="50%" valign="top">

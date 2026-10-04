@@ -7,6 +7,7 @@
   "priceNote": "Plus/Pro/Ultra tiers; prices are rendered client-side, check the pricing page",
   "pricingUrl": "https://gamma.app/pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "skill": {
     "name": "pptx",
     "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pptx",

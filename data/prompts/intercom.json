@@ -5,6 +5,7 @@
   "category": "communication",
   "priceMonthly": 29,
   "verdict": "kinda",
+  "added": "2026-10-04",
   "whatYouLose": [
     "AI agent trained on your help center with handoff to humans",
     "Mobile SDKs and push notifications",

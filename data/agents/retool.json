@@ -7,6 +7,8 @@
   "priceNote": "Team, per builder, billed yearly (+$5 per internal user)",
   "pricingUrl": "https://retool.com/pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
+  "checked": "2026-10-04",
   "agent": {
     "name": "Replit Agent",
     "maker": "Replit",

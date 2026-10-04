@@ -7,6 +7,7 @@
   "priceNote": "Pro, billed yearly; the price is not readable without JavaScript, check the pricing page",
   "pricingUrl": "https://smallpdf.com/pricing",
   "verdict": "yes",
+  "added": "2026-10-04",
   "skill": {
     "name": "pdf",
     "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pdf",

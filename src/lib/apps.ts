@@ -5,6 +5,14 @@ export type { Kind, Verdict } from './kinds';
 export interface PriorArt {
   name: string;
   url: string;
+  /** One line on what it is. Optional. */
+  desc?: string;
+}
+
+export interface PricePoint {
+  date: string; // YYYY-MM-DD
+  price: number | null;
+  note?: string;
 }
 
 interface Base {
@@ -21,6 +29,14 @@ interface Base {
   whatYouLose: string[];
   priorArt: PriorArt[];
   notes: string;
+  /** Date the entry went live (YYYY-MM-DD). */
+  added?: string;
+  /** Date the price was last checked against the pricing page. */
+  checked?: string;
+  /** Earlier prices, oldest first. The current price is priceMonthly. */
+  priceHistory?: PricePoint[];
+  /** Who added it. Defaults to the maintainer. */
+  contributor?: { name: string; url?: string };
 }
 
 export interface PromptEntry extends Base {
@@ -134,6 +150,13 @@ function validate(raw: unknown, file: string, kind: Kind): Entry {
   if (!Array.isArray(a.whatYouLose) || a.whatYouLose.some((x: unknown) => typeof x !== 'string')) fail('whatYouLose must be string[]');
   if (!Array.isArray(a.priorArt) || a.priorArt.some((p: any) => !p?.name || !/^https?:\/\//.test(p?.url ?? ''))) fail('priorArt must be {name,url}[]');
 
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  for (const k of ['added', 'checked']) if (a[k] !== undefined && !DATE_RE.test(a[k])) fail(`${k} must be YYYY-MM-DD`);
+  if (a.priceHistory !== undefined && (!Array.isArray(a.priceHistory) || a.priceHistory.some((p: any) => !DATE_RE.test(p?.date ?? '') || !(p.price === null || typeof p.price === 'number')))) {
+    fail('priceHistory must be [{date: YYYY-MM-DD, price: number|null, note?}]');
+  }
+  if (a.contributor !== undefined && (typeof a.contributor?.name !== 'string' || !a.contributor.name.trim())) fail('contributor needs a name');
+
   if (kind === 'prompts' && typeof a.prompt !== 'string') fail('prompts need "prompt"');
   if (kind === 'skills') {
     const s = a.skill;
@@ -234,3 +257,35 @@ export function searchText(e: Entry): string {
 }
 
 export const verdictLabel = (e: Entry) => KINDS[e.kind].verdicts[e.verdict].label;
+
+/* ---------------- cross-directory helpers ---------------- */
+
+export const LAUNCH_DATE = '2026-10-04';
+export const MAINTAINER = { name: 'biratdatta', url: 'https://github.com/biratdatta' };
+export const addedOn = (e: Entry) => e.added ?? LAUNCH_DATE;
+export const contributorOf = (e: Entry) => e.contributor ?? MAINTAINER;
+
+/** One row per app (slug), with every directory that covers it. */
+export function apps() {
+  const map = new Map<string, Entry[]>();
+  for (const e of ENTRIES) map.set(e.slug, [...(map.get(e.slug) ?? []), e]);
+  return [...map.entries()]
+    .map(([slug, list]) => ({ slug, name: list[0].name, domain: list[0].domain, category: list[0].category, entries: KIND_ORDER.map((k) => list.find((x) => x.kind === k)).filter((x): x is Entry => !!x) }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Most recent price change, if the entry has a history and the price moved. */
+export function lastPriceChange(e: Entry): { from: number | null; to: number | null; date: string; note?: string } | undefined {
+  const h = e.priceHistory;
+  if (!h?.length) return undefined;
+  const prev = h[h.length - 1];
+  if (prev.price === e.priceMonthly) return undefined;
+  return { from: prev.price, to: e.priceMonthly, date: e.checked ?? addedOn(e), note: prev.note };
+}
+
+/** Free / open-source alternatives across every directory entry for this app, deduplicated by URL. */
+export function freeAlternatives(slug: string): PriorArt[] {
+  const seen = new Map<string, PriorArt>();
+  for (const e of ENTRIES.filter((x) => x.slug === slug)) for (const p of e.priorArt) if (!seen.has(p.url)) seen.set(p.url, p);
+  return [...seen.values()];
+}

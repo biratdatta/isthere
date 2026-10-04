@@ -7,6 +7,7 @@
   "priceNote": "Starter, billed annually ($29 monthly)",
   "pricingUrl": "https://lavender.ai/coach#pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "plugin": {
     "name": "sales",
     "marketplace": "anthropics/knowledge-work-plugins",

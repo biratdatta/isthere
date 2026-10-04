@@ -5,6 +5,7 @@
   "category": "automation",
   "priceMonthly": 20,
   "verdict": "kinda",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Thousands of maintained integrations with OAuth already approved",
     "Reliability: retries, replay, error alerts and a task history",

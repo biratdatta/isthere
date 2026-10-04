@@ -5,6 +5,7 @@
   "category": "marketing",
   "priceMonthly": 6,
   "verdict": "kinda",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Approved API access to every network (some charge for API use or require app review)",
     "Maintenance every time a platform changes its API",

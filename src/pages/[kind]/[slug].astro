@@ -4,7 +4,7 @@ import Icon from '../../components/Icon.astro';
 import Odometer from '../../components/Odometer.astro';
 import PromptBlock from '../../components/PromptBlock.astro';
 import InstallBlock from '../../components/InstallBlock.astro';
-import { CATEGORIES, ENTRIES, formatPrice, keyOf, relatedEntries, siblings, verdictLabel, type Entry } from '../../lib/apps';
+import { CATEGORIES, ENTRIES, addedOn, contributorOf, formatPrice, freeAlternatives, keyOf, lastPriceChange, relatedEntries, siblings, verdictLabel, type Entry } from '../../lib/apps';
 import { KINDS } from '../../lib/kinds';
 import { mcpInstalls, pluginInstalls, skillInstalls } from '../../lib/installs';
 import { breadcrumbs, entryDescription, entryPath, entryTitle, faqFor, faqPage, shortUrl } from '../../lib/seo';
@@ -23,7 +23,19 @@ const related = relatedEntries(e);
 const also = siblings(e);
 const faq = faqFor(e);
 const short = shortUrl(e);
-const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(`${entryTitle(e)} Verdict: ${v.label}.`)}&url=${encodeURIComponent(short)}`;
+const shareText =
+  k.metric === 'mrr' && e.priceMonthly
+    ? `I just replaced ${e.name} (${formatPrice(e.priceMonthly)}/mo) with ${k.article} ${k.word}. Verdict: ${v.label}.`
+    : `${entryTitle(e)} Verdict: ${v.label}.`;
+const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(short)}`;
+const alts = freeAlternatives(e.slug);
+const change = lastPriceChange(e);
+const who = contributorOf(e);
+const fmtDate = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+const badgeUrl = new URL(`/badge/${e.kind}/${e.slug}.svg`, site).href;
+const pageUrl = new URL(entryPath(e), site).href;
+const badgeMd = `[![${entryTitle(e)} ${v.label}](${badgeUrl})](${pageUrl})`;
+const badgeHtml = `<a href="${pageUrl}"><img src="${badgeUrl}" alt="${entryTitle(e)} ${v.label}" height="20"></a>`;
 const crumbs = [
   { name: 'Home', path: '/' },
   { name: k.plural, path: `/${e.kind}` },
@@ -46,7 +58,7 @@ const price = e.priceMonthly;
     <ol>
       <li><a href="/">Home</a></li>
       <li><a href={`/${e.kind}`}>{k.plural}</a></li>
-      <li><a href={`/${e.kind}?cat=${e.category}#list`}>{c.label}</a></li>
+      <li><a href={`/category/${e.category}`}>{c.label}</a></li>
       <li aria-current="page">{e.name}</li>
     </ol>
   </nav>
@@ -62,6 +74,12 @@ const price = e.priceMonthly;
         </span>
       </span>
       <h1>{titleParts.length === 2 ? <>{titleParts[0]}<span class="hl">{k.word}</span>{titleParts[1]}</> : entryTitle(e)}</h1>
+      <ul class="stat-row" aria-label="At a glance">
+        {isMrr && price !== null && price > 0 && <li><span>you’d save</span><b class="save">{formatPrice(price * 12)}/yr</b></li>}
+        <li><span>{k.voted}</span><b><span data-count-key={key}>0</span> people</b></li>
+        <li><span>added</span><b>{fmtDate(addedOn(e))}</b></li>
+        {e.checked && <li><span>price checked</span><b>{fmtDate(e.checked)}</b></li>}
+      </ul>
       {also.length > 0 && (
         <div class="also">
           <span>Also for {e.name}:</span>
@@ -75,6 +93,15 @@ const price = e.priceMonthly;
       <span class="eyebrow">The verdict</span>
       <span class="big">{v.label === 'NOT REALLY' ? 'Not really' : v.label.charAt(0) + v.label.slice(1).toLowerCase()}</span>
       <span style="display:flex;flex-direction:column;gap:6px"><strong>{v.headline}</strong><span class="muted" style="font-size:14px;line-height:1.5">{v.blurb}</span></span>
+      <form class="agree" method="post" action={`/api/verdict/${e.kind}/${e.slug}`} data-verdict={key}>
+        <span class="q">Agree with this verdict?</span>
+        <span class="agree-btns">
+          <button type="submit" name="agree" value="1" class="btn btn-sm"><Icon name="check" size={14} />Agree</button>
+          <button type="submit" name="agree" value="0" class="btn btn-sm"><Icon name="x" size={14} />Disagree</button>
+        </span>
+        <span class="agree-bar" aria-hidden="true"><i data-agree-bar style="width:0%"></i></span>
+        <span class="agree-note" data-agree-note>Be the first to weigh in.</span>
+      </form>
     </div>
   </section>
 
@@ -154,18 +181,29 @@ const price = e.priceMonthly;
           {e.whatYouLose.map((item) => <li><span class="x"><Icon name="x" size={12} /></span>{item}</li>)}
         </ul>
         <p class="notes">{e.notes}</p>
+        <p class="credit">Added by <a href={who.url ?? '/contributors'} rel="noopener">@{who.name}</a> · <a href="/contributors">contributors</a></p>
       </div>
 
-      {e.priorArt.length > 0 && (
-        <div class="card pad stack">
-          <h2 class="section-title">Prior art</h2>
-          <ul class="prior">
-            {e.priorArt.map((p) => (
-              <li><a href={p.url} rel="noopener"><span>{p.name}<small>{p.url.replace(/^https?:\/\//, '')}</small></span><Icon name="external" size={16} /></a></li>
+      {alts.length > 0 && (
+        <div class="card pad stack" id="alternatives">
+          <span style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px">
+            <h2 class="section-title">Free alternatives</h2>
+            <span class="muted" style="font-size:13px">Open source, $0 to self-host</span>
+          </span>
+          <ul class="prior alts">
+            {alts.map((p) => (
+              <li><a href={p.url} rel="noopener"><span>{p.name}<small>{p.desc ?? p.url.replace(/^https?:\/\//, '')}</small></span><span class="free">$0 · FREE</span><Icon name="external" size={16} /></a></li>
             ))}
           </ul>
+          <a class="more-link" href={`/alternatives#${e.slug}`}>All free alternatives to {e.name} <Icon name="arrow" size={14} /></a>
         </div>
       )}
+
+      <a class={`card compare-cta`} href={`/compare/${e.slug}`}>
+        <span><span class="eyebrow">Compare</span><strong>Every answer for {e.name}, side by side</strong></span>
+        <span class="mini-verdicts">{siblings(e).concat([e]).map((x) => <span class={`k-${x.kind}`} title={`${KINDS[x.kind].plural}: ${verdictLabel(x)}`}><Icon name={x.kind} size={14} /></span>)}</span>
+        <Icon name="arrow" size={18} />
+      </a>
 
       <div class="card pad faq">
         <h2 class="section-title" style="margin-bottom:10px">{e.name}, answered</h2>
@@ -192,6 +230,18 @@ const price = e.priceMonthly;
           {e.priceNote ?? (price !== null ? `${formatPrice(price * 12)}/yr per seat.` : '')}
           {e.pricingUrl && <> · <a href={e.pricingUrl} rel="noopener nofollow" style="text-decoration:underline">Pricing ↗</a></>}
         </span>
+        {change && (
+          <span class={`price-change ${change.to !== null && change.from !== null && change.to > change.from ? 'up' : 'down'}`}>
+            {change.from !== null && change.to !== null ? (change.to > change.from ? 'Price went up' : 'Price went down') : 'Price changed'}: {formatPrice(change.from)} → {formatPrice(change.to)} · {fmtDate(change.date)}
+          </span>
+        )}
+        {isMrr && price !== null && price > 0 && (
+          <div class="calc" data-calc={price}>
+            <label for="calc-seats">Seats</label>
+            <input id="calc-seats" type="number" min="1" max="10000" value="1" inputmode="numeric" data-calc-seats />
+            <span>you’d save <b data-calc-out>{formatPrice(price * 12)}</b>/yr</span>
+          </div>
+        )}
       </div>
       <div class="card stack" style="gap:12px;padding:22px;position:relative">
         <span class="eyebrow">{isMrr ? 'Did you do it?' : 'Using it?'}</span>
@@ -206,7 +256,17 @@ const price = e.priceMonthly;
           <a class="btn" href={shareUrl} target="_blank" rel="noopener"><Icon name="share" size={15} />Share on X</a>
           <button class="btn" type="button" data-copy-text={short}><Icon name="link" size={15} /><span class="idle">Copy link</span><span class="ok">Copied</span></button>
         </div>
+        <p class="share-preview">“{shareText}” <span>{short.replace('https://', '')}</span></p>
+        <button class="btn stack-btn" type="button" data-stack-add={key} data-stack-name={e.name}><Icon name="plus" size={15} /><span class="idle">Add to my stack</span><span class="ok">In your stack</span></button>
       </div>
+      <details class="card embed">
+        <summary><span class="eyebrow">Embed badge</span><img src={`/badge/${e.kind}/${e.slug}.svg`} alt="" height="20" loading="lazy" /></summary>
+        <div class="stack" style="gap:8px;margin-top:12px">
+          <span class="muted" style="font-size:13px">For a README or docs page. Links back here.</span>
+          <button class="btn btn-sm" type="button" data-copy-text={badgeMd}><Icon name="copy" size={14} /><span class="idle">Copy Markdown</span><span class="ok">Copied</span></button>
+          <button class="btn btn-sm" type="button" data-copy-text={badgeHtml}><Icon name="copy" size={14} /><span class="idle">Copy HTML</span><span class="ok">Copied</span></button>
+        </div>
+      </details>
       {related.length > 0 && (
         <div class="card stack" style="gap:4px;padding:14px">
           <span class="eyebrow" style="padding:8px 8px 4px">More {k.plural}</span>

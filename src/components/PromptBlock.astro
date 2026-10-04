@@ -8,6 +8,11 @@ interface Props {
 }
 const { prompt, filename } = Astro.props;
 const lines = prompt.split('\n').length;
+const cursorPrefix = AGENTS.find((a) => a.id === 'cursor')!.prefix;
+// Cursor deeplink (cursor.com/docs/reference/deeplinks): opens Cursor with the prompt pre-filled; nothing runs until you confirm.
+const cursorLink = `https://cursor.com/link/prompt?text=${encodeURIComponent(cursorPrefix + prompt)}`;
+// Claude Code and Codex take the first prompt as a CLI argument; a quoted heredoc keeps it intact.
+const cli = (bin: string, id: string) => `mkdir my-app && cd my-app && ${bin} "$(cat <<'PROMPT_EOF'\n${AGENTS.find((a) => a.id === id)!.prefix}${prompt}\nPROMPT_EOF\n)"`;
 ---
 <div class="stack" data-prompt-block>
   <div class="code">
@@ -24,5 +29,11 @@ const lines = prompt.split('\n').length;
       <span class="idle">Copy raw</span><span class="ok">Copied</span>
     </button>
   </div>
-  <p class="hint" data-copy-hint>Each button adds run instructions for that agent in front of the prompt.</p>
+  <div class="open-row" role="group" aria-label="Open in your agent">
+    <span class="eyebrow">Open in</span>
+    <button class="btn btn-sm" type="button" data-copy-cmd={cli('claude', 'claude-code')} data-label="Claude Code"><Icon name="copy" size={14} /><span class="idle">Claude Code command</span><span class="ok">Copied</span></button>
+    <button class="btn btn-sm" type="button" data-copy-cmd={cli('codex', 'codex')} data-label="Codex"><Icon name="copy" size={14} /><span class="idle">Codex command</span><span class="ok">Copied</span></button>
+    {cursorLink.length < 10000 && <a class="btn btn-sm" href={cursorLink} target="_blank" rel="noopener">Open in Cursor <Icon name="external" size={14} /></a>}
+  </div>
+  <p class="hint" data-copy-hint>Copy buttons add run instructions for that agent. The commands start the agent in a new folder with the prompt filled in; Cursor opens with it pre-filled and waits for you.</p>
 </div>

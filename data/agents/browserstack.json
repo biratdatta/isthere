@@ -7,6 +7,8 @@
   "priceNote": "Automate Desktop, 1 parallel test, billed yearly",
   "pricingUrl": "https://www.browserstack.com/pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
+  "checked": "2026-10-04",
   "agent": {
     "name": "Momentic",
     "maker": "Momentic",

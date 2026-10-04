@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { ENTRIES, apps, keyOf } from '../lib/apps';
+import { KINDS } from '../lib/kinds';
+import { breadcrumbs, entryPath } from '../lib/seo';
+
+const site = Astro.site!;
+// Everything the client needs to render a stack, keyed "kind:slug".
+const data = Object.fromEntries(
+  ENTRIES.map((e) => [keyOf(e), { n: e.name, s: e.slug, k: e.kind, w: KINDS[e.kind].word, p: e.priceMonthly, v: e.verdict, l: KINDS[e.kind].verdicts[e.verdict].label, u: entryPath(e), m: KINDS[e.kind].metric }])
+);
+const picker = apps().map((a) => ({ slug: a.slug, name: a.name, keys: a.entries.map(keyOf) }));
+---
+<Base title="My stack: what you pay for, and what could replace it" description="Tick the SaaS apps you pay for and see your monthly spend, what an AI skill, plugin, prompt or agent could replace, and what you'd save. Saved in your browser only." path="/stack"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'My stack', path: '/stack' }])]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">My stack</li></ol></nav>
+  <section class="hero">
+    <div class="page-title">
+      <h1>My <span class="hl">stack</span></h1>
+      <p class="muted" style="font-size:18px;max-width:560px">Add the apps you pay for. See what you spend, what could replace each one, and what you’d save. Saved in this browser only, no account.</p>
+    </div>
+    <div class="stats">
+      <div class="card stat"><b data-stack-total>$0</b><span>per month now</span></div>
+      <div class="tile stat" style="--k:var(--green)"><b data-stack-save>$0</b><span>you could save / yr</span></div>
+      <div class="card stat"><b data-stack-count>0</b><span>apps</span></div>
+    </div>
+  </section>
+
+  <section class="card pad stack">
+    <label class="field" for="stack-pick">Add an app<input id="stack-pick" list="stack-apps" placeholder="Start typing: Notion, Calendly, Zendesk…" autocomplete="off" data-stack-pick /></label>
+    <datalist id="stack-apps">{picker.map((p) => <option value={p.name} />)}</datalist>
+    <ul class="stack-list" data-stack-list aria-live="polite"></ul>
+    <p class="empty-note" data-stack-empty>Nothing yet. Add an app above, or use “Add to my stack” on any app page.</p>
+    <div class="form-foot">
+      <span class="muted" style="font-size:13px">Savings count apps with a YES or KINDA answer in any directory, at the entry price per seat.</span>
+      <span style="display:flex;gap:8px">
+        <button class="btn btn-sm" type="button" data-stack-share><Icon name="link" size={14} /><span class="idle">Copy share link</span><span class="ok">Copied</span></button>
+        <button class="btn btn-sm" type="button" data-stack-clear>Clear</button>
+      </span>
+    </div>
+  </section>
+  <script is:inline type="application/json" id="stack-data" set:html={JSON.stringify({ data, picker })} />
+</Base>

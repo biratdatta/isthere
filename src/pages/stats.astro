@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { ENTRIES, keyOf } from '../lib/apps';
+import { KINDS, KIND_ORDER } from '../lib/kinds';
+import { breadcrumbs, entryPath } from '../lib/seo';
+
+const site = Astro.site!;
+const names = Object.fromEntries(ENTRIES.map((e) => [keyOf(e), { n: e.name, u: entryPath(e), k: e.kind, w: KINDS[e.kind].word, p: KINDS[e.kind].metric === 'mrr' ? e.priceMonthly ?? 0 : 0 }]));
+---
+<Base title="isthere in numbers: MRR destroyed, most-replaced apps" description="Live stats: total MRR destroyed, the most-replaced SaaS apps all time and this week, and votes per directory." path="/stats"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Stats', path: '/stats' }])]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Stats</li></ol></nav>
+  <section class="page-title">
+    <h1>The <span class="hl">numbers</span></h1>
+    <p class="muted" style="font-size:18px;max-width:560px">Live from the vote counter. Updates every minute.</p>
+  </section>
+
+  <section class="stats stats-4">
+    <div class="card stat"><b data-stat="mrr">$0</b><span>MRR destroyed / mo</span></div>
+    <div class="card stat"><b data-stat="mrr12">$0</b><span>per year</span></div>
+    <div class="card stat"><b data-stat="votes">0</b><span>votes all time</span></div>
+    <div class="card stat"><b data-stat="votes24h">0</b><span>votes in 24h</span></div>
+  </section>
+
+  <section class="card pad stack">
+    <h2 class="section-title">Votes in the last 14 days</h2>
+    <div class="bars" data-daily aria-label="Votes per day"></div>
+  </section>
+
+  <section class="dir-grid">
+    {KIND_ORDER.map((k) => (
+      <div class={`tile stat-tile k-${k}`}>
+        <span class="ico-k"><Icon name={k} size={20} /></span>
+        <strong>{KINDS[k].plural}</strong>
+        <b data-kind-votes={k}>0</b>
+        <span class="muted" style="font-size:13px">{KINDS[k].voted}{KINDS[k].metric === 'mrr' && <> · $<span data-kind-mrr={k}>0</span>/mo</>}</span>
+      </div>
+    ))}
+  </section>
+
+  <section class="split">
+    <div class="card pad stack"><h2 class="section-title">Most replaced, all time</h2><ol class="rank-list" data-top></ol></div>
+    <div class="card pad stack"><h2 class="section-title">Hot this week</h2><ol class="rank-list" data-week></ol></div>
+  </section>
+  <script is:inline type="application/json" id="stats-names" set:html={JSON.stringify(names)} />
+</Base>

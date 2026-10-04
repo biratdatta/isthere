@@ -115,6 +115,21 @@ export function faqFor(e: Entry): { q: string; a: string }[] {
     });
   }
   faq.push({ q: `Which AI agents work with this ${k.word}?`, a: agentsAnswer(e) });
+  faq.push({
+    q: `Is ${e.name} free?`,
+    a:
+      e.priceMonthly === null
+        ? `${e.name} doesn't publish a simple per-seat price${e.priceNote ? ` (${e.priceNote})` : ''}. Check its pricing page.`
+        : e.priceMonthly === 0
+          ? `${e.name} has a free plan.`
+          : `Paid plans start at about ${formatPrice(e.priceMonthly)}/month${e.priceNote ? ` (${e.priceNote})` : ''}. Some features may have a free tier; check the pricing page.`,
+  });
+  if (e.priorArt.length) {
+    faq.push({
+      q: `Is there an open-source alternative to ${e.name}?`,
+      a: `Yes: ${e.priorArt.map((p) => p.name).join(', ')}. ${e.priorArt.length > 1 ? 'They are' : 'It is'} free to self-host.`,
+    });
+  }
   return faq;
 }
 

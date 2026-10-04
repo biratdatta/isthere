@@ -5,6 +5,7 @@
   "category": "productivity",
   "priceMonthly": 9,
   "verdict": "yes",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Desktop idle detection and automatic tracking",
     "Browser extension that adds timers into Jira, GitHub, Asana",

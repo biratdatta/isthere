@@ -5,6 +5,7 @@
   "category": "communication",
   "priceMonthly": 15,
   "verdict": "no",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Instant share links while the video is still uploading",
     "Transcoding, adaptive streaming and a CDN",

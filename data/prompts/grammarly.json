@@ -5,6 +5,7 @@
   "category": "writing",
   "priceMonthly": 12,
   "verdict": "kinda",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Inline suggestions in every text box on every site and desktop app",
     "Low-latency checks without paying per LLM call",

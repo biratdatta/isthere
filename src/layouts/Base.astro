@@ -13,6 +13,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FooterAd from '../components/FooterAd.astro';
+import Newsletter from '../components/Newsletter.astro';
 import Rail from '../components/Rail.astro';
 import { ICON_VERSION, OG_VERSION, SITE_NAME, abs, graph, ldJson, organization, website } from '../lib/seo';
 import type { Kind } from '../lib/kinds';
@@ -74,6 +75,7 @@ const ld = graph(website(site), organization(site), ...jsonld);
         }, 5000);
       })();
     </script>
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/feed.xml" />
     <script type="application/ld+json" set:html={ldJson(ld)} />
   </head>
   <body>
@@ -83,6 +85,7 @@ const ld = graph(website(site), organization(site), ...jsonld);
       <Rail side="left" />
       <main id="main" class={`content${home ? ' home' : ''}`}>
         <slot />
+        <Newsletter source={kind ?? ''} />
         <FooterAd />
         <Footer />
       </main>

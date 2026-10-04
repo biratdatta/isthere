@@ -7,6 +7,8 @@
   "priceNote": "Support Team, per agent, billed yearly (Suite Team with AI agents is $55)",
   "pricingUrl": "https://www.zendesk.com/pricing/",
   "verdict": "kinda",
+  "added": "2026-10-04",
+  "checked": "2026-10-04",
   "agent": {
     "name": "Fin",
     "maker": "Intercom",

@@ -7,6 +7,7 @@
   "priceNote": "Pro, billed annually ($45 month-to-month)",
   "pricingUrl": "https://www.beautiful.ai/pricing",
   "verdict": "kinda",
+  "added": "2026-10-04",
   "skill": {
     "name": "pptx",
     "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pptx",

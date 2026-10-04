@@ -42,6 +42,8 @@ for (const kind of Object.keys(EXTRA)) {
     if (!(a.priceMonthly === null || typeof a.priceMonthly === 'number')) fail(id, 'priceMonthly must be a number or null');
     if (!Array.isArray(a.whatYouLose)) fail(id, 'whatYouLose must be an array');
     if (!Array.isArray(a.priorArt) || a.priorArt.some((p) => !p.name || !/^https?:\/\//.test(p.url))) fail(id, 'priorArt must be [{name, url}]');
+    for (const k of ['added', 'checked']) if (a[k] !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(a[k])) fail(id, `${k} must be YYYY-MM-DD`);
+    if (a.priceHistory !== undefined && !Array.isArray(a.priceHistory)) fail(id, 'priceHistory must be an array');
     const extra = EXTRA[kind](a); // truthy value when valid, or an error message
     if (typeof extra === 'string' && extra.startsWith('needs ')) fail(id, extra);
   }

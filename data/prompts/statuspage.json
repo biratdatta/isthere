@@ -5,6 +5,7 @@
   "category": "monitoring",
   "priceMonthly": 29,
   "verdict": "yes",
+  "added": "2026-10-04",
   "whatYouLose": [
     "Hosting the status page on infrastructure separate from your own (do this anyway)",
     "Subscriber SMS notifications",

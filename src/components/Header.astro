@@ -23,6 +23,7 @@ const { kind, current } = Astro.props;
     </div>
     <div class="nav-actions">
       <a class="icon-btn nav-search" href="/#q" aria-label="Search" data-search-jump><Icon name="search" size={18} /></a>
+      <a class="icon-btn stack-link" href="/stack" aria-label="My stack" title="My stack"><Icon name="layers" size={18} /><span class="stack-dot" data-stack-badge hidden></span></a>
       <button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="Toggle dark mode" title="Toggle theme (t)">
         <Icon name="moon" size={18} class="moon" /><Icon name="sun" size={18} class="sun" />
       </button>
@@ -46,9 +47,17 @@ const { kind, current } = Astro.props;
       <div style="display:flex;flex-direction:column;gap:10px">
         <span class="eyebrow">Community</span>
         <strong>Add your own is-there</strong>
-        <span class="muted" style="font-size:14px;line-height:1.5">Submit a skill, MCP, plugin or prompt that replaces a paid app. Reviewed before it goes live.</span>
+        <span class="muted" style="font-size:14px;line-height:1.5">Submit a skill, MCP, plugin, prompt or agent that replaces a paid app. Reviewed before it goes live.</span>
       </div>
       <a href="/submit" class="btn btn-primary" style="align-self:flex-start">Submit one <Icon name="arrow" size={14} /></a>
+      <nav class="mega-links" aria-label="Explore">
+        <a href="/stack"><Icon name="layers" size={16} />My stack</a>
+        <a href="/new"><Icon name="rss" size={16} />What’s new</a>
+        <a href="/stats"><Icon name="chart" size={16} />Stats</a>
+        <a href="/alternatives"><Icon name="external" size={16} />Free alternatives</a>
+        <a href="/requests"><Icon name="megaphone" size={16} />Request an app</a>
+        <a href="/contributors"><Icon name="github" size={16} />Contributors</a>
+      </nav>
     </div>
   </div>
 </header>
