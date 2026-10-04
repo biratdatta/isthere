@@ -29,7 +29,23 @@ const markFor = (kind) => {
   const svg = kind ? MARK_SVG.replace(/fill="#(4f7cff|2fbf71|f05252|f5a524)"/g, `fill="${KIND_COLOR[kind]}"`) : MARK_SVG;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 };
-fs.writeFileSync(path.join(root, 'public/apple-touch-icon.png'), new Resvg(MARK_SVG, { fitTo: { mode: 'width', value: 180 } }).render().asPng());
+const markPng = (size) => new Resvg(MARK_SVG, { fitTo: { mode: 'width', value: size } }).render().asPng();
+fs.writeFileSync(path.join(root, 'public/apple-touch-icon.png'), markPng(180));
+fs.writeFileSync(path.join(root, 'public/favicon-32.png'), markPng(32));
+// favicon.ico for browsers and tools that ask for it directly: PNG images inside an ICO container.
+{
+  const imgs = [16, 32, 48].map((s) => [s, markPng(s)]);
+  const head = Buffer.alloc(6 + 16 * imgs.length);
+  head.writeUInt16LE(0, 0); head.writeUInt16LE(1, 2); head.writeUInt16LE(imgs.length, 4);
+  let offset = head.length;
+  imgs.forEach(([s, png], i) => {
+    const o = 6 + i * 16;
+    head.writeUInt8(s, o); head.writeUInt8(s, o + 1); head.writeUInt16LE(1, o + 4); head.writeUInt16LE(32, o + 6);
+    head.writeUInt32LE(png.length, o + 8); head.writeUInt32LE(offset, o + 12);
+    offset += png.length;
+  });
+  fs.writeFileSync(path.join(root, 'public/favicon.ico'), Buffer.concat([head, ...imgs.map(([, p]) => p)]));
+}
 
 const h = (type, style, children) => ({ type, props: { style: { display: 'flex', ...style }, children } });
 const price = (n) => (Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`);
