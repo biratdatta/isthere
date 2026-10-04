@@ -1,15 +1,22 @@
 ---
-/** A 160×600 ad slot in the page margin. Hidden below 1180px. */
+/** A margin rail split into a 2 × 2 grid of ad tiles (76 × 290 each). Hidden below 1320px. */
 interface Props {
   side: 'left' | 'right';
 }
 const { side } = Astro.props;
+const prefix = side === 'left' ? 'L' : 'R';
 ---
 <aside class="rail" aria-label="Advertising">
-  <a href="/advertise" class="rail-slot">
-    <span class="top"><span>AD</span><span>{side.toUpperCase()}</span></span>
-    <span class="art">160 × 600<br />your creative</span>
-    <strong>Advertise here</strong>
-    <span class="p">Book this slot by the week</span>
-  </a>
+  <div class="rail-box">
+    <span class="rail-head"><span>AD</span><span>{side.toUpperCase()}</span></span>
+    <div class="rail-grid">
+      {[1, 2, 3, 4].map((n) => (
+        <a href="/advertise?slot=tile" class="rail-tile" aria-label={`Ad tile ${prefix}${n}: advertise here`}>
+          <span class="id">{prefix}{n}</span>
+          <span class="art">76<br />×<br />290</span>
+          <span class="p">Your ad</span>
+        </a>
+      ))}
+    </div>
+  </div>
 </aside>

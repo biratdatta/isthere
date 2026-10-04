@@ -5,15 +5,15 @@ import { breadcrumbs } from '../lib/seo';
 
 const site = Astro.site!;
 const slots = [
-  { id: 'left', name: 'Left rail', kind: 'skills', size: '160 × 600', where: 'Sticky beside every page, left side', l: true, r: false },
-  { id: 'right', name: 'Right rail', kind: 'mcp', size: '160 × 600', where: 'Sticky beside every page, right side', l: false, r: true },
-  { id: 'takeover', name: 'Directory takeover', kind: 'plugins', size: '2 × 160 × 600', where: 'Both rails on one directory and all its entries', l: true, r: true },
-  { id: 'footer', name: 'Footer banner', kind: 'prompts', size: '728 × 90', where: 'Wide banner above the footer on every page', l: false, r: false, b: true },
+  { id: 'tile', name: 'Rail tile', kind: 'skills', size: '76 × 290', where: 'One of 8 tiles beside every page, 4 per side', l: [0], r: [], b: false },
+  { id: 'side', name: 'Full side', kind: 'mcp', size: '4 tiles · 160 × 600', where: 'All 4 tiles on one side of every page', l: [], r: [0, 1, 2, 3], b: false },
+  { id: 'takeover', name: 'Directory takeover', kind: 'plugins', size: '8 tiles', where: 'Every tile on both sides of one directory and its entries', l: [0, 1, 2, 3], r: [0, 1, 2, 3], b: false },
+  { id: 'footer', name: 'Footer banner', kind: 'prompts', size: '728 × 90', where: 'Wide banner above the footer on every page', l: [], r: [], b: true },
 ];
 ---
 <Base
   title="Is there a skill for it? Advertise in the margins"
-  description="Book a 160×600 rail or a 728×90 footer banner on every page of isthere, by the week. Static image, one link, no tracking pixels."
+  description="Book an ad tile in the side rails or a 728×90 footer banner on every page of isthere, by the week. Static image, one link, no tracking pixels."
   path="/advertise"
   current="advertise"
   jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Advertise', path: '/advertise' }])]}
@@ -31,9 +31,9 @@ const slots = [
     {slots.map((s) => (
       <div class={`tile slot k-${s.kind}`}>
         <div class="sketch" aria-hidden="true">
-          <span class={`r${s.l ? ' on' : ''}`}></span>
+          <span class="r">{[0, 1, 2, 3].map((j) => <i class={s.l.includes(j) ? 'on' : ''}></i>)}</span>
           <span class="c"><i style="height:14px;border-radius:999px"></i><i style="height:30px;width:70%"></i><span class="g"><i></i><i></i><i></i><i></i></span><i class={`fb${s.b ? ' on' : ''}`}></i></span>
-          <span class={`r${s.r ? ' on' : ''}`}></span>
+          <span class="r">{[0, 1, 2, 3].map((j) => <i class={s.r.includes(j) ? 'on' : ''}></i>)}</span>
         </div>
         <span style="display:flex;flex-direction:column;gap:6px"><strong>{s.name}</strong><span class="muted" style="font-size:14px;line-height:1.5">{s.where}</span></span>
         <span class="foot"><span>{s.size}</span><b>[YOUR PRICE] / week</b></span>
@@ -57,7 +57,7 @@ const slots = [
         <label class="field" for="a-url">Click-through link<input id="a-url" name="url" type="url" required maxlength="300" placeholder="https://acme.dev" /></label>
       </div>
       <label class="field" for="a-email">Email<span class="hint">Booking confirmation and invoice go here</span><input id="a-email" name="email" type="email" required maxlength="254" placeholder="you@acme.dev" /></label>
-      <label class="field" for="a-notes">Anything else?<span class="hint">Optional. You’ll send the image (160×600 for rails, 728×90 for the footer) once we confirm the slot.</span><textarea id="a-notes" name="notes" rows="3" maxlength="1000"></textarea></label>
+      <label class="field" for="a-notes">Anything else?<span class="hint">Optional. You’ll send the image (76×290 per tile, 728×90 for the footer) once we confirm the slot. Tell us if you want a particular tile, like L1.</span><textarea id="a-notes" name="notes" rows="3" maxlength="1000"></textarea></label>
       <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
       <div class="form-foot">
         <span class="muted" style="font-size:13px">We confirm availability before you pay.</span>
@@ -79,7 +79,7 @@ const slots = [
       <div class="ticker" style="gap:10px">
         <span class="label">OPEN THIS WEEK</span>
         <strong style="font:700 30px/1.1 var(--display)" data-this-week>This week</strong>
-        <span style="font-size:13px;opacity:.8">Rails and footer banner, every directory.</span>
+        <span style="font-size:13px;opacity:.8">Rail tiles and footer banner, every directory.</span>
       </div>
     </aside>
   </section>
@@ -101,6 +101,9 @@ const slots = [
     var y = t.getFullYear(), jan4 = new Date(y, 0, 4);
     var wk = 1 + Math.round(((t - jan4) / 864e5 - 3 + ((jan4.getDay() + 6) % 7)) / 7);
     var input = document.getElementById('a-week');
+    var pick = new URLSearchParams(location.search).get('slot');
+    var sel = document.getElementById('a-slot');
+    if (pick && sel && sel.querySelector('option[value="' + pick + '"]')) sel.value = pick;
     if (input && !input.value) { input.value = y + '-W' + String(wk).padStart(2, '0'); input.min = input.value; }
   })();
 </script>
