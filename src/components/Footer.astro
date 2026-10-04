@@ -1,12 +1,11 @@
 ---
 /**
- * Site footer: live stats strip, ticker tape, activity feed, random verdict,
- * grouped links, weekly email, sponsor of the week and a giant wordmark.
+ * Site footer: live stats strip, grouped links, weekly email, sponsor of the week and a giant wordmark.
  * Live numbers come from /api/pulse (see src/scripts/main.ts → "footer pulse").
  */
 import Icon from './Icon.astro';
 import Mark from './Mark.astro';
-import { ENTRIES, addedOn, apps, formatPrice, keyOf, lastPriceChange, tickerSymbol } from '../lib/apps';
+import { ENTRIES, addedOn, apps, keyOf } from '../lib/apps';
 import { KINDS } from '../lib/kinds';
 import { REPO_URL, entryPath } from '../lib/seo';
 import { repoStars } from '../lib/github';
@@ -14,14 +13,7 @@ import { repoStars } from '../lib/github';
 const stars = await repoStars;
 const appCount = apps().length;
 const lastAdded = ENTRIES.map(addedOn).sort().at(-1)!;
-const tape = ENTRIES.filter((e) => KINDS[e.kind].metric === 'mrr' && e.priceMonthly)
-  .sort((a, b) => (b.priceMonthly ?? 0) - (a.priceMonthly ?? 0))
-  .filter((e, i, arr) => arr.findIndex((x) => x.slug === e.slug) === i)
-  .slice(0, 18)
-  .map((e) => ({ key: keyOf(e), sym: tickerSymbol(e), price: e.priceMonthly!, change: lastPriceChange(e), url: entryPath(e) }));
 const names = Object.fromEntries(ENTRIES.map((e) => [keyOf(e), { n: e.name, u: entryPath(e), w: KINDS[e.kind].word }]));
-const verdicts = ENTRIES.map((e) => ({ t: KINDS[e.kind].entryTitle(e.name), l: KINDS[e.kind].verdicts[e.verdict].label, v: e.verdict, u: entryPath(e), k: e.kind }));
-const first = verdicts[0];
 ---
 <footer class="site-footer" data-footer>
   <a href="/advertise?slot=footer" class="sponsor-card">
@@ -41,36 +33,8 @@ const first = verdicts[0];
     <a class="pulse-stat hot" href="/stats" data-pulse-hot><b>—</b><span>hot this week</span></a>
   </section>
 
-  <div class="tape" aria-hidden="true">
-    <div class="tape-track">
-      {[0, 1].map(() => tape.map((x) => (
-        <a href={x.url} tabindex="-1">
-          <b>{x.sym}</b>
-          {x.change && x.change.from !== null && x.change.to !== null && x.change.to !== x.change.from ? (
-            <span class={x.change.to > x.change.from ? 'dn' : 'up'}>{x.change.to > x.change.from ? '▼ price ' : '▲ price '}{formatPrice(x.change.from)}→{formatPrice(x.change.to)}</span>
-          ) : (
-            <span class="up">▲ <span data-tape-key={x.key}>0</span> replaced</span>
-          )}
-          <span class="px">{formatPrice(x.price)}/mo</span>
-        </a>
-      )))}
-    </div>
-  </div>
 
   <div class="foot-grid">
-    <div class="foot-left">
-      <div class="random-card" data-random>
-        <span class="eyebrow">Random verdict <kbd>R</kbd></span>
-        <a href={first.u} class={`rv k-${first.k} v-${first.v}`} data-random-link>
-          <strong data-random-title>{first.t}</strong>
-          <span class="badge" data-random-label>{first.l}</span>
-        </a>
-        <button type="button" class="btn btn-sm" data-random-next><Icon name="arrow" size={14} />Shuffle</button>
-      </div>
-      <ul class="activity" data-activity aria-live="polite" aria-label="Recent activity">
-        <li class="muted">Waiting for the next cancellation…</li>
-      </ul>
-    </div>
     <nav class="foot-col" aria-label="Directories">
       <span class="eyebrow">Directories</span>
       {(['skills', 'mcp', 'plugins', 'prompts', 'agents'] as const).map((k) => <a href={`/${k}`} class={`k-${k}`}><Icon name={k} size={14} class="ico-k" />{KINDS[k].plural}</a>)}
@@ -82,7 +46,6 @@ const first = verdicts[0];
       <a href="/alternatives">Free alternatives</a>
       <a href="/stats">Stats</a>
       <a href="/new">What’s new</a>
-      <a href="/feed.xml">RSS</a>
     </nav>
     <nav class="foot-col" aria-label="Community">
       <span class="eyebrow">Community</span>
@@ -116,6 +79,6 @@ const first = verdicts[0];
     <span>Last verdict added <time datetime={lastAdded} data-ago>{lastAdded}</time></span>
   </div>
   <p class="fine">Prices are entry paid tiers, approximate and subject to change; verdicts are opinions. Install commands follow each tool’s docs; check before running anything.</p>
-  <script is:inline type="application/json" id="footer-data" set:html={JSON.stringify({ names, verdicts })} />
+  <script is:inline type="application/json" id="footer-data" set:html={JSON.stringify({ names })} />
 </footer>
 <div class="toast" role="status" aria-live="polite" data-toast></div>
