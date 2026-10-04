@@ -44,12 +44,13 @@ const site = Astro.site!;
     <div class="card list-card reveal" style="min-width: 0">
       <div class="list-head">
         <h2>Cancel Culture</h2>
-        <span class="muted mono" style="font-size:12px" data-result-count aria-live="polite">{ENTRIES.length} of {ENTRIES.length}</span>
+        <span class="muted mono" style="font-size:12px" data-result-count aria-live="polite">Top 20 of {ENTRIES.length}</span>
       </div>
       <div style="padding: 0 10px 12px">
         <Chips param="kind" chips={chips} total={ENTRIES.length} action="/" />
       </div>
-      <EntryList entries={ENTRIES} filterBy="kind" />
+      <EntryList entries={ENTRIES} filterBy="kind" limit={20} />
+      <a class="see-all" href="/cancel-culture" data-see-all><span data-see-all-label>See the full list · all {ENTRIES.length}</span><Icon name="arrow" size={15} /></a>
     </div>
   </section>
 

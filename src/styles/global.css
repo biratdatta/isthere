@@ -791,3 +791,10 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .foot-base a { text-decoration: underline; text-decoration-color: var(--f-line); }
 .stars { display: inline-flex; align-items: center; gap: 4px; }
 @media (prefers-reduced-motion: reduce) { .wordmark-xl .xl-mark .t { animation: none; } }
+
+/* top-20 list on the home page */
+.rows > li.row-capped { display: none; }
+.see-all { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 4px 10px 12px; padding: 14px; border-radius: 14px; border: 1px dashed var(--line); font-weight: 600; font-size: 14px; color: var(--primary); }
+.see-all:hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 6%, var(--surface)); }
+.see-all[hidden] { display: none; }
+.rows[data-limit='20']:not([data-capped]) > li:nth-child(n + 21) { display: none; }

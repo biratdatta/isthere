@@ -11,13 +11,15 @@ import { entryPath } from '../lib/seo';
 interface Props {
   entries: Entry[];
   filterBy: 'category' | 'kind';
+  /** Show only the top N rows (after live re-ranking and filtering). */
+  limit?: number;
 }
-const { entries, filterBy } = Astro.props;
+const { entries, filterBy, limit } = Astro.props;
 const rank = { yes: 0, kinda: 1, no: 2 } as const;
 const ranked = [...entries].sort((a, b) => rank[a.verdict] - rank[b.verdict] || (b.priceMonthly ?? 0) - (a.priceMonthly ?? 0) || a.name.localeCompare(b.name));
 const facet = (e: Entry) => (filterBy === 'kind' ? e.kind : e.category);
 ---
-<ol class="rows" data-list>
+<ol class="rows" data-list data-limit={limit}>
   {ranked.map((e, i) => (
     <li data-search={searchText(e)} data-cat={facet(e)} data-key={keyOf(e)} data-order={i}>
       <a class={`row k-${e.kind} v-${e.verdict}`} href={entryPath(e)}>

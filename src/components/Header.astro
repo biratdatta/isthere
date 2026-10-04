@@ -17,7 +17,7 @@ const { kind, current } = Astro.props;
       <button type="button" aria-expanded="false" aria-controls="mega" data-mega-toggle aria-current={kind ? 'page' : undefined}>
         Directories <Icon name="chev" size={14} class="chev" />
       </button>
-      <a href="/#list" aria-current={current === 'list' ? 'page' : undefined}>Cancel Culture</a>
+      <a href="/cancel-culture" aria-current={current === 'list' ? 'page' : undefined}>Cancel Culture</a>
       <a href="/submit" aria-current={current === 'submit' ? 'page' : undefined}>Submit</a>
       <a href="/advertise" aria-current={current === 'advertise' ? 'page' : undefined}>Advertise</a>
     </div>

@@ -209,6 +209,34 @@ if (rot && !reduced) {
   rot.closest('h1')?.addEventListener('mouseleave', () => (paused = false));
 }
 
+/* ---------- top-N lists (home shows the top 20; the full list lives at /cancel-culture) ---------- */
+function capLists() {
+  $$('[data-list][data-limit]').forEach((ol) => {
+    const limit = Number(ol.dataset.limit);
+    ol.dataset.capped = 'true';
+    let shown = 0;
+    let matches = 0;
+    $$(':scope > li', ol).forEach((li) => {
+      if (li.classList.contains('row-hidden')) return li.classList.remove('row-capped');
+      matches++;
+      li.classList.toggle('row-capped', ++shown > limit);
+    });
+    const count = $('[data-result-count]', ol.closest('.list-card') ?? document);
+    const total = ol.children.length;
+    if (count) count.textContent = matches === total ? `Top ${Math.min(limit, total)} of ${total}` : `${Math.min(limit, matches)} of ${matches} matches`;
+    const all = $<HTMLAnchorElement>('[data-see-all]', ol.parentElement ?? document);
+    if (all) {
+      all.hidden = matches <= limit;
+      const url = new URL('/cancel-culture', location.origin);
+      const p = new URLSearchParams(location.search);
+      for (const k of ['q', 'kind']) if (p.get(k)) url.searchParams.set(k, p.get(k)!);
+      all.href = url.pathname + url.search;
+      const label = $('[data-see-all-label]', all);
+      if (label) label.textContent = matches === total ? `See the full list · all ${total}` : `See all ${matches} matches`;
+    }
+  });
+}
+
 /* ---------- live search + category chips ---------- */
 const list = $('[data-list]');
 if (list) {
@@ -245,6 +273,7 @@ if (list) {
     q ? url.searchParams.set('q', q) : url.searchParams.delete('q');
     cat ? url.searchParams.set(param, cat) : url.searchParams.delete(param);
     history.replaceState(null, '', url.pathname + url.search + url.hash);
+    capLists();
   };
 
   input.addEventListener('input', apply);
@@ -269,6 +298,8 @@ if (list) {
   );
   if (input.value || cat) apply();
 }
+
+capLists();
 
 /* ---------- live numbers (pages are static; counts come from D1 via /api/counts) ---------- */
 interface Totals {
@@ -330,6 +361,7 @@ function applyCounts(data: Snapshot) {
         if (r) r.textContent = String(i + 1).padStart(2, '0');
       });
   });
+  capLists();
 }
 
 async function loadCounts() {

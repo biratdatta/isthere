@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import Ticker from '../components/Ticker.astro';
+import EntryList from '../components/EntryList.astro';
+import SearchBox from '../components/SearchBox.astro';
+import Chips from '../components/Chips.astro';
+import { ENTRIES, byKind } from '../lib/apps';
+import { KINDS, KIND_ORDER } from '../lib/kinds';
+import { breadcrumbs, entryPath, entryTitle, itemList } from '../lib/seo';
+
+const site = Astro.site!;
+const chips = KIND_ORDER.map((k) => ({ key: k, label: KINDS[k].plural, count: byKind(k).length, kind: k }));
+---
+<Base
+  title={`Cancel Culture: all ${ENTRIES.length} SaaS apps, ranked by how many people replaced them`}
+  description={`Every app on isthere, ranked live by "I replaced this" votes, across skills, MCPs, plugins, prompts and agents.`}
+  path="/cancel-culture"
+  current="list"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Cancel Culture', path: '/cancel-culture' }]), itemList(site, 'Cancel Culture', ENTRIES.map((e) => ({ name: entryTitle(e), path: entryPath(e) })))]}
+>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Cancel Culture</li></ol></nav>
+  <section class="hero">
+    <div class="page-title">
+      <h1>Cancel <span class="hl">Culture</span></h1>
+      <p class="muted" style="font-size:18px;max-width:560px">Every app, ranked live by how many people replaced it. Search, or filter by directory.</p>
+    </div>
+    <div style="align-self:end;width:100%"><SearchBox action="/cancel-culture" placeholder={`Search ${ENTRIES.length} apps…`} /></div>
+  </section>
+  <section id="list" class="board">
+    <Ticker scope="all" metric="mrr" />
+    <div class="card list-card" style="min-width: 0">
+      <div class="list-head">
+        <h2>All {ENTRIES.length}</h2>
+        <span class="muted mono" style="font-size:12px" data-result-count aria-live="polite">{ENTRIES.length} of {ENTRIES.length}</span>
+      </div>
+      <div style="padding: 0 10px 12px">
+        <Chips param="kind" chips={chips} total={ENTRIES.length} action="/cancel-culture" />
+      </div>
+      <EntryList entries={ENTRIES} filterBy="kind" />
+    </div>
+  </section>
+</Base>
