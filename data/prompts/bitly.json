@@ -1,0 +1,29 @@
+{
+  "slug": "bitly",
+  "name": "Bitly",
+  "domain": "bitly.com",
+  "category": "web",
+  "priceMonthly": 10,
+  "verdict": "yes",
+  "whatYouLose": [
+    "A short domain with years of reputation (yours may get flagged by spam filters at first)",
+    "Global edge redirects and uptime SLAs",
+    "QR code designer and campaign UI polish"
+  ],
+  "priorArt": [
+    {
+      "name": "Shlink",
+      "url": "https://github.com/shlinkio/shlink"
+    },
+    {
+      "name": "Dub",
+      "url": "https://github.com/dubinc/dub"
+    },
+    {
+      "name": "YOURLS",
+      "url": "https://github.com/YOURLS/YOURLS"
+    }
+  ],
+  "prompt": "Build a link shortener with analytics, a Bitly replacement.\n\nStack: Cloudflare Workers + D1 (or Node + SQLite if not on Cloudflare).\nFeatures:\n- POST /api/links {url, slug?} with an API key header; random 6-char slugs if none given.\n- GET /:slug → 302 redirect, logging timestamp, referrer host, country (from request headers) and device class. Never store raw IPs.\n- Dashboard /admin (password env var): list links, click charts per day (inline SVG, no chart lib), top referrers and countries.\n- QR code SVG for each link at /:slug.qr.\n- UTM builder in the create form.\nDone when: creating a link, clicking it 3 times and seeing 3 clicks in the dashboard works locally.",
+  "notes": "A redirect plus a counter. Bring your own short domain and you are done in an afternoon."
+}

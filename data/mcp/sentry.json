@@ -1,0 +1,31 @@
+{
+  "slug": "sentry",
+  "name": "Sentry",
+  "domain": "sentry.io",
+  "category": "dev-tools",
+  "priceMonthly": 26,
+  "priceNote": "Team plan, flat per organization, billed annually",
+  "pricingUrl": "https://sentry.io/pricing/",
+  "verdict": "yes",
+  "server": {
+    "official": true,
+    "transport": "http",
+    "url": "https://mcp.sentry.dev/mcp",
+    "auth": "oauth",
+    "docsUrl": "https://mcp.sentry.dev"
+  },
+  "tools": [
+    "search_events",
+    "search_issues",
+    "Issue inspection",
+    "Triage",
+    "Seer root-cause analysis"
+  ],
+  "whatYouLose": [
+    "The local stdio build is still a work in progress",
+    "Seer may not work on self-hosted Sentry",
+    "Built for debugging from your agent, not full Sentry admin"
+  ],
+  "priorArt": [],
+  "notes": "Can be scoped to one org and project; MCP access is included even on the free plan."
+}

@@ -1,0 +1,26 @@
+{
+  "slug": "typeform",
+  "name": "Typeform",
+  "domain": "typeform.com",
+  "category": "forms",
+  "priceMonthly": 25,
+  "verdict": "yes",
+  "whatYouLose": [
+    "Hosted response limits are replaced by your own hosting and backups",
+    "Template gallery and design polish",
+    "Dozens of native integrations (HubSpot, Salesforce, Sheets) you would wire by webhook",
+    "Built-in spam protection and accessibility auditing"
+  ],
+  "priorArt": [
+    {
+      "name": "Formbricks",
+      "url": "https://github.com/formbricks/formbricks"
+    },
+    {
+      "name": "OpnForm",
+      "url": "https://github.com/JhumanJ/OpnForm"
+    }
+  ],
+  "prompt": "Build a one-question-at-a-time form builder, a Typeform replacement.\n\nStack: Astro (server output) + SQLite, vanilla JS for the form runner.\nFeatures:\n- Forms defined as JSON (question types: short text, long text, email, number, single choice, multi choice, rating 1-10, yes/no).\n- Runner at /f/:id: one question per screen, Enter to advance, progress bar, smooth slide transitions, keyboard shortcuts A/B/C for choices.\n- Conditional logic: \"if answer to q3 is X, jump to q7\".\n- Responses saved to SQLite; admin table view with CSV export.\n- Webhook POST on each submission, honeypot + rate limiting for spam.\n- Admin at /admin protected by a password env var, with a JSON editor and live preview.\nDone when: a sample 6-question form with one logic jump works end to end and exports CSV.",
+  "notes": "The magic of Typeform is the interaction design, and a coding agent reproduces that well. Logic jumps and CSV export are the only real requirements for most teams."
+}

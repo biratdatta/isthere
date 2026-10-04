@@ -1,0 +1,33 @@
+{
+  "name": "isthere",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Is there a skill, an MCP, a plugin or a prompt for it? A directory of what replaces the SaaS you pay for.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "npm run og && astro dev",
+    "og": "node scripts/og.mjs",
+    "prebuild": "npm run og",
+    "build": "astro build",
+    "start": "node ./dist/server/entry.mjs",
+    "preview": "astro preview",
+    "check-data": "node scripts/check-data.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs"
+  },
+  "dependencies": {
+    "@astrojs/node": "^11.1.6",
+    "@fontsource/jetbrains-mono": "^5.2.5",
+    "@fontsource/space-grotesk": "^5.2.5",
+    "astro": "^7.3.5",
+    "better-sqlite3": "^13.0.3"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/better-sqlite3": "^7.6.12",
+    "satori": "^0.35.0"
+  }
+}

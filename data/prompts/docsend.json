@@ -1,0 +1,21 @@
+{
+  "slug": "docsend",
+  "name": "DocSend",
+  "domain": "docsend.com",
+  "category": "documents",
+  "priceMonthly": 45,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Recipients recognizing a trusted link format in fundraising",
+    "Robust download prevention (any screen can be screenshotted, but theirs is harder to strip)",
+    "Data rooms with granular permissions and NDA flows"
+  ],
+  "priorArt": [
+    {
+      "name": "Papermark",
+      "url": "https://github.com/mfts/papermark"
+    }
+  ],
+  "prompt": "Build tracked document sharing, a DocSend replacement.\n\nStack: Node + Hono, SQLite, PDF.js for rendering, files on disk or S3.\nFeatures:\n- Upload a PDF, create multiple share links per document (one per investor), each with optional email gate, password, expiry and download toggle.\n- Viewer renders pages to canvas with PDF.js, watermarks the viewer's email on every page.\n- Page-level analytics: time spent per page per visitor, total visits, completion rate; email me on first open.\n- Revoke a link instantly; replace the PDF without changing links.\nDone when: opening a link, reading 3 pages and closing shows per-page seconds in the dashboard.",
+  "notes": "Per-page time tracking on a PDF viewer is a weekend project. The brand trust in fundraising is not."
+}

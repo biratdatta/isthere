@@ -1,0 +1,49 @@
+---
+import Odometer from './Odometer.astro';
+import Tape from './Tape.astro';
+import { formatInt, type Entry } from '../lib/apps';
+import type { Totals } from '../lib/db';
+
+interface Props {
+  totals: Totals;
+  counts: Map<string, number>;
+  entries: Entry[];
+  /** "mrr" shows $X/mo destroyed; "users" shows a plain count. */
+  metric: 'mrr' | 'users';
+  label?: string;
+  showKind?: boolean;
+}
+const { totals: t, counts, entries, metric, showKind = false } = Astro.props;
+const label = Astro.props.label ?? (metric === 'mrr' ? 'COLLECTIVE MRR DESTROYED' : 'AGENTS PLUGGED IN');
+const value = metric === 'mrr' ? t.mrr : t.votes;
+---
+<section class="ticker reveal" aria-labelledby="ticker-label" data-ticker>
+  <div class="ticker-board">
+    <div class="ticker-top">
+      <h2 class="ticker-label" id="ticker-label">{label}</h2>
+      <span class="live">LIVE</span>
+    </div>
+    <div class="ticker-value">
+      {metric === 'mrr' && <span class="cur" aria-hidden="true">$</span>}
+      <Odometer value={value} id="ticker-odo" label={metric === 'mrr' ? `$${formatInt(value)} per month` : `${formatInt(value)} agents`} />
+      <span class="per">{metric === 'mrr' ? '/mo' : 'agents'}</span>
+    </div>
+    <div class="ticker-meta">
+      {metric === 'mrr' ? (
+        <>
+          <span class="up">▲ ${formatInt(t.mrr24h)} <span class="muted">24H</span></span>
+          <span><b>{formatInt(t.votes)}</b> votes</span>
+          <span>annualized <b>${formatInt(t.mrr * 12)}</b></span>
+          <span>Σ price × "I replaced this"</span>
+        </>
+      ) : (
+        <>
+          <span class="up">▲ {formatInt(t.votes24h)} <span class="muted">24H</span></span>
+          <span><b>{entries.length}</b> servers tracked</span>
+          <span>Σ "I use this"</span>
+        </>
+      )}
+    </div>
+  </div>
+  <Tape entries={entries} counts={counts} showKind={showKind} />
+</section>

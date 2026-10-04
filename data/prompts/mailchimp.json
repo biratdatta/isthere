@@ -1,0 +1,26 @@
+{
+  "slug": "mailchimp",
+  "name": "Mailchimp",
+  "domain": "mailchimp.com",
+  "category": "marketing",
+  "priceMonthly": 13,
+  "verdict": "no",
+  "whatYouLose": [
+    "Deliverability: warmed IPs, reputation, feedback loops and bounce handling",
+    "Legal compliance tooling (CAN-SPAM, GDPR consent, unsubscribe handling at scale)",
+    "Drag-and-drop email builder that renders in Outlook",
+    "Automations, segmentation and audience analytics"
+  ],
+  "priorArt": [
+    {
+      "name": "listmonk",
+      "url": "https://github.com/knadh/listmonk"
+    },
+    {
+      "name": "Keila",
+      "url": "https://github.com/pentacent/keila"
+    }
+  ],
+  "prompt": "Build a newsletter manager on top of a transactional email API (Postmark, SES or Resend), a small-list Mailchimp alternative.\n\nStack: Node + Hono, SQLite, server-rendered admin.\nFeatures:\n- Double opt-in signup form and embeddable snippet; one-click unsubscribe (List-Unsubscribe header).\n- Lists and tags; CSV import with deduplication.\n- Compose in markdown → responsive HTML email with a single tested template; send test email.\n- Batched sending through the provider API with rate limiting; handle bounce and complaint webhooks by suppressing addresses.\n- Per-campaign open/click stats (tracking optional and off by default).\nDone when: I can import 50 contacts, send a campaign through the provider sandbox and see bounces suppressed.",
+  "notes": "You can build the software. You cannot prompt your way into inbox placement. Use a sending provider and keep your list small, or keep paying."
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "github",
+  "name": "GitHub",
+  "domain": "github.com",
+  "category": "dev-tools",
+  "priceMonthly": 4,
+  "priceNote": "Team plan; $4/user/month promo for the first 12 months",
+  "pricingUrl": "https://github.com/pricing",
+  "verdict": "yes",
+  "server": {
+    "official": true,
+    "transport": "http",
+    "url": "https://api.githubcopilot.com/mcp/",
+    "auth": "oauth",
+    "docsUrl": "https://github.com/github/github-mcp-server",
+    "repoUrl": "https://github.com/github/github-mcp-server"
+  },
+  "tools": [
+    "list_issues",
+    "get_file_contents",
+    "search_code",
+    "create_pull_request",
+    "merge_pull_request"
+  ],
+  "whatYouLose": [
+    "A large toolset: filter toolsets to keep your agent focused",
+    "Write tools are on unless you choose read-only (local server)",
+    "A personal access token is the fallback if OAuth is not available"
+  ],
+  "priorArt": [],
+  "notes": "Official remote server; a local Docker/binary build is also documented in the repo."
+}

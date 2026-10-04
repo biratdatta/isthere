@@ -1,0 +1,32 @@
+---
+import { formatPrice, keyOf, tickerSymbol, type Entry } from '../lib/apps';
+import { KINDS } from '../lib/kinds';
+import { entryPath } from '../lib/seo';
+
+interface Props {
+  entries: Entry[];
+  counts: Map<string, number>;
+  /** Append the directory code (·MCP, ·SKL…) to each symbol, for mixed tapes. */
+  showKind?: boolean;
+}
+const { entries, counts, showKind = false } = Astro.props;
+const items = [...entries].sort((a, b) => (counts.get(keyOf(b)) ?? 0) - (counts.get(keyOf(a)) ?? 0) || (b.priceMonthly ?? 0) - (a.priceMonthly ?? 0));
+const dur = Math.max(40, items.length * 3.2);
+---
+<div class="tape" aria-label="Live board of tracked SaaS apps" style={`--tape-dur:${dur}s`}>
+  <div class="tape-track">
+    {[0, 1].map((copy) =>
+      items.map((e) => {
+        const n = counts.get(keyOf(e)) ?? 0;
+        const users = KINDS[e.kind].metric === 'users';
+        return (
+          <a class="tape-item" href={entryPath(e)} tabindex={copy ? -1 : undefined} aria-hidden={copy ? 'true' : undefined} title={`${e.name} (${KINDS[e.kind].plural}): ${n} ${KINDS[e.kind].voted}`}>
+            <span class="sym">{tickerSymbol(e)}{showKind && <span class="kd">·{KINDS[e.kind].short}</span>}</span>
+            <span class="px">{e.priceMonthly === null ? 'USAGE' : formatPrice(e.priceMonthly)}</span>
+            <span class={`dn ${n === 0 ? 'flat' : ''}`}>{n === 0 ? '— 0' : `${users ? '▲' : '▼'} ${n.toLocaleString('en-US')}`}</span>
+          </a>
+        );
+      })
+    )}
+  </div>
+</div>

@@ -1,0 +1,31 @@
+{
+  "slug": "motion",
+  "name": "Motion",
+  "domain": "usemotion.com",
+  "category": "productivity",
+  "priceMonthly": 19,
+  "priceNote": "Pro AI per seat; check whether this is the annual price",
+  "pricingUrl": "https://www.usemotion.com/pricing",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "productivity",
+    "marketplace": "anthropics/knowledge-work-plugins",
+    "marketplaceName": "knowledge-work-plugins",
+    "repoUrl": "https://github.com/anthropics/knowledge-work-plugins/tree/main/productivity",
+    "includes": [
+      "Task management in TASKS.md",
+      "Workplace memory",
+      "Scans email, calendar and chat for updates",
+      "Local HTML dashboard",
+      "Connectors: Slack, Microsoft 365, Notion, Asana, Linear, Atlassian, monday.com, ClickUp"
+    ]
+  },
+  "whatYouLose": [
+    "Automatic time-blocking and rescheduling on your calendar (Motion’s core feature)",
+    "Booking links and notetaker",
+    "Mobile apps",
+    "Gantt charts, time tracking and capacity planning"
+  ],
+  "priorArt": [],
+  "notes": "A weak “kinda”: great for task capture, triage and memory, but there’s no auto-scheduling calendar."
+}

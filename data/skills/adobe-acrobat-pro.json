@@ -1,0 +1,33 @@
+{
+  "slug": "adobe-acrobat-pro",
+  "name": "Adobe Acrobat Pro",
+  "domain": "adobe.com",
+  "category": "documents",
+  "priceMonthly": 19.99,
+  "priceNote": "Annual plan billed monthly; $29.99 month-to-month",
+  "pricingUrl": "https://www.adobe.com/acrobat/pricing.html",
+  "verdict": "kinda",
+  "skill": {
+    "name": "pdf",
+    "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pdf",
+    "marketplace": "anthropics/skills",
+    "plugin": "document-skills@anthropic-agent-skills"
+  },
+  "whatYouLose": [
+    "WYSIWYG editing of text and images inside an existing PDF",
+    "Legally backed e-signature workflows and signature tracking",
+    "Certified-grade redaction and PDF/A or accessibility preflight",
+    "Desktop and mobile apps with offline use"
+  ],
+  "priorArt": [
+    {
+      "name": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills"
+    },
+    {
+      "name": "Stirling-PDF",
+      "url": "https://github.com/Stirling-Tools/Stirling-PDF"
+    }
+  ],
+  "notes": "Merge, split, extract, fill forms, OCR and create are well covered by the pdf skill’s scripts. Anything you would do by clicking on the page is not."
+}

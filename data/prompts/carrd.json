@@ -1,0 +1,25 @@
+{
+  "slug": "carrd",
+  "name": "Carrd",
+  "domain": "carrd.co",
+  "category": "web",
+  "priceMonthly": 1.58,
+  "verdict": "yes",
+  "whatYouLose": [
+    "A visual editor for people who will never open a code editor",
+    "Built-in form handling and hosting in one bill",
+    "At about $19/year it is already very cheap"
+  ],
+  "priorArt": [
+    {
+      "name": "Astro",
+      "url": "https://astro.build"
+    },
+    {
+      "name": "HTML5 UP",
+      "url": "https://html5up.net"
+    }
+  ],
+  "prompt": "Build a one-page landing site generator, a Carrd replacement.\n\nStack: Astro, content in site.yaml, deploys to any static host.\nFeatures:\n- Sections composed from site.yaml: hero, features grid, testimonial, pricing, FAQ, email capture, footer.\n- 5 visual presets (minimal, bold, editorial, terminal, soft) switched by one key.\n- Email capture form posts to a single serverless function that appends to a CSV or forwards to a webhook.\n- Responsive down to 320px, accessible color contrast, prefers-reduced-motion respected.\n- Generated OG image and favicon from the site title.\nDone when: changing site.yaml rebuilds a polished page in under 2 seconds.",
+  "notes": "Carrd is cheap and good. You replace it to own the code, not to save money."
+}

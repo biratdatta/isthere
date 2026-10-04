@@ -1,0 +1,28 @@
+{
+  "slug": "otter-ai",
+  "name": "Otter.ai Pro",
+  "domain": "otter.ai",
+  "category": "productivity",
+  "priceMonthly": 8.33,
+  "priceNote": "Pro billed annually ($16.99 monthly)",
+  "pricingUrl": "https://otter.ai/pricing",
+  "verdict": "no",
+  "skill": {
+    "name": "meeting-notes",
+    "sourceUrl": null,
+    "skillMd": "---\nname: meeting-notes\ndescription: Turn an existing meeting transcript (.txt, .vtt, .srt, .docx, or pasted text) into structured notes, decisions, and action items. Use when the user provides a transcript or recording export. Does not transcribe audio.\n---\n# Meeting notes from a transcript\n\n## Scope\nThis skill works only on text. If given audio or video, say that a transcript is needed first (from the meeting platform's built-in transcription or a local speech-to-text tool) and stop.\n\n## Steps\n1. Load the transcript. For .vtt/.srt, strip cue numbers and timestamps but keep the first timestamp of each speaker turn.\n2. Identify speakers. If labels are generic (\"Speaker 1\"), keep them and ask whether to map names.\n3. Skim the full text before summarizing. Do not summarize chunk by chunk without a final merge pass.\n4. Extract:\n   - Decisions: what was agreed, who agreed, timestamp.\n   - Action items: owner, task, due date if stated (otherwise \"no date\").\n   - Open questions: raised but not resolved.\n   - Key discussion points: 3–7 bullets, neutral wording.\n5. Quote sparingly and only verbatim; never attribute words a speaker did not say.\n6. Mark anything uncertain (inaudible, crosstalk) as [unclear].\n\n## Output\nMarkdown file `<meeting>-notes.md` with sections: Summary (3 sentences), Decisions, Action items (table: Owner | Task | Due | Timestamp), Open questions, Discussion. Offer a short follow-up email draft at the end.\n"
+  },
+  "whatYouLose": [
+    "A bot that joins Zoom/Teams/Meet and records",
+    "Live speech-to-text with speaker identification",
+    "Searchable audio playback synced to the transcript",
+    "CRM/Zapier sync"
+  ],
+  "priorArt": [
+    {
+      "name": "Whisper",
+      "url": "https://github.com/openai/whisper"
+    }
+  ],
+  "notes": "A skill can’t record or transcribe audio. It only turns a transcript you already have into notes and action items."
+}

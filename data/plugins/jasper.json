@@ -1,0 +1,31 @@
+{
+  "slug": "jasper",
+  "name": "Jasper",
+  "domain": "jasper.ai",
+  "category": "marketing",
+  "priceMonthly": 59,
+  "priceNote": "Pro, per seat, billed yearly ($69 monthly)",
+  "pricingUrl": "https://www.jasper.ai/pricing",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "marketing",
+    "marketplace": "anthropics/knowledge-work-plugins",
+    "marketplaceName": "knowledge-work-plugins",
+    "repoUrl": "https://github.com/anthropics/knowledge-work-plugins/tree/main/marketing",
+    "includes": [
+      "Draft content and email sequences",
+      "Campaign plans and brand-voice review",
+      "Competitive briefs and SEO audits",
+      "Performance reports",
+      "Connectors: Slack, Canva, Figma, HubSpot, Notion, Ahrefs, Klaviyo and more"
+    ]
+  },
+  "whatYouLose": [
+    "Image generation, background removal and upscaling",
+    "Browser extension and in-app editor",
+    "Copyscape plagiarism checker",
+    "Team collaboration UI"
+  ],
+  "priorArt": [],
+  "notes": "Drafting, brand-voice review and campaign planning are well covered. Jasper’s visual and editor tooling is not."
+}

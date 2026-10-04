@@ -1,0 +1,25 @@
+{
+  "slug": "buffer",
+  "name": "Buffer",
+  "domain": "buffer.com",
+  "category": "marketing",
+  "priceMonthly": 6,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Approved API access to every network (some charge for API use or require app review)",
+    "Maintenance every time a platform changes its API",
+    "Mobile apps and team approval flows"
+  ],
+  "priorArt": [
+    {
+      "name": "Postiz",
+      "url": "https://github.com/gitroomhq/postiz-app"
+    },
+    {
+      "name": "Mixpost",
+      "url": "https://github.com/inovector/mixpost"
+    }
+  ],
+  "prompt": "Build a social post scheduler, a Buffer replacement for one person.\n\nStack: Node + Hono, SQLite, a cron worker (node-cron), server-rendered UI.\nFeatures:\n- Connect accounts via OAuth for Bluesky (AT Protocol), Mastodon and LinkedIn; X optional if I provide API keys.\n- Compose once, customize per network, character counters per network, image upload.\n- Queue with posting slots per weekday; drag to reorder the queue; calendar view.\n- Worker publishes due posts, retries with backoff and records the post URL or error.\n- Link shortening optional; basic stats where the APIs expose them.\nDone when: a post scheduled 2 minutes out is published to Bluesky and Mastodon.",
+  "notes": "Open APIs (Bluesky, Mastodon) are trivial. Closed ones cost money or review time, which is what Buffer absorbs for you."
+}

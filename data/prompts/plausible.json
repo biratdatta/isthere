@@ -1,0 +1,29 @@
+{
+  "slug": "plausible",
+  "name": "Plausible",
+  "domain": "plausible.io",
+  "category": "analytics",
+  "priceMonthly": 9,
+  "verdict": "yes",
+  "whatYouLose": [
+    "Managed ingestion that scales past millions of pageviews without you thinking about it",
+    "Maintained bot filtering and referrer spam lists",
+    "Funding a small, independent, privacy-first company"
+  ],
+  "priorArt": [
+    {
+      "name": "Umami",
+      "url": "https://github.com/umami-software/umami"
+    },
+    {
+      "name": "GoatCounter",
+      "url": "https://github.com/arp242/goatcounter"
+    },
+    {
+      "name": "Plausible CE",
+      "url": "https://github.com/plausible/analytics"
+    }
+  ],
+  "prompt": "Build cookieless, privacy-friendly web analytics, a Plausible replacement.\n\nStack: Node + Hono, SQLite (WAL mode), a <1KB tracking script.\nFeatures:\n- Script sends path, referrer and screen width via navigator.sendBeacon; respects Do Not Track.\n- Unique visitors counted with a daily-rotating salted hash of IP + user agent; the salt is deleted each day so nothing is stored long-term.\n- Dashboard: visitors and pageviews over time (inline SVG), top pages, top referrers, countries (from a CDN header), devices; date range picker.\n- Multiple sites, each with a public/private toggle.\n- Basic bot filtering by user agent.\nDone when: adding the script to a test page and refreshing shows live numbers in the dashboard.",
+  "notes": "Plausible is open source and inexpensive, which is exactly why this is easy to replicate. The site you are reading uses first-party analytics like this."
+}

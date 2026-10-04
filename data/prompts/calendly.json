@@ -1,0 +1,26 @@
+{
+  "slug": "calendly",
+  "name": "Calendly",
+  "domain": "calendly.com",
+  "category": "scheduling",
+  "priceMonthly": 10,
+  "verdict": "yes",
+  "whatYouLose": [
+    "Round-robin and collective team scheduling out of the box",
+    "Native Zoom/Teams link creation without wiring OAuth yourself",
+    "The recognizable \"pick a time\" link people already trust",
+    "Polished mobile apps and calendar sync edge cases (time zones, DST, recurring holds)"
+  ],
+  "priorArt": [
+    {
+      "name": "Cal.com",
+      "url": "https://github.com/calcom/cal.com"
+    },
+    {
+      "name": "Easy!Appointments",
+      "url": "https://github.com/alextselegidis/easyappointments"
+    }
+  ],
+  "prompt": "Build a self-hosted scheduling page, a Calendly replacement for one person.\n\nStack: Node + Hono, SQLite, server-rendered HTML, no client framework.\nFeatures:\n- Public page /:eventSlug with a month calendar and available time slots in the visitor's time zone.\n- Availability rules: weekly hours, buffer before/after, minimum notice, max bookings per day.\n- Read busy times from my Google Calendar (OAuth, freebusy API) and write confirmed events back with a Google Meet link.\n- Booking form (name, email, notes) → confirmation page + .ics attachment emailed via SMTP to both parties.\n- Cancel/reschedule links with signed tokens.\n- Admin page behind a single password env var to edit event types.\nDone when: npm run dev serves a working booking flow, and tests cover slot generation across a DST change.",
+  "notes": "Single-user scheduling is a solved, well-documented problem: slot math plus the Google Calendar freebusy API. The hard parts are teams and calendar edge cases, which a solo user rarely hits."
+}

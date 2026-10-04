@@ -1,0 +1,25 @@
+{
+  "slug": "grammarly",
+  "name": "Grammarly",
+  "domain": "grammarly.com",
+  "category": "writing",
+  "priceMonthly": 12,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Inline suggestions in every text box on every site and desktop app",
+    "Low-latency checks without paying per LLM call",
+    "Tone detection and organization style guides"
+  ],
+  "priorArt": [
+    {
+      "name": "LanguageTool",
+      "url": "https://github.com/languagetool-org/languagetool"
+    },
+    {
+      "name": "Harper",
+      "url": "https://github.com/Automattic/harper"
+    }
+  ],
+  "prompt": "Build a browser extension writing assistant, a Grammarly alternative using an LLM API.\n\nStack: Chrome/Firefox Manifest V3 extension in vanilla TS, Harper (WASM) for fast local grammar checks, optional LLM API for rewrites.\nFeatures:\n- Underline issues in textareas and contenteditable fields on any site; click to see suggestion and apply.\n- Local, instant grammar and spelling via Harper; nothing leaves the machine unless I ask for a rewrite.\n- Rewrite menu: shorter, clearer, friendlier, more formal (calls the LLM with my API key stored in extension storage).\n- Per-site disable toggle; personal dictionary.\nDone when: typing a sentence with an error in a Gmail compose box shows an underline and a working fix.",
+  "notes": "LLMs made the checking part commodity. Working smoothly in every text field on the internet is still hard engineering."
+}

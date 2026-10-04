@@ -1,0 +1,32 @@
+{
+  "slug": "grammarly",
+  "name": "Grammarly Pro",
+  "domain": "grammarly.com",
+  "category": "writing",
+  "priceMonthly": 12,
+  "priceNote": "Pro; check whether this is the annual or monthly rate",
+  "pricingUrl": "https://www.grammarly.com/plans",
+  "verdict": "kinda",
+  "skill": {
+    "name": "copyedit",
+    "sourceUrl": null,
+    "skillMd": "---\nname: copyedit\ndescription: Copyedit and proofread a draft the user pastes or points to. Use when asked to proofread, fix grammar, tighten, or \"Grammarly\" a piece of writing. Returns corrected text plus a short change log.\n---\n# Copyedit\n\n## Inputs\n- The draft (pasted text or a file path).\n- Optional: audience, tone (formal, neutral, casual), dialect (US/UK), and a style guide file.\n\n## Process\n1. Read the whole draft once before changing anything. Note its purpose and register.\n2. Fix objective errors: spelling, grammar, agreement, punctuation, wrong words (affect/effect), and broken parallelism.\n3. Apply consistency: one dialect, one serial-comma rule, consistent capitalization of terms, numerals and dates.\n4. Tighten: cut filler (\"in order to\", \"very\", \"just\"), collapse redundant phrases, prefer active voice when the actor matters.\n5. Flag, don't rewrite, anything that changes meaning: unclear claims, missing facts, ambiguous pronouns.\n6. Preserve the author's voice. Do not add ideas, examples, or jargon. Never change quotes, code, names, or numbers.\n7. If a style guide file is given, it overrides these defaults.\n\n## Output\n- First, the full corrected text in a code block, or written to `<name>.edited.<ext>` if a file was given.\n- Then a \"Changes\" list grouped as Errors / Consistency / Clarity, one line each: `original -> new (reason)`.\n- Then \"Questions for the author\" for anything flagged in step 5. Omit the section if empty.\n\n## Modes\n- \"light\": steps 2–3 only.\n- \"standard\" (default): steps 2–5.\n- \"tone:<x>\": also adjust word choice toward tone x, and list every tone edit.\n"
+  },
+  "whatYouLose": [
+    "Inline suggestions as you type in every app (browser, Docs, Office, mobile)",
+    "Plagiarism and AI-text detection",
+    "Team style guide and brand tone enforcement",
+    "Writing analytics"
+  ],
+  "priorArt": [
+    {
+      "name": "LanguageTool",
+      "url": "https://github.com/languagetool-org/languagetool"
+    },
+    {
+      "name": "Harper",
+      "url": "https://github.com/Automattic/harper"
+    }
+  ],
+  "notes": "Pasting a draft for a thorough copyedit works well. Always-on underlining everywhere you type does not."
+}

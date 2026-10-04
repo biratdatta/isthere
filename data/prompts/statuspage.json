@@ -1,0 +1,29 @@
+{
+  "slug": "statuspage",
+  "name": "Statuspage",
+  "domain": "statuspage.io",
+  "category": "monitoring",
+  "priceMonthly": 29,
+  "verdict": "yes",
+  "whatYouLose": [
+    "Hosting the status page on infrastructure separate from your own (do this anyway)",
+    "Subscriber SMS notifications",
+    "Atlassian/Opsgenie integrations"
+  ],
+  "priorArt": [
+    {
+      "name": "Upptime",
+      "url": "https://github.com/upptime/upptime"
+    },
+    {
+      "name": "cState",
+      "url": "https://github.com/cstate/cstate"
+    },
+    {
+      "name": "Uptime Kuma",
+      "url": "https://github.com/louislam/uptime-kuma"
+    }
+  ],
+  "prompt": "Build a public status page, an Atlassian Statuspage replacement.\n\nStack: Astro static site rebuilt by a GitHub Action; incidents as markdown files in the repo.\nFeatures:\n- Components (API, Web, Database) with current status and 90-day uptime bars.\n- A scheduled GitHub Action pings each component URL every 5 minutes and commits results to a JSON history file.\n- Incidents and maintenance windows as markdown with frontmatter (status, affected components, updates timeline).\n- RSS/Atom feed and email subscriptions via a provider webhook.\n- Deploys to GitHub Pages, so it stays up even when your infrastructure does not.\nDone when: taking a test URL down shows a red bar and an open incident on the page within 10 minutes.",
+  "notes": "Static site + scheduled checks. Hosting it on a different provider than your app is the only real requirement."
+}

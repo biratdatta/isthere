@@ -1,0 +1,25 @@
+{
+  "slug": "todoist",
+  "name": "Todoist",
+  "domain": "todoist.com",
+  "category": "productivity",
+  "priceMonthly": 4,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Natural-language date parsing that just works in every language",
+    "Native apps on every platform with instant sync and reminders",
+    "Widgets, watch apps and email forwarding into your inbox"
+  ],
+  "priorArt": [
+    {
+      "name": "Vikunja",
+      "url": "https://vikunja.io"
+    },
+    {
+      "name": "todo.txt",
+      "url": "http://todotxt.org"
+    }
+  ],
+  "prompt": "Build a keyboard-first todo app as an installable PWA, a Todoist replacement for one person.\n\nStack: Vite + vanilla TS, IndexedDB for storage, optional sync to a tiny Node + SQLite endpoint.\nFeatures:\n- Quick add with natural language: \"pay rent every 1st #home p1\" → recurring task, project, priority.\n- Inbox, Today, Upcoming views; projects and labels.\n- Recurring tasks, subtasks, drag to reorder.\n- Push notifications for reminders (service worker + Web Push).\n- Keyboard shortcuts for everything (q add, j/k move, e complete), command palette.\n- Works offline; installable on phone home screens.\nDone when: the PWA installs on a phone, works offline and fires a reminder.",
+  "notes": "A good todo PWA is very buildable. Native widgets and bulletproof sync across devices are the gap."
+}

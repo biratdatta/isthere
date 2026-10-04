@@ -1,0 +1,86 @@
+---
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/700.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/700.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Tape from '../components/Tape.astro';
+import { SITE_NAME, abs, graph, ldJson, organization, website } from '../lib/seo';
+import { voteCounts } from '../lib/db';
+import { ENTRIES, byKind } from '../lib/apps';
+import type { Kind } from '../lib/kinds';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  ogImage?: string;
+  jsonld?: object[];
+  tape?: boolean;
+  kind?: Kind;
+  noindex?: boolean;
+}
+
+const { title, description, path, ogImage = '/og/index.png', jsonld = [], tape = true, kind, noindex = false } = Astro.props;
+const site = Astro.site!;
+const canonical = abs(site, path);
+const og = abs(site, ogImage);
+const ld = graph(website(site), organization(site), ...jsonld);
+const counts = tape ? voteCounts() : new Map<string, number>();
+const tapeEntries = kind ? byKind(kind) : ENTRIES;
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#050705" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={og} />
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light' || t === 'dark') d.dataset.theme = t;
+        } catch (e) {}
+        // Safety net: if the main script never runs, show the real numbers anyway.
+        setTimeout(function () {
+          document.querySelectorAll('[data-odometer]').forEach(function (el) { el.setAttribute('data-rolled', '1'); });
+        }, 5000);
+      })();
+    </script>
+    <script type="application/ld+json" set:html={ldJson(ld)} />
+  </head>
+  <body>
+    <a class="sr-only" href="#main">Skip to content</a>
+    <Header kind={kind} />
+    {tape && <Tape entries={tapeEntries} counts={counts} showKind={!kind} />}
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>

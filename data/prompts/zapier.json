@@ -1,0 +1,29 @@
+{
+  "slug": "zapier",
+  "name": "Zapier",
+  "domain": "zapier.com",
+  "category": "automation",
+  "priceMonthly": 20,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Thousands of maintained integrations with OAuth already approved",
+    "Reliability: retries, replay, error alerts and a task history",
+    "A no-code editor non-engineers on your team can use"
+  ],
+  "priorArt": [
+    {
+      "name": "n8n",
+      "url": "https://github.com/n8n-io/n8n"
+    },
+    {
+      "name": "Activepieces",
+      "url": "https://github.com/activepieces/activepieces"
+    },
+    {
+      "name": "Huginn",
+      "url": "https://github.com/huginn/huginn"
+    }
+  ],
+  "prompt": "Build a code-first automation runner, a Zapier replacement for developers.\n\nStack: Node + TypeScript, SQLite job queue, a small web UI.\nFeatures:\n- Workflows are TS files in /workflows exporting {trigger, steps}. Triggers: webhook URL, cron schedule, poll an RSS/JSON endpoint, IMAP new email.\n- Steps are plain async functions with a typed context; built-in helpers for HTTP, Slack, Discord, email (SMTP), Google Sheets (service account), OpenAI-compatible LLM calls.\n- Every run is persisted with inputs/outputs per step; failed steps retry with exponential backoff; replay any run from the UI.\n- UI: workflow list, run history, logs, enable/disable toggle; secrets in .env.\nDone when: a webhook-triggered workflow posts to Discord and a cron workflow appends a row to a Google Sheet.",
+  "notes": "For developers, code-first automation is better than Zapier. For the marketing team, it is not a replacement."
+}

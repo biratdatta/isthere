@@ -1,0 +1,32 @@
+---
+import { AGENTS } from '../lib/agents';
+
+interface Props {
+  prompt: string;
+  filename: string;
+}
+const { prompt, filename } = Astro.props;
+const lines = prompt.split('\n').length;
+const id = `p-${Math.random().toString(36).slice(2, 8)}`;
+---
+<div class="prompt-block" data-prompt-block>
+  <div class="terminal reveal">
+    <div class="term-bar">
+      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>{filename}</span>
+      <span class="lines">{lines} lines</span>
+    </div>
+    <pre id={id} tabindex="0" data-prompt><code>{prompt}</code></pre>
+  </div>
+  <div class="copy-bar" role="group" aria-label="Copy prompt for your agent">
+    {AGENTS.map((a, i) => (
+      <button class={`btn ${i === 0 ? 'btn-primary' : ''}`} type="button" data-copy-agent={a.id} data-prefix={a.prefix} data-hint={a.hint} aria-describedby={`${id}-hint`}>
+        <span class="idle">⧉ Copy for {a.name}</span><span class="ok">✓ Copied for {a.name}</span>
+      </button>
+    ))}
+    <button class="btn" type="button" data-copy-agent="raw" data-prefix="" data-hint="Raw prompt, no agent instructions.">
+      <span class="idle">Copy raw</span><span class="ok">✓ Copied</span>
+    </button>
+  </div>
+  <p class="copy-hint" id={`${id}-hint`} data-copy-hint>Each button adds agent-specific run instructions in front of the prompt.</p>
+</div>

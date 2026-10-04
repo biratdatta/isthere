@@ -1,0 +1,25 @@
+{
+  "slug": "linktree",
+  "name": "Linktree",
+  "domain": "linktr.ee",
+  "category": "web",
+  "priceMonthly": 5,
+  "verdict": "yes",
+  "whatYouLose": [
+    "The linktr.ee domain that audiences already recognize",
+    "Built-in commerce and tipping integrations",
+    "Drag-and-drop editor for non-technical edits"
+  ],
+  "priorArt": [
+    {
+      "name": "LittleLink",
+      "url": "https://github.com/sethcottle/littlelink"
+    },
+    {
+      "name": "LinkStack",
+      "url": "https://github.com/LinkStackOrg/LinkStack"
+    }
+  ],
+  "prompt": "Build a link-in-bio page generator, a Linktree replacement.\n\nStack: Astro static site, content in a single links.json file.\nFeatures:\n- One page: avatar, name, short bio, a vertical stack of link buttons, social icon row.\n- 6 themes via CSS variables (including dark, paper, neon); theme chosen in links.json.\n- Privacy-friendly click counts: each button hits /go/:id on a tiny serverless function that increments a counter and redirects.\n- Open Graph image auto-generated from the name and avatar.\n- Lighthouse 100 across the board; no client JS except for the counter link.\nDone when: editing links.json and redeploying to any static host updates the page.",
+  "notes": "It is a single HTML page. This is the canonical \"you do not need a subscription for this\" example."
+}

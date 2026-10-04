@@ -1,0 +1,26 @@
+---
+/**
+ * Server-rendered odometer. Each digit is a vertical 0–9 strip translated to
+ * its value, so the number is correct without JS; main.ts rolls it on reveal.
+ */
+interface Props {
+  value: number;
+  label?: string;
+  class?: string;
+  id?: string;
+}
+const { value, label, class: cls = '', id } = Astro.props;
+const text = Math.round(value).toLocaleString('en-US');
+const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+---
+<span class={`odo ${cls}`} id={id} data-odometer data-value={Math.round(value)} role="img" aria-label={label ?? text}>
+  <span class="odo-inner" aria-hidden="true">
+    {text.split('').map((ch) =>
+      /\d/.test(ch) ? (
+        <span class="odo-col"><span class="odo-strip" style={`transform:translateY(-${Number(ch)}em)`}>{digits.map((d) => <span>{d}</span>)}</span></span>
+      ) : (
+        <span class="odo-sep">{ch}</span>
+      )
+    )}
+  </span>
+</span>

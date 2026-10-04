@@ -1,0 +1,31 @@
+{
+  "slug": "notion",
+  "name": "Notion",
+  "domain": "notion.so",
+  "category": "productivity",
+  "priceMonthly": 10,
+  "verdict": "no",
+  "whatYouLose": [
+    "Real-time multiplayer editing with presence and conflict-free merges",
+    "Offline-capable desktop and mobile apps with sync",
+    "Databases with relations, rollups and dozens of views",
+    "Permissions, sharing, public pages, comments and an integration ecosystem",
+    "Years of edge-case polish in the block editor"
+  ],
+  "priorArt": [
+    {
+      "name": "AppFlowy",
+      "url": "https://github.com/AppFlowy-IO/AppFlowy"
+    },
+    {
+      "name": "AFFiNE",
+      "url": "https://github.com/toeverything/AFFiNE"
+    },
+    {
+      "name": "Outline",
+      "url": "https://github.com/outline/outline"
+    }
+  ],
+  "prompt": "Build a personal block-based notes app (a narrow Notion-like tool for one person).\n\nStack: Vite + vanilla TS, Tiptap editor, SQLite via a small Node API.\nFeatures:\n- Nested pages in a sidebar tree with drag to reorder.\n- Block editor: headings, lists, to-dos, code blocks, quotes, images (uploaded to disk), slash command menu.\n- Simple databases: a page can be a table with typed columns (text, number, select, date, checkbox) and a board view grouped by a select column.\n- Full-text search across pages (SQLite FTS5).\n- Markdown export of any page.\nDone when: one person can take notes, nest pages and track a small board. Multiplayer is explicitly out of scope.",
+  "notes": "You can build a nice single-player notes app in one prompt. You cannot build Notion: the value is collaboration, sync and the long tail of polish."
+}

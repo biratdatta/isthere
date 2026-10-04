@@ -1,0 +1,25 @@
+{
+  "slug": "uptimerobot",
+  "name": "UptimeRobot",
+  "domain": "uptimerobot.com",
+  "category": "monitoring",
+  "priceMonthly": 7,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Checks from many regions so you know it is down for everyone, not just your server",
+    "A monitor that does not go down with your own infrastructure",
+    "SMS and voice call alerts"
+  ],
+  "priorArt": [
+    {
+      "name": "Uptime Kuma",
+      "url": "https://github.com/louislam/uptime-kuma"
+    },
+    {
+      "name": "Gatus",
+      "url": "https://github.com/TwiN/gatus"
+    }
+  ],
+  "prompt": "Build an uptime monitor, an UptimeRobot replacement.\n\nStack: Node + Hono, SQLite, a worker loop, server-rendered dashboard.\nFeatures:\n- Monitors: HTTP(S) with expected status/keyword, TCP port, TLS certificate expiry, heartbeat (cron job pings us).\n- Intervals from 30s to 1h; confirm failures with 2 retries before alerting.\n- Alerts to email, Slack/Discord webhooks and ntfy.sh on down and recovery.\n- Dashboard with response-time sparklines and uptime percentages (24h, 7d, 30d).\n- Dockerfile; recommended deployment on a different provider than the services being monitored.\nDone when: stopping a local test server triggers a Discord alert and recovery is reported.",
+  "notes": "The software is easy. The value is independent, multi-region vantage points. Run yours somewhere else."
+}

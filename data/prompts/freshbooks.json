@@ -1,0 +1,26 @@
+{
+  "slug": "freshbooks",
+  "name": "FreshBooks",
+  "domain": "freshbooks.com",
+  "category": "finance",
+  "priceMonthly": 21,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Card and bank payments with reconciliation",
+    "Tax reports your accountant already accepts",
+    "Bank feeds and expense import",
+    "Automatic late-payment reminders that land in inboxes"
+  ],
+  "priorArt": [
+    {
+      "name": "Invoice Ninja",
+      "url": "https://github.com/invoiceninja/invoiceninja"
+    },
+    {
+      "name": "InvoiceShelf",
+      "url": "https://github.com/InvoiceShelf/InvoiceShelf"
+    }
+  ],
+  "prompt": "Build invoicing for a freelancer, a FreshBooks replacement.\n\nStack: Node + Hono, SQLite, server-rendered HTML, PDF via Playwright print-to-PDF.\nFeatures:\n- Clients, invoices with line items, taxes, discounts, currency per client, sequential numbering.\n- Beautiful invoice PDF and a public invoice page /i/:token with a Stripe Payment Link button.\n- Stripe webhook marks invoices paid; reminders emailed at due date and +7 days.\n- Expenses with receipt upload and categories; simple P&L and tax-year summary report, CSV export for my accountant.\n- Recurring invoices.\nDone when: I create an invoice, pay it in Stripe test mode, and see it marked paid.",
+  "notes": "Invoices are easy; money movement and accounting compliance are where you either keep paying or lean on Stripe."
+}

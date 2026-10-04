@@ -1,0 +1,34 @@
+{
+  "slug": "asana",
+  "name": "Asana",
+  "domain": "asana.com",
+  "category": "project-management",
+  "priceMonthly": 10.99,
+  "priceNote": "Starter, billed annually",
+  "pricingUrl": "https://asana.com/pricing",
+  "verdict": "yes",
+  "server": {
+    "official": true,
+    "transport": "http",
+    "url": "https://mcp.asana.com/v2/mcp",
+    "auth": "oauth",
+    "docsUrl": "https://developers.asana.com/docs/using-asanas-mcp-server"
+  },
+  "tools": [
+    "search_objects",
+    "get_task",
+    "get_my_tasks",
+    "create_tasks",
+    "update_tasks",
+    "create_project",
+    "add_comment",
+    "create_project_status_update"
+  ],
+  "whatYouLose": [
+    "search_tasks needs Premium",
+    "A token covers one workspace and doesn’t work with the REST API",
+    "Admins can block the app; the old beta /sse endpoint is shut down"
+  ],
+  "priorArt": [],
+  "notes": "Use the v2 URL: older guides still show the retired /sse endpoint."
+}

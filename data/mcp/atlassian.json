@@ -1,0 +1,32 @@
+{
+  "slug": "atlassian",
+  "name": "Jira & Confluence",
+  "domain": "atlassian.com",
+  "category": "project-management",
+  "priceMonthly": null,
+  "priceNote": "Check Jira pricing for your seat count",
+  "pricingUrl": "https://www.atlassian.com/software/jira/pricing",
+  "verdict": "yes",
+  "server": {
+    "official": true,
+    "transport": "http",
+    "url": "https://mcp.atlassian.com/v2/mcp",
+    "auth": "oauth",
+    "docsUrl": "https://support.atlassian.com/atlassian-ai-gateway/docs/get-started-with-the-atlassian-remote-mcp-server/"
+  },
+  "tools": [
+    "getJiraIssue",
+    "createJiraIssue",
+    "editJiraIssue",
+    "searchJiraIssuesUsingJql",
+    "transitionJiraIssue",
+    "lookupJiraAccountId"
+  ],
+  "whatYouLose": [
+    "Calls use Rovo credits from the organization’s shared pool",
+    "Acts with your full permissions across Jira, Confluence, Bitbucket and Loom",
+    "API-token auth is optional and admin-controlled"
+  ],
+  "priorArt": [],
+  "notes": "The v2 server also covers Jira Service Management, Bitbucket, Goals/Projects and Loom."
+}

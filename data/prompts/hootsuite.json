@@ -1,0 +1,26 @@
+{
+  "slug": "hootsuite",
+  "name": "Hootsuite",
+  "domain": "hootsuite.com",
+  "category": "marketing",
+  "priceMonthly": 99,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Social listening across networks you cannot query yourself",
+    "Unified inbox for DMs and comments on every platform",
+    "Team roles, approvals, compliance archiving",
+    "Enterprise integrations and reporting decks"
+  ],
+  "priorArt": [
+    {
+      "name": "Postiz",
+      "url": "https://github.com/gitroomhq/postiz-app"
+    },
+    {
+      "name": "Mixpost",
+      "url": "https://github.com/inovector/mixpost"
+    }
+  ],
+  "prompt": "Build a team social media dashboard, a Hootsuite alternative for a small team.\n\nStack: Node + Hono, SQLite, SSE for live columns, vanilla JS.\nFeatures:\n- Workspaces with members and roles (admin, editor, approver); magic-link login.\n- Scheduler with approval flow: drafts must be approved before they enter the queue.\n- Stream columns: mentions and replies from Mastodon and Bluesky, refreshed live; reply inline.\n- Content calendar (month/week) with drag to reschedule.\n- Weekly report email: posts published, engagement where APIs expose it.\nDone when: an editor drafts, an approver approves, and the post publishes on schedule.",
+  "notes": "At $99 a month the motivation is real. You get scheduling and approvals; you lose listening and the closed-network inbox."
+}

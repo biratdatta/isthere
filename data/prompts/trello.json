@@ -1,0 +1,29 @@
+{
+  "slug": "trello",
+  "name": "Trello",
+  "domain": "trello.com",
+  "category": "productivity",
+  "priceMonthly": 5,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Real-time updates when teammates move cards",
+    "Power-Ups, automation (Butler) and mobile apps",
+    "Attachments, checklists and due-date reminders all wired to email"
+  ],
+  "priorArt": [
+    {
+      "name": "Planka",
+      "url": "https://github.com/plankanban/planka"
+    },
+    {
+      "name": "Wekan",
+      "url": "https://github.com/wekan/wekan"
+    },
+    {
+      "name": "Focalboard",
+      "url": "https://github.com/mattermost-community/focalboard"
+    }
+  ],
+  "prompt": "Build a kanban board app, a Trello replacement for a small team.\n\nStack: Node + Hono, SQLite, vanilla JS with native drag and drop, Server-Sent Events for live updates.\nFeatures:\n- Boards → lists → cards; drag cards between lists and reorder lists.\n- Card details: description (markdown), labels, due date, checklist, comments.\n- Live updates via SSE so two browsers see moves instantly.\n- Magic-link email login, board members, archive/restore.\n- Daily email digest of cards due tomorrow.\nDone when: two browser windows on the same board stay in sync while dragging cards.",
+  "notes": "The board itself is easy. Live sync, notifications and mobile apps are where the subscription earns its keep."
+}

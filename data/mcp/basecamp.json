@@ -1,0 +1,36 @@
+{
+  "slug": "basecamp",
+  "name": "Basecamp",
+  "domain": "basecamp.com",
+  "category": "project-management",
+  "priceMonthly": 25,
+  "priceNote": "Flat per account (no per-user fees), billed annually",
+  "pricingUrl": "https://basecamp.com/pricing",
+  "verdict": "kinda",
+  "server": {
+    "official": false,
+    "transport": "stdio",
+    "command": "python",
+    "args": [
+      "basecamp_fastmcp.py"
+    ],
+    "auth": "oauth",
+    "repoUrl": "https://github.com/georgeantonopoulos/Basecamp-MCP-Server"
+  },
+  "tools": [
+    "get_projects",
+    "search_basecamp",
+    "create_todo",
+    "complete_todo",
+    "create_message",
+    "move_card",
+    "create_document"
+  ],
+  "whatYouLose": [
+    "Community-maintained, not run by 37signals",
+    "Must be cloned and run locally with your own Basecamp OAuth app",
+    "Tokens are stored in a local JSON file"
+  ],
+  "priorArt": [],
+  "notes": "Basecamp says official MCP support is coming soon. Until then, this community server is the way in. Read its README before running it."
+}

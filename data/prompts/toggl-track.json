@@ -1,0 +1,25 @@
+{
+  "slug": "toggl-track",
+  "name": "Toggl Track",
+  "domain": "toggl.com",
+  "category": "productivity",
+  "priceMonthly": 9,
+  "verdict": "yes",
+  "whatYouLose": [
+    "Desktop idle detection and automatic tracking",
+    "Browser extension that adds timers into Jira, GitHub, Asana",
+    "Team reports and billable-rate approvals"
+  ],
+  "priorArt": [
+    {
+      "name": "Kimai",
+      "url": "https://github.com/kimai/kimai"
+    },
+    {
+      "name": "Timewarrior",
+      "url": "https://timewarrior.net"
+    }
+  ],
+  "prompt": "Build a time tracker, a Toggl Track replacement.\n\nStack: Node + Hono, SQLite, server-rendered HTML with vanilla JS.\nFeatures:\n- One-click start/stop timer with description, project, client and tags; manual entry and edit.\n- Projects with hourly rates; billable flag per entry.\n- Reports: by day/week/month, grouped by project or client, bar chart in inline SVG, CSV and PDF export.\n- Generate an invoice draft from billable hours in a date range.\n- A tiny CLI (track start \"fix bug\" -p acme, track stop) hitting the same API.\nDone when: I can track a week of work and export a client report.",
+  "notes": "Start/stop/report is the whole product for freelancers. Agents nail this."
+}

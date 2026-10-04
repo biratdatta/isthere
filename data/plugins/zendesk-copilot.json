@@ -1,0 +1,32 @@
+{
+  "slug": "zendesk-copilot",
+  "name": "Zendesk Copilot",
+  "domain": "zendesk.com",
+  "category": "support",
+  "priceMonthly": 50,
+  "priceNote": "Add-on per agent, paid yearly, on top of a Suite plan",
+  "pricingUrl": "https://www.zendesk.com/pricing/",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "customer-support",
+    "marketplace": "anthropics/knowledge-work-plugins",
+    "marketplaceName": "knowledge-work-plugins",
+    "repoUrl": "https://github.com/anthropics/knowledge-work-plugins/tree/main/customer-support",
+    "includes": [
+      "Ticket triage",
+      "Customer research",
+      "Draft responses",
+      "Escalations",
+      "Knowledge-base articles",
+      "Connectors: Slack, Intercom, HubSpot, Guru, Notion, Atlassian, Microsoft 365"
+    ]
+  },
+  "whatYouLose": [
+    "Copilot inside the agent workspace on every ticket",
+    "Automatic triage and routing at ticket intake",
+    "Auto-assist actions against Zendesk data",
+    "The helpdesk itself: this replaces the AI layer, not Zendesk"
+  ],
+  "priorArt": [],
+  "notes": "Replaces the AI-assist layer (triage, drafts, KB writing) for one agent at a time, not the ticketing system."
+}

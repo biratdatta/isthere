@@ -1,0 +1,35 @@
+{
+  "slug": "figma",
+  "name": "Figma",
+  "domain": "figma.com",
+  "category": "design",
+  "priceMonthly": null,
+  "priceNote": "Depends on seat type; MCP limits also depend on plan",
+  "pricingUrl": "https://www.figma.com/pricing/",
+  "verdict": "yes",
+  "server": {
+    "official": true,
+    "transport": "http",
+    "url": "https://mcp.figma.com/mcp",
+    "auth": "oauth",
+    "docsUrl": "https://developers.figma.com/docs/figma-mcp-server/remote-server-installation/"
+  },
+  "tools": [
+    "get_design_context",
+    "get_screenshot",
+    "get_metadata",
+    "get_variable_defs",
+    "use_figma",
+    "generate_diagram",
+    "add_code_connect_map",
+    "create_new_file"
+  ],
+  "whatYouLose": [
+    "Only clients in the Figma MCP Catalog can connect",
+    "Starter plans get 20 calls a month; view/collab seats 6 a month",
+    "Dev/Full seats: 200 calls a day on Pro/Org",
+    "Writing to the canvas works in select clients only"
+  ],
+  "priorArt": [],
+  "notes": "Reads and writes the canvas; tool limits depend on your plan and seat."
+}

@@ -1,0 +1,89 @@
+---
+import Base from '../layouts/Base.astro';
+import Ticker from '../components/Ticker.astro';
+import Waitlist from '../components/Waitlist.astro';
+import EntryList from '../components/EntryList.astro';
+import SearchChips from '../components/SearchChips.astro';
+import { ENTRIES, byKind, keyOf, verdictLabel } from '../lib/apps';
+import { KINDS, KIND_ORDER, isKind } from '../lib/kinds';
+import { totals, voteCounts } from '../lib/db';
+import { SITE_TAGLINE, directoryItems, entryPath, itemList } from '../lib/seo';
+
+const counts = voteCounts();
+const t = totals(ENTRIES, counts);
+const q = (Astro.url.searchParams.get('q') ?? '').trim().slice(0, 80);
+const kindParam = Astro.url.searchParams.get('kind') ?? '';
+const kind = isKind(kindParam) ? kindParam : '';
+const chips = KIND_ORDER.map((k) => ({ key: k, label: KINDS[k].plural, emoji: KINDS[k].emoji, count: byKind(k).length }));
+const rotate = ['skills', 'plugins', 'mcp', 'prompts'] as const;
+const top = (k: (typeof KIND_ORDER)[number]) =>
+  [...byKind(k)].sort((a, b) => (counts.get(keyOf(b)) ?? 0) - (counts.get(keyOf(a)) ?? 0)).slice(0, 3);
+
+const title = 'Is there a skill for it? Skills, MCPs, plugins and prompts that replace SaaS';
+const description = `${ENTRIES.length} paid SaaS apps checked across four directories: is there a skill, an MCP server, a plugin or a one-shot prompt that replaces it? Honest verdicts and copy-paste installs for Claude Code, Codex and Cursor.`;
+const site = Astro.site!;
+---
+<Base title={title} description={description} path="/" tape={false} jsonld={[itemList(site, 'Directories', directoryItems())]}>
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">four directories, one question</span>
+      <h1>
+        <span class="sr-only">Is there a skill for it?</span>
+        <span aria-hidden="true">Is there <span data-article>a</span> <a class="rot" href="/skills" data-rotate={rotate.map((k) => KINDS[k].word).join(',')} data-hrefs={rotate.map((k) => `/${k}`).join(',')}><span class="rot-word">skill</span></a> for it<span class="q">?</span></span>
+      </h1>
+      <p class="lede">{SITE_TAGLINE} Honest verdicts, copy-paste installs, and what you actually give up.</p>
+      <SearchChips action="/" q={q} filter={kind} param="kind" chips={chips} total={ENTRIES.length} placeholder="notion, pdf, code review, stripe…" />
+      <Ticker totals={t} counts={counts} entries={ENTRIES} metric="mrr" showKind />
+    </section>
+
+    <section aria-labelledby="dirs-title">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">pick your weapon</span>
+          <h2 id="dirs-title">The directories</h2>
+        </div>
+      </div>
+      <div class="dir-grid">
+        {KIND_ORDER.map((k, i) => {
+          const list = byKind(k);
+          const kk = KINDS[k];
+          return (
+            <div class="dir reveal" style={`--d:${i * 70}ms`}>
+              <a class="dir-head" href={`/${k}`}>
+                <span class="dir-emoji" aria-hidden="true">{kk.emoji}</span>
+                <span>
+                  <span class="dir-q">Is there {kk.article} <b>{kk.word}</b> for it?</span>
+                  <span class="dir-n">{list.length} apps · {list.filter((e) => e.verdict === 'yes').length} {kk.verdicts.yes.label}</span>
+                </span>
+                <span class="arrow" aria-hidden="true">→</span>
+              </a>
+              <p class="dir-lede">{kk.lede}</p>
+              <ul class="dir-top">
+                {top(k).map((e) => (
+                  <li>
+                    <a href={entryPath(e)}>
+                      <img src={`/api/favicon/${e.slug}`} width="18" height="18" alt="" loading="lazy" />
+                      <span>{e.name}</span>
+                      <span class={`badge ${e.verdict}`}>{verdictLabel(e)}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    <section id="list" aria-labelledby="dl-title">
+      <EntryList entries={ENTRIES} counts={counts} q={q} filter={kind} filterBy="kind" showKind>
+        <div slot="head">
+          <span class="eyebrow">every directory, ranked by votes</span>
+          <h2 id="dl-title">The Death List</h2>
+        </div>
+      </EntryList>
+    </section>
+
+    <Waitlist source="home" />
+  </div>
+</Base>

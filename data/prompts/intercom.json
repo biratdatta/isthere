@@ -1,0 +1,26 @@
+{
+  "slug": "intercom",
+  "name": "Intercom",
+  "domain": "intercom.com",
+  "category": "communication",
+  "priceMonthly": 29,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "AI agent trained on your help center with handoff to humans",
+    "Mobile SDKs and push notifications",
+    "Shared inbox with assignment, SLAs and reporting for a support team",
+    "Product tours and outbound messaging"
+  ],
+  "priorArt": [
+    {
+      "name": "Chatwoot",
+      "url": "https://github.com/chatwoot/chatwoot"
+    },
+    {
+      "name": "Papercups",
+      "url": "https://github.com/papercups-io/papercups"
+    }
+  ],
+  "prompt": "Build a live chat widget and support inbox, an Intercom alternative for a small SaaS.\n\nStack: Node + Hono, SQLite, WebSockets, a vanilla JS embeddable widget (<15KB).\nFeatures:\n- Widget: launcher bubble, conversation view, offline email capture, unread badge, identity via signed user hash.\n- Agent inbox: conversations list, assign, close/reopen, canned replies, internal notes, typing indicators.\n- Email fallback: if the visitor leaves, replies are emailed and email replies are threaded back in.\n- AI draft: suggest an answer from docs in /kb (markdown) using an LLM API; the agent approves before sending.\nDone when: a visitor message appears live in the inbox and the agent's reply appears in the widget.",
+  "notes": "Chat and inbox are buildable. The AI agent, mobile SDKs and team reporting are the part priced per seat."
+}

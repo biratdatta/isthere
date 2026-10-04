@@ -1,0 +1,30 @@
+{
+  "slug": "linear",
+  "name": "Linear",
+  "domain": "linear.app",
+  "category": "project-management",
+  "priceMonthly": 10,
+  "pricingUrl": "https://linear.app/pricing",
+  "verdict": "yes",
+  "server": {
+    "official": true,
+    "transport": "http",
+    "url": "https://mcp.linear.app/mcp",
+    "auth": "oauth",
+    "docsUrl": "https://linear.app/docs/mcp"
+  },
+  "tools": [
+    "Find, create and update issues",
+    "Projects",
+    "Comments",
+    "Milestones",
+    "Issue relationships"
+  ],
+  "whatYouLose": [
+    "Read-only access needs the /mcp/readonly endpoint or the read OAuth scope",
+    "Each workspace needs its own auth session",
+    "The old /sse endpoint is deprecated"
+  ],
+  "priorArt": [],
+  "notes": "Centrally hosted Streamable HTTP server; OAuth 2.1, or a Bearer API key."
+}

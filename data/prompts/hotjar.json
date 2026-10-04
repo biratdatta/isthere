@@ -1,0 +1,30 @@
+{
+  "slug": "hotjar",
+  "name": "Hotjar",
+  "domain": "hotjar.com",
+  "category": "analytics",
+  "priceMonthly": 32,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Scalable session storage and playback at volume",
+    "Aggregated heatmaps across thousands of sessions with sampling",
+    "Built-in PII masking that has been audited",
+    "Surveys and feedback widgets tied to recordings"
+  ],
+  "priorArt": [
+    {
+      "name": "rrweb",
+      "url": "https://github.com/rrweb-io/rrweb"
+    },
+    {
+      "name": "OpenReplay",
+      "url": "https://github.com/openreplay/openreplay"
+    },
+    {
+      "name": "PostHog",
+      "url": "https://github.com/PostHog/posthog"
+    }
+  ],
+  "prompt": "Build session replay and click heatmaps, a lightweight Hotjar replacement.\n\nStack: rrweb for recording and playback, Node + Hono, SQLite for metadata, gzipped event chunks on disk.\nFeatures:\n- Snippet that records sessions with rrweb, masks all inputs and any element with data-private, and uploads chunks every 10 seconds.\n- Sample rate setting (e.g. record 10% of sessions).\n- Dashboard: session list with duration, pages, device; player with skip-inactivity.\n- Click heatmap per URL: aggregate click coordinates normalized to element selectors and overlay them on a screenshot iframe.\n- Retention: delete recordings older than 30 days.\nDone when: I can record my own visit to a demo page and replay it.",
+  "notes": "rrweb does the hard recording work. Storage costs and privacy compliance at scale are what you are actually paying for."
+}

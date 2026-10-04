@@ -1,0 +1,35 @@
+{
+  "slug": "coderabbit",
+  "name": "CodeRabbit",
+  "domain": "coderabbit.ai",
+  "category": "dev-tools",
+  "priceMonthly": 24,
+  "priceNote": "Essentials, per developer, billed annually",
+  "pricingUrl": "https://www.coderabbit.ai/pricing",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "code-review",
+    "marketplace": "anthropics/claude-plugins-official",
+    "marketplaceName": "claude-plugins-official",
+    "repoUrl": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-review",
+    "includes": [
+      "/code-review command",
+      "4 parallel review agents (CLAUDE.md compliance ×2, bug scan, git-history analysis)",
+      "Confidence scoring with an 80 threshold to filter false positives",
+      "Posts the PR comment through the gh CLI"
+    ]
+  },
+  "whatYouLose": [
+    "Runs on every PR automatically (the plugin runs when you call it, or from your own CI)",
+    "1-click fixes, learnings and Jira/Linear integrations",
+    "Built-in linter/SAST aggregation and multi-repo analysis",
+    "Org dashboards and seat management"
+  ],
+  "priorArt": [
+    {
+      "name": "PR-Agent",
+      "url": "https://github.com/qodo-ai/pr-agent"
+    }
+  ],
+  "notes": "Covers the core PR-review loop for teams already using Claude Code. You trade the always-on bot for a command you run or script."
+}

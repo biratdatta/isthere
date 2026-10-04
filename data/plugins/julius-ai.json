@@ -1,0 +1,32 @@
+{
+  "slug": "julius-ai",
+  "name": "Julius AI",
+  "domain": "julius.ai",
+  "category": "data",
+  "priceMonthly": 16,
+  "priceNote": "Plus, billed yearly ($20 monthly)",
+  "pricingUrl": "https://julius.ai/pricing",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "data",
+    "marketplace": "anthropics/knowledge-work-plugins",
+    "marketplaceName": "knowledge-work-plugins",
+    "repoUrl": "https://github.com/anthropics/knowledge-work-plugins/tree/main/data",
+    "includes": [
+      "Analyze and explore data",
+      "Write SQL queries",
+      "Create charts",
+      "Build self-contained HTML dashboards",
+      "Validate results",
+      "Your warehouse via your own MCP (Snowflake, Databricks, BigQuery)"
+    ]
+  },
+  "whatYouLose": [
+    "Hosted web app with shareable reports",
+    "Scheduled report runs",
+    "Built-in warehouse connectors",
+    "Team workspace, audit logs, SSO"
+  ],
+  "priorArt": [],
+  "notes": "Covers CSV and warehouse analysis plus charts. No hosting, scheduling or sharing."
+}

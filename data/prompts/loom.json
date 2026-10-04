@@ -1,0 +1,26 @@
+{
+  "slug": "loom",
+  "name": "Loom",
+  "domain": "loom.com",
+  "category": "communication",
+  "priceMonthly": 15,
+  "verdict": "no",
+  "whatYouLose": [
+    "Instant share links while the video is still uploading",
+    "Transcoding, adaptive streaming and a CDN",
+    "Desktop recorder with camera bubble, drawing and trimming",
+    "Viewer analytics, comments and reactions inside your company workspace"
+  ],
+  "priorArt": [
+    {
+      "name": "Cap",
+      "url": "https://github.com/CapSoftware/Cap"
+    },
+    {
+      "name": "OBS Studio",
+      "url": "https://github.com/obsproject/obs-studio"
+    }
+  ],
+  "prompt": "Build a browser-based screen recorder with share links, a minimal Loom alternative.\n\nStack: Vite + vanilla TS, MediaRecorder + getDisplayMedia, Node + Hono backend, files on disk or S3-compatible storage, ffmpeg for transcoding.\nFeatures:\n- Record screen + mic + optional camera bubble composited on a canvas.\n- Upload in chunks while recording; on stop, ffmpeg produces an MP4 and a thumbnail.\n- Share page /v/:id with player, title, view count and timestamped comments.\n- Whisper-based transcript (local or API) shown under the video.\n- Trim start/end before publishing.\nDone when: a 1-minute recording uploads and plays back from a share link in another browser.",
+  "notes": "Recording in the browser is easy. Instant links, streaming infrastructure and the desktop app experience are not one prompt."
+}

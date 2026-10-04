@@ -1,0 +1,33 @@
+{
+  "slug": "smallpdf",
+  "name": "Smallpdf Pro",
+  "domain": "smallpdf.com",
+  "category": "documents",
+  "priceMonthly": null,
+  "priceNote": "Pro, billed yearly; the price is not readable without JavaScript, check the pricing page",
+  "pricingUrl": "https://smallpdf.com/pricing",
+  "verdict": "yes",
+  "skill": {
+    "name": "pdf",
+    "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pdf",
+    "marketplace": "anthropics/skills",
+    "plugin": "document-skills@anthropic-agent-skills"
+  },
+  "whatYouLose": [
+    "One-click browser UI usable on any device",
+    "Bundled e-signature subscription",
+    "PDF to Word/Excel/PPT conversion that keeps the layout",
+    "Mobile scanner app"
+  ],
+  "priorArt": [
+    {
+      "name": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills"
+    },
+    {
+      "name": "Stirling-PDF",
+      "url": "https://github.com/Stirling-Tools/Stirling-PDF"
+    }
+  ],
+  "notes": "Compress, merge, split, rotate, protect and unlock are exactly the jobs the pdf skill scripts."
+}

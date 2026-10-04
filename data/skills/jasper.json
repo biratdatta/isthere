@@ -1,0 +1,23 @@
+{
+  "slug": "jasper",
+  "name": "Jasper Pro",
+  "domain": "jasper.ai",
+  "category": "marketing",
+  "priceMonthly": 59,
+  "priceNote": "Billed yearly; $69 monthly",
+  "pricingUrl": "https://www.jasper.ai/pricing",
+  "verdict": "yes",
+  "skill": {
+    "name": "marketing-copy",
+    "sourceUrl": null,
+    "skillMd": "---\nname: marketing-copy\ndescription: Write on-brand marketing copy (landing pages, ads, emails, social posts, product descriptions). Use when the user asks for marketing or campaign copy, variants, or repurposing content across channels.\n---\n# Marketing copy\n\n## Before writing\n1. Look for `brand.md` in the project or skill folder. If present, read voice, banned words, product facts, and audience.\n2. If missing, ask at most three questions: product and key benefit, target reader, desired action.\n3. Never invent statistics, customer names, prices, or testimonials. Use [PLACEHOLDER] instead.\n\n## Channel rules\n- Landing page: headline <= 10 words, subhead, 3 benefit blocks (benefit first, feature second), one CTA repeated.\n- Search ad: headlines <= 30 chars, descriptions <= 90 chars; give 5 headline and 3 description variants.\n- Email: subject <= 50 chars plus preview text; one idea; one link CTA; P.S. optional.\n- LinkedIn: hook in the first line, short paragraphs, <= 1,300 chars, max 3 hashtags.\n- X/short social: <= 280 chars, one variant per angle.\n- Product description: 1-sentence summary, scannable bullets, specs last.\n\n## Method\n1. State the single message and the reader's main objection in one line each.\n2. Draft three angles (pain, outcome, proof) unless the user picked one.\n3. Write in second person, concrete verbs, no superlatives without evidence.\n4. Self-check against brand.md banned words and the channel limits; count characters.\n\n## Output\nA table or labeled sections per variant, each with its angle and character count, then a one-line recommendation of which to test first and why.\n"
+  },
+  "whatYouLose": [
+    "Stored brand voices, audiences and knowledge assets in a shared UI",
+    "Browser extension and integrations (Webflow, Google Docs, Slack)",
+    "Image suite (background removal, upscaling, packshots)",
+    "Copyscape plagiarism add-on"
+  ],
+  "priorArt": [],
+  "notes": "For a solo marketer, a skill with your voice notes in brand.md covers most of Jasper’s text work at a fraction of the price."
+}

@@ -1,0 +1,33 @@
+{
+  "slug": "beautiful-ai",
+  "name": "Beautiful.ai",
+  "domain": "beautiful.ai",
+  "category": "presentations",
+  "priceMonthly": 14.5,
+  "priceNote": "Pro, billed annually ($45 month-to-month)",
+  "pricingUrl": "https://www.beautiful.ai/pricing",
+  "verdict": "kinda",
+  "skill": {
+    "name": "pptx",
+    "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pptx",
+    "marketplace": "anthropics/skills",
+    "plugin": "document-skills@anthropic-agent-skills"
+  },
+  "whatYouLose": [
+    "Smart Slides that re-layout automatically as you edit",
+    "300+ curated layouts and a stock media library",
+    "Viewer analytics and secure sharing",
+    "Audio narration and player branding"
+  ],
+  "priorArt": [
+    {
+      "name": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills"
+    },
+    {
+      "name": "Marp",
+      "url": "https://marp.app"
+    }
+  ],
+  "notes": "A skill builds a strong first draft, but later edits happen in PowerPoint without Beautiful.ai’s auto-layout."
+}

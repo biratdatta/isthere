@@ -1,0 +1,33 @@
+---
+interface Props {
+  source?: string;
+}
+const { source = Astro.url.pathname } = Astro.props;
+const status = Astro.url.searchParams.get('waitlist');
+const msg =
+  status === 'added' ? "You're on the list. We'll email you once, when it ships." :
+  status === 'exists' ? "You're already on the list. Nice." :
+  status === 'invalid' ? 'That email looks off. Try again?' :
+  status === 'limited' ? 'Too many tries. Give it a minute.' : '';
+---
+<section id="waitlist" class="reveal">
+  <div class="waitlist">
+    <div>
+      <span class="eyebrow">waitlist</span>
+      <h2>Get the <code>skill</code> CLI before it ships.</h2>
+      <p><code>npx isthere notion</code> pipes the verdict and prompt straight into your agent. One email when it launches, plus new verdicts. No spam, no tracking pixels.</p>
+    </div>
+    <div>
+      <form class="wl-form" method="post" action="/api/waitlist" data-waitlist>
+        <label class="sr-only" for="wl-email">Email address</label>
+        <input id="wl-email" type="email" name="email" required autocomplete="email" placeholder="you@domain.dev" maxlength="254" />
+        <div class="hp" aria-hidden="true">
+          <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+        <input type="hidden" name="source" value={source} />
+        <button class="btn btn-primary" type="submit"><span class="idle">Join</span><span class="ok">✓ In</span></button>
+      </form>
+      <p class={`wl-msg ${status === 'added' || status === 'exists' ? 'ok' : status ? 'err' : ''}`} role="status" aria-live="polite">{msg}</p>
+    </div>
+  </div>
+</section>

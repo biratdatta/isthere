@@ -1,0 +1,31 @@
+{
+  "slug": "lavender",
+  "name": "Lavender",
+  "domain": "lavender.ai",
+  "category": "sales",
+  "priceMonthly": 27,
+  "priceNote": "Starter, billed annually ($29 monthly)",
+  "pricingUrl": "https://lavender.ai/coach#pricing",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "sales",
+    "marketplace": "anthropics/knowledge-work-plugins",
+    "marketplaceName": "knowledge-work-plugins",
+    "repoUrl": "https://github.com/anthropics/knowledge-work-plugins/tree/main/sales",
+    "includes": [
+      "Draft outreach",
+      "Account research and call prep",
+      "Call summaries and daily briefings",
+      "Pipeline review and forecasting",
+      "Connectors: HubSpot, Close, Gong, Fireflies, Clay, ZoomInfo, Apollo, Slack"
+    ]
+  },
+  "whatYouLose": [
+    "Live email scoring inside Gmail/Outlook as you type",
+    "Reply-rate model trained on Lavender’s email data",
+    "Manager coaching dashboard",
+    "Integrations inside Outreach/Salesloft"
+  ],
+  "priorArt": [],
+  "notes": "Research-first, personalized outreach drafts are covered; real-time coaching in your inbox is not."
+}

@@ -1,0 +1,34 @@
+{
+  "slug": "stripe",
+  "name": "Stripe",
+  "domain": "stripe.com",
+  "category": "payments",
+  "priceMonthly": null,
+  "priceNote": "Usage-based fees, no per-seat plan",
+  "pricingUrl": "https://stripe.com/pricing",
+  "verdict": "yes",
+  "server": {
+    "official": true,
+    "transport": "http",
+    "url": "https://mcp.stripe.com",
+    "auth": "oauth",
+    "docsUrl": "https://docs.stripe.com/mcp"
+  },
+  "tools": [
+    "stripe_api_search",
+    "stripe_api_details",
+    "stripe_api_read",
+    "stripe_api_write",
+    "get_stripe_account_info",
+    "search_stripe_documentation",
+    "stripe_analytics"
+  ],
+  "whatYouLose": [
+    "Some writes (refunds, outbound payments) need human approval through a link",
+    "From Oct 31, 2026 plain secret keys stop working: use OAuth or agent keys",
+    "OAuth is not supported for Connect connected accounts",
+    "Admins can turn MCP access off per environment"
+  ],
+  "priorArt": [],
+  "notes": "Generic read/write tools cover most of the Stripe API."
+}

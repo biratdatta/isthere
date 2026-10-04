@@ -1,0 +1,25 @@
+{
+  "slug": "miro",
+  "name": "Miro",
+  "domain": "miro.com",
+  "category": "productivity",
+  "priceMonthly": 8,
+  "verdict": "kinda",
+  "whatYouLose": [
+    "Smooth real-time collaboration with dozens of cursors",
+    "Huge template library and integrations",
+    "Enterprise sharing controls and huge-board performance"
+  ],
+  "priorArt": [
+    {
+      "name": "Excalidraw",
+      "url": "https://github.com/excalidraw/excalidraw"
+    },
+    {
+      "name": "tldraw",
+      "url": "https://github.com/tldraw/tldraw"
+    }
+  ],
+  "prompt": "Build a collaborative whiteboard, a lightweight Miro alternative.\n\nStack: Vite + vanilla TS, tldraw SDK for the canvas, Yjs + y-websocket for real-time sync, Node server persisting docs to SQLite.\nFeatures:\n- Boards list with create/rename/delete; share link with edit or view-only tokens.\n- Live cursors with names, presence avatars, sticky notes, shapes, arrows, text, images.\n- Templates: retro (3 columns), kanban, 2x2 matrix, user journey.\n- Export board to PNG and SVG; timer and voting dots for workshops.\nDone when: two browsers on the same board see each other's cursors and sticky notes in real time.",
+  "notes": "tldraw + Yjs make this surprisingly doable. Scale, templates and enterprise controls are what you lose."
+}

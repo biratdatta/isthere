@@ -1,0 +1,40 @@
+{
+  "slug": "snyk",
+  "name": "Snyk",
+  "domain": "snyk.io",
+  "category": "security",
+  "priceMonthly": 25,
+  "priceNote": "Team plan starts at $25/month billed monthly; check the per-developer basis",
+  "pricingUrl": "https://snyk.io/plans/",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "claude-security",
+    "marketplace": "anthropics/claude-plugins-official",
+    "marketplaceName": "claude-plugins-official",
+    "repoUrl": "https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-security",
+    "includes": [
+      "Scan the whole codebase or just a diff (branch, PR, commit)",
+      "Multi-agent threat model, hunt and independent verification",
+      "Secrets pass",
+      "Reports: RESULTS.md and RESULTS.jsonl",
+      "Patch files, never auto-applied"
+    ]
+  },
+  "whatYouLose": [
+    "Dependency (SCA) scanning against a vulnerability database",
+    "Container and IaC scanning",
+    "Continuous monitoring and alerts on new CVEs",
+    "Deterministic results and IDE/SCM integrations"
+  ],
+  "priorArt": [
+    {
+      "name": "Semgrep",
+      "url": "https://github.com/semgrep/semgrep"
+    },
+    {
+      "name": "Trivy",
+      "url": "https://github.com/aquasecurity/trivy"
+    }
+  ],
+  "notes": "Strong on reasoning-based review of your own code with verified patches. It doesn’t replace Snyk’s dependency and container scanning."
+}

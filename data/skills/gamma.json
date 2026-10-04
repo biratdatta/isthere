@@ -1,0 +1,37 @@
+{
+  "slug": "gamma",
+  "name": "Gamma",
+  "domain": "gamma.app",
+  "category": "presentations",
+  "priceMonthly": null,
+  "priceNote": "Plus/Pro/Ultra tiers; prices are rendered client-side, check the pricing page",
+  "pricingUrl": "https://gamma.app/pricing",
+  "verdict": "kinda",
+  "skill": {
+    "name": "pptx",
+    "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/pptx",
+    "marketplace": "anthropics/skills",
+    "plugin": "document-skills@anthropic-agent-skills"
+  },
+  "whatYouLose": [
+    "Hosted, shareable web decks with viewer analytics",
+    "Published websites on custom domains",
+    "Built-in AI image generation",
+    "The live, card-based editing UI"
+  ],
+  "priorArt": [
+    {
+      "name": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills"
+    },
+    {
+      "name": "Slidev",
+      "url": "https://github.com/slidevjs/slidev"
+    },
+    {
+      "name": "Marp",
+      "url": "https://marp.app"
+    }
+  ],
+  "notes": "The pptx skill turns a prompt into a native, editable .pptx with a QA pass. You get a file, not a hosted, interactive deck."
+}

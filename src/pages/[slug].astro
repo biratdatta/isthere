@@ -1,0 +1,8 @@
+---
+// Legacy URLs from before the four directories: /notion → /prompts/notion (301).
+import { getEntry } from '../lib/apps';
+
+const slug = Astro.params.slug ?? '';
+if (getEntry('prompts', slug)) return Astro.redirect(`/prompts/${slug}${Astro.url.search}`, 301);
+return Astro.rewrite('/404');
+---

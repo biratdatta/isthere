@@ -1,0 +1,33 @@
+{
+  "slug": "canva-pro",
+  "name": "Canva Pro",
+  "domain": "canva.com",
+  "category": "design",
+  "priceMonthly": 12,
+  "priceNote": "US$144/year for one person",
+  "pricingUrl": "https://www.canva.com/pricing/",
+  "verdict": "no",
+  "skill": {
+    "name": "canvas-design",
+    "sourceUrl": "https://github.com/anthropics/skills/tree/main/skills/canvas-design",
+    "marketplace": "anthropics/skills",
+    "plugin": "example-skills@anthropic-agent-skills"
+  },
+  "whatYouLose": [
+    "Drag-and-drop editor for fine adjustments",
+    "Huge licensed template, stock photo and font library",
+    "Brand kit, background remover, Magic Resize",
+    "Social scheduling and print ordering"
+  ],
+  "priorArt": [
+    {
+      "name": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills"
+    },
+    {
+      "name": "Penpot",
+      "url": "https://penpot.app"
+    }
+  ],
+  "notes": "canvas-design makes one-off, art-style posters as PNG/PDF. It is not a template editor, so it can’t replace typical Canva use."
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "goheather",
+  "name": "goHeather",
+  "domain": "goheather.io",
+  "category": "legal",
+  "priceMonthly": 200,
+  "priceNote": "Starter, $2,400/year or $400 monthly, 1 seat",
+  "pricingUrl": "https://www.goheather.io/pricing",
+  "verdict": "kinda",
+  "plugin": {
+    "name": "legal",
+    "marketplace": "anthropics/knowledge-work-plugins",
+    "marketplaceName": "knowledge-work-plugins",
+    "repoUrl": "https://github.com/anthropics/knowledge-work-plugins/tree/main/legal",
+    "includes": [
+      "Playbook-based contract review (green/yellow/red with redlines)",
+      "NDA triage",
+      "Vendor checks",
+      "Legal risk assessment and briefings",
+      "Connectors: Slack, Box, Egnyte, Atlassian, Microsoft 365"
+    ]
+  },
+  "whatYouLose": [
+    "Word add-in with tracked-change redlines in the document",
+    "Playbook setup sessions with a lawyer",
+    "Jurisdiction-tuned knowledge (the plugin’s defaults are US)",
+    "OCR, e-signature and obligation tracking"
+  ],
+  "priorArt": [],
+  "notes": "The playbook review logic is substantial. Output is a markdown analysis, not a redlined Word file, and it is not legal advice."
+}
