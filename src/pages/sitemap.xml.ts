@@ -9,7 +9,6 @@ export const GET: APIRoute = ({ site }) => {
     { loc: new URL('/', base).href, priority: '1.0', changefreq: 'hourly' },
     ...KIND_ORDER.map((k) => ({ loc: new URL(`/${k}`, base).href, priority: '0.9', changefreq: 'daily' })),
     ...ENTRIES.map((e) => ({ loc: new URL(entryPath(e), base).href, priority: '0.8', changefreq: 'weekly' })),
-    { loc: new URL('/rebuild', base).href, priority: '0.4', changefreq: 'monthly' },
   ];
   const xml =
     '<?xml version="1.0" encoding="UTF-8"?>\n' +

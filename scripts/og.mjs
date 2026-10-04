@@ -1,5 +1,5 @@
 // Build-time Open Graph images: satori (JSX-less element tree -> SVG) + resvg (SVG -> PNG).
-// Writes public/og/index.png, public/og/rebuild.png and public/og/<slug>.png.
+// Writes public/og/index.png, public/og/<directory>.png and public/og/<directory>/<slug>.png.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -105,16 +105,6 @@ function kindCard(kind, apps) {
   ]);
 }
 
-function rebuildCard() {
-  return frame([
-    h('div', { fontFamily: 'Space Grotesk', fontSize: 96, fontWeight: 700, lineHeight: 1.02, letterSpacing: -3, color: '#fff' }, 'This site is one prompt.'),
-    h('div', { justifyContent: 'space-between', fontSize: 30 }, [
-      h('div', { color: C.muted }, 'Copy it. Rebuild it. MIT.'),
-      h('div', { color: C.green, fontWeight: 700 }, '/rebuild'),
-    ]),
-  ]);
-}
-
 async function render(tree, file) {
   const svg = await satori(tree, { width: 1200, height: 630, fonts });
   const png = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng();
@@ -136,8 +126,7 @@ const t0 = Date.now();
 let n = 0;
 const all = Object.keys(KINDS).map((kind) => [kind, load(kind)]);
 await render(homeCard(all.reduce((s, [, a]) => s + a.length, 0)), 'index.png');
-await render(rebuildCard(), 'rebuild.png');
-n += 2;
+n += 1;
 for (const [kind, apps] of all) {
   await render(kindCard(kind, apps), `${kind}.png`);
   n++;

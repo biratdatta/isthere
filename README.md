@@ -13,9 +13,6 @@ Every entry has a blunt verdict, copy-paste installs for Claude Code, Codex and 
 "what you lose" list, and a vote counter. Votes on skills, plugins and prompts feed the **COLLECTIVE MRR
 DESTROYED** ticker. The same app can appear in several directories, and entries link to each other.
 
-The original site was built from a single prompt, which lives in [`data/rebuild-prompt.md`](data/rebuild-prompt.md)
-and is served at `/rebuild`.
-
 ## Stack
 
 - Astro 7 on **Cloudflare Workers** (`@astrojs/cloudflare`). Every page is prerendered to static HTML;

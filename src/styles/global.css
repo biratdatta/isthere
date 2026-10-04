@@ -571,9 +571,6 @@ a.card:hover { transform: translateY(-3px); border-color: var(--green-dim); box-
 .foot-links { display: flex; gap: 8px 18px; flex-wrap: wrap; }
 .foot-links a { color: var(--muted); text-decoration: none; }
 .foot-links a:hover { color: var(--green); }
-.meta-prompt { display: inline-flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px dashed var(--green-dim); border-radius: 10px; text-decoration: none; color: var(--text); transition: transform 0.2s var(--ease), background 0.2s; }
-.meta-prompt:hover { background: var(--green-soft); transform: translateY(-2px); }
-.meta-prompt b { color: var(--green); }
 
 .prose { max-width: 760px; font-family: var(--sans); font-size: 18px; color: var(--muted); }
 .prose strong { color: var(--text); }
