@@ -1,0 +1,41 @@
+{
+  "slug": "webflow",
+  "name": "Webflow",
+  "domain": "webflow.com",
+  "category": "web",
+  "priceMonthly": 15,
+  "priceNote": "Basic site plan, billed yearly",
+  "pricingUrl": "https://webflow.com/pricing",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Lovable",
+    "maker": "Lovable",
+    "url": "https://lovable.dev/",
+    "price": "Free tier; Pro from $25/mo",
+    "pricingUrl": "https://lovable.dev/pricing",
+    "autonomy": "supervised",
+    "does": [
+      "Builds full sites and apps from a chat prompt",
+      "Adds login, database and hosting",
+      "Syncs code to GitHub and lets you edit it",
+      "Publishes to a custom domain on paid plans"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Pixel-precise visual design control",
+    "A polished CMS that non-technical editors can use",
+    "Fixed costs, since every change uses credits"
+  ],
+  "priorArt": [
+    {
+      "name": "bolt.diy",
+      "url": "https://github.com/stackblitz-labs/bolt.diy"
+    },
+    {
+      "name": "Dyad",
+      "url": "https://github.com/dyad-sh/dyad"
+    }
+  ],
+  "notes": "Lovable is great for getting a site or web app live fast. Marketing teams that live in a visual CMS will miss Webflow's editor."
+}

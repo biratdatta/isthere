@@ -1,0 +1,32 @@
+{
+  "slug": "apollo-io",
+  "name": "Apollo.io",
+  "domain": "apollo.io",
+  "category": "sales",
+  "priceMonthly": null,
+  "priceNote": "Free plan exists; paid prices are on the pricing page",
+  "pricingUrl": "https://www.apollo.io/pricing",
+  "verdict": "kinda",
+  "agent": {
+    "name": "AiSDR",
+    "maker": "AiSDR",
+    "url": "https://aisdr.com/",
+    "price": "Solo $250/mo; Explore $900/mo; Scale $2,500/mo",
+    "pricingUrl": "https://aisdr.com/pricing/",
+    "autonomy": "autonomous",
+    "does": [
+      "Finds and researches leads from its own database",
+      "Writes personalized email and LinkedIn messages",
+      "Replies to prospects and books meetings",
+      "Syncs activity to HubSpot or Salesforce"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Hands-on control of every sequence and template",
+    "Far cheaper entry price on Apollo",
+    "Apollo's big contact database for manual list building"
+  ],
+  "priorArt": [],
+  "notes": "AiSDR runs outbound end to end instead of handing you tools to run it yourself. The Solo plan is month to month; bigger plans need a quarterly commitment."
+}

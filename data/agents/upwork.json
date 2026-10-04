@@ -1,0 +1,37 @@
+{
+  "slug": "upwork",
+  "name": "Upwork",
+  "domain": "upwork.com",
+  "category": "dev-tools",
+  "priceMonthly": null,
+  "priceNote": "No subscription on Basic; 5% marketplace fee plus a per-contract fee, on top of freelancer rates",
+  "pricingUrl": "https://www.upwork.com/pricing/client",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Devin",
+    "maker": "Cognition",
+    "url": "https://devin.ai/",
+    "price": "Free tier; Pro $20/mo; Teams $80/mo + $40 per dev seat",
+    "pricingUrl": "https://devin.ai/pricing",
+    "autonomy": "autonomous",
+    "does": [
+      "Picks up tickets from Jira, Linear or Slack",
+      "Writes code and opens pull requests in the cloud",
+      "Runs several sessions in parallel",
+      "Works with GitHub, GitLab and Bitbucket"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Human judgment on vague or product-heavy tasks",
+    "Someone who owns the result and answers questions",
+    "Usage limits mean heavy work costs extra"
+  ],
+  "priorArt": [
+    {
+      "name": "OpenHands",
+      "url": "https://github.com/OpenHands/OpenHands"
+    }
+  ],
+  "notes": "Devin handles well-scoped backlog tickets that you might otherwise farm out to a junior contractor. You still need an engineer to review every pull request."
+}

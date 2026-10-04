@@ -1,0 +1,37 @@
+{
+  "slug": "ahrefs",
+  "name": "Ahrefs",
+  "domain": "ahrefs.com",
+  "category": "marketing",
+  "priceMonthly": 129,
+  "priceNote": "Lite, billed monthly",
+  "pricingUrl": "https://ahrefs.com/pricing",
+  "verdict": "kinda",
+  "agent": {
+    "name": "OTTO SEO",
+    "maker": "Search Atlas",
+    "url": "https://searchatlas.com/otto-seo/",
+    "price": "Starter $99/mo; 7-day free trial",
+    "pricingUrl": "https://searchatlas.com/pricing/",
+    "autonomy": "autonomous",
+    "does": [
+      "Applies technical and on-page fixes to your site",
+      "Writes and publishes content to your CMS",
+      "Manages Google Business Profile updates",
+      "Tracks rankings and AI search visibility"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Ahrefs' deep backlink index and research data",
+    "Full manual control over every site change",
+    "Trust that edits match your brand without review"
+  ],
+  "priorArt": [
+    {
+      "name": "SerpBear",
+      "url": "https://github.com/towfiqi/serpbear"
+    }
+  ],
+  "notes": "OTTO runs on autopilot by default, with an optional approval mode. It does SEO work rather than just reporting data, but its research depth is not at Ahrefs' level."
+}

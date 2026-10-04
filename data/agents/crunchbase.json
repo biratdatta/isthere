@@ -1,0 +1,37 @@
+{
+  "slug": "crunchbase",
+  "name": "Crunchbase",
+  "domain": "crunchbase.com",
+  "category": "data",
+  "priceMonthly": null,
+  "priceNote": "Paid plans are on the pricing page",
+  "pricingUrl": "https://www.crunchbase.com/buy/select-product",
+  "verdict": "kinda",
+  "agent": {
+    "name": "ChatGPT deep research",
+    "maker": "OpenAI",
+    "url": "https://chatgpt.com/features/deep-research/",
+    "price": "Limited on Free; Plus $20/mo",
+    "pricingUrl": "https://chatgpt.com/pricing/",
+    "autonomy": "autonomous",
+    "does": [
+      "Researches companies across many web sources",
+      "Writes cited reports on markets and competitors",
+      "Pulls together funding news and leadership info",
+      "Exports findings into docs or spreadsheets"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "A structured, filterable database of funding rounds",
+    "Bulk exports and alerts on company changes",
+    "Confidence that numbers are verified, not inferred from the web"
+  ],
+  "priorArt": [
+    {
+      "name": "GPT Researcher",
+      "url": "https://github.com/assafelovic/gpt-researcher"
+    }
+  ],
+  "notes": "Deep research is good for one-off company and market briefs. For screening thousands of companies by funding stage, a real database still wins."
+}

@@ -1,0 +1,41 @@
+{
+  "slug": "quickbooks",
+  "name": "QuickBooks Online",
+  "domain": "quickbooks.intuit.com",
+  "category": "finance",
+  "priceMonthly": 38,
+  "priceNote": "Simple Start list price",
+  "pricingUrl": "https://quickbooks.intuit.com/pricing/",
+  "verdict": "yes",
+  "agent": {
+    "name": "Digits",
+    "maker": "Digits Financial",
+    "url": "https://digits.com/",
+    "price": "Essentials $65/mo; Core $100/mo; 30-day free trial",
+    "pricingUrl": "https://digits.com/pricing",
+    "autonomy": "autonomous",
+    "does": [
+      "Categorizes transactions as they arrive",
+      "Reconciles bank and card accounts around the clock",
+      "Produces live P&L, balance sheet and cash flow",
+      "Handles bill pay and invoicing"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "US businesses only",
+    "QuickBooks' huge ecosystem of apps and accountants",
+    "Inventory and built-in payroll; Digits connects to payroll instead"
+  ],
+  "priorArt": [
+    {
+      "name": "Akaunting",
+      "url": "https://github.com/akaunting/akaunting"
+    },
+    {
+      "name": "Bigcapital",
+      "url": "https://github.com/bigcapitalhq/bigcapital"
+    }
+  ],
+  "notes": "Digits keeps the books itself, so for a small US service business it can replace QuickBooks plus much of a bookkeeper's monthly work. Have an accountant review before tax time."
+}

@@ -2,7 +2,7 @@
 
 # is<span>there</span>?
 
-### Is there a **skill**, an **MCP**, a **plugin** or a **prompt** for it?
+### Is there a **skill**, an **MCP**, a **plugin**, a **prompt** or an **agent** for it?
 
 The SaaS you pay for every month, checked against what an AI agent can do instead.<br />
 Honest verdicts. Copy-paste installs. What you actually give up.
@@ -26,6 +26,7 @@ Honest verdicts. Copy-paste installs. What you actually give up.
 | 🔌 | **[MCPs](https://isthere.biratdatta.tech/mcp)** | Is there an MCP server so your agent can drive it? | `OFFICIAL` · `COMMUNITY` · `NOT YET` | [isthereanmcpforit…/github](https://isthereanmcpforit.biratdatta.tech/github) |
 | 🧩 | **[Plugins](https://isthere.biratdatta.tech/plugins)** | Can an agent plugin replace the workflow? | `YES` · `KINDA` · `NOT REALLY` | [isthereapluginforit…/coderabbit](https://isthereapluginforit.biratdatta.tech/coderabbit) |
 | ⌨️ | **[Prompts](https://isthere.biratdatta.tech/prompts)** | Can one coding prompt rebuild it? | `YES` · `KINDA` · `NOT REALLY` | [isthereapromptforit…/calendly](https://isthereapromptforit.biratdatta.tech/calendly) |
+| 🤖 | **[Agents](https://isthere.biratdatta.tech/agents)** | Is there an AI agent that does the job? | `YES` · `KINDA` · `NOT REALLY` | [isthereanagentforit…/calendly](https://isthereanagentforit.biratdatta.tech/calendly) |
 
 Every entry comes with install commands for **Claude Code**, **Codex** and **Cursor**, the list of things you lose by switching,
 open-source prior art, and an **"I replaced this"** button that feeds the site's
@@ -43,7 +44,7 @@ open-source prior art, and an **"I replaced this"** button that feeds the site's
 <td width="50%" valign="top">
 
 **For visitors**
-- One search across all four directories
+- One search across all five directories
 - Death List ranked by real votes, live MRR ticker
 - Per-agent install tabs with one-click copy
 - Light mode and a calm slate dark mode
@@ -176,6 +177,25 @@ Local servers use `"transport": "stdio"` with `"command"`, `"args"` and optional
 </details>
 
 <details>
+<summary><b>🤖 Agents: add an <code>agent</code> block</b></summary>
+
+```json
+"agent": {
+  "name": "Howie",
+  "maker": "3030 Labs",
+  "url": "https://howie.com/",
+  "price": "Team from $25/mo",
+  "pricingUrl": "https://howie.com/#pricing",
+  "autonomy": "autonomous",
+  "does": ["Schedules meetings over email", "Follows up when people go quiet"]
+}
+```
+
+`autonomy` is `autonomous` (works on its own) or `supervised` (you review its work).
+
+</details>
+
+<details>
 <summary><b>⌨️ Prompts: add the <code>prompt</code></b></summary>
 
 ```json
@@ -200,11 +220,11 @@ The install snippets for each agent are generated from your fields, so you never
 
 ```text
 data/
-  skills/ mcp/ plugins/ prompts/   one JSON file per app
+  skills/ mcp/ plugins/ prompts/ agents/   one JSON file per app
 src/
   pages/            home, /[directory], /[directory]/[app], /submit, /advertise
   components/       nav, tiles, Death List, install tabs, ticker
-  lib/kinds.ts      the four directories: words, verdict labels, colours
+  lib/kinds.ts      the five directories: words, verdict labels, colours
   lib/installs.ts   per-agent install commands
   styles/global.css the whole design system
 shortlinks/         redirect Worker for the isthere…forit subdomains

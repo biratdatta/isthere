@@ -1,0 +1,37 @@
+{
+  "slug": "hootsuite",
+  "name": "Hootsuite",
+  "domain": "hootsuite.com",
+  "category": "marketing",
+  "priceMonthly": 99,
+  "priceNote": "Standard, per user, billed yearly",
+  "pricingUrl": "https://www.hootsuite.com/plans",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Blaze",
+    "maker": "Blaze",
+    "url": "https://www.blaze.ai/",
+    "price": "Starter $79/mo; Growth $149/mo; free trial",
+    "pricingUrl": "https://www.blaze.ai/pricing",
+    "autonomy": "supervised",
+    "does": [
+      "Builds a content plan from your brand",
+      "Writes and designs social posts each week",
+      "Auto-posts to connected accounts",
+      "Reports on what performs"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Unified social inbox for replies and DMs",
+    "Social listening and competitor tracking",
+    "Team approval workflows on larger plans"
+  ],
+  "priorArt": [
+    {
+      "name": "Postiz",
+      "url": "https://github.com/gitroomhq/postiz-app"
+    }
+  ],
+  "notes": "Blaze creates the posts as well as scheduling them, which Hootsuite leaves to you. It is lighter on engagement and listening."
+}

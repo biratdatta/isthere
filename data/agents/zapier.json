@@ -1,0 +1,41 @@
+{
+  "slug": "zapier",
+  "name": "Zapier",
+  "domain": "zapier.com",
+  "category": "automation",
+  "priceMonthly": 19.99,
+  "priceNote": "Professional, lowest task tier",
+  "pricingUrl": "https://zapier.com/pricing",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Lindy",
+    "maker": "Lindy",
+    "url": "https://www.lindy.ai/",
+    "price": "Free $50 in credits for 7 days; Team $29.99/user/mo",
+    "pricingUrl": "https://www.lindy.ai/pricing",
+    "autonomy": "supervised",
+    "does": [
+      "Takes plain-language requests in Slack",
+      "Runs scheduled routines across 1,500+ integrations",
+      "Manages inboxes, meetings and follow-ups",
+      "Asks for approval before actions with outside impact"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Predictable, repeatable rule-based workflows",
+    "Zapier's 9,000+ app catalog",
+    "Simple per-task pricing that is easy to forecast"
+  ],
+  "priorArt": [
+    {
+      "name": "n8n",
+      "url": "https://github.com/n8n-io/n8n"
+    },
+    {
+      "name": "Activepieces",
+      "url": "https://github.com/activepieces/activepieces"
+    }
+  ],
+  "notes": "Lindy is now a Slack-based AI teammate rather than a workflow builder. It suits fuzzy tasks; for strict, high-volume automations Zapier is still the safer tool."
+}

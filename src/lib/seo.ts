@@ -2,7 +2,7 @@ import { CATEGORIES, formatPrice, type Entry } from './apps';
 import { KINDS, KIND_ORDER } from './kinds';
 
 export const SITE_NAME = 'Is there a skill for it?';
-export const SITE_TAGLINE = 'Is there a skill, an MCP, a plugin or a prompt that replaces the SaaS you pay for?';
+export const SITE_TAGLINE = 'Is there a skill, an MCP, a plugin, a prompt or an agent that replaces the SaaS you pay for?';
 export const REPO_URL = 'https://github.com/biratdatta/isthere';
 /** Canonical host; must match `site` in astro.config.mjs. */
 export const SITE_HOST = 'isthere.biratdatta.tech';
@@ -77,6 +77,8 @@ function agentsAnswer(e: Entry): string {
       return `Any MCP client. This page has the exact setup for Claude Code (claude mcp add), OpenAI Codex (codex mcp add) and Cursor (mcp.json).`;
     case 'plugins':
       return `This plugin is published for Claude Code's plugin marketplaces. Codex and Cursor have their own plugin systems, so look for an equivalent there, or use the skills and MCP connectors it bundles directly.`;
+    case 'agents':
+      return `${e.kind === 'agents' ? e.agent.name : 'It'} is a hosted agent by ${e.kind === 'agents' ? e.agent.maker : 'its maker'}: you sign up on its site rather than install it into Claude Code, Codex or Cursor.`;
     case 'prompts':
       return `Any capable coding agent: Claude Code, OpenAI Codex or Cursor in Agent mode. Each copy button adds run instructions for that tool in front of the prompt.`;
   }

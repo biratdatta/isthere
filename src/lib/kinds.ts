@@ -1,8 +1,8 @@
 /**
- * The four directories. Each one answers a different "Is there a ___ for it?" question,
+ * The five directories. Each one answers a different "Is there a ___ for it?" question,
  * with its own verdict wording, vote meaning and headline metric.
  */
-export type Kind = 'skills' | 'mcp' | 'plugins' | 'prompts';
+export type Kind = 'skills' | 'mcp' | 'plugins' | 'prompts' | 'agents';
 export type Verdict = 'yes' | 'kinda' | 'no';
 
 export interface KindConfig {
@@ -116,7 +116,29 @@ export const KINDS: Record<Kind, KindConfig> = {
       no: { label: 'NOT REALLY', headline: 'Not really. Keep paying (or self-host the open-source one).', blurb: 'The hard part is not code: it is infrastructure, trust, compliance or network effects.' },
     },
   },
+  agents: {
+    id: 'agents',
+    tagline: 'AI agents that do the job you pay a SaaS (or a person) for.',
+    word: 'agent',
+    article: 'an',
+    plural: 'Agents',
+    emoji: '🤖',
+    short: 'AGT',
+    vanity: ['isthereanagentforit'],
+    lede: 'AI agents that do the work a SaaS app helps you do: answer the tickets, book the meetings, keep the books. Hire the agent, cancel the seat.',
+    metric: 'mrr',
+    vote: 'I replaced this',
+    voted: 'replaced',
+    listTitle: 'The Death List',
+    listEyebrow: 'ranked by "I replaced this"',
+    entryTitle: (n) => `Is there an agent for ${n}?`,
+    verdicts: {
+      yes: { label: 'YES', headline: 'Yes. An agent does the job.', blurb: 'Hand the work to the agent and cancel the subscription.' },
+      kinda: { label: 'KINDA', headline: 'Kinda. The agent does the core work.', blurb: 'It handles the main job on its own; control, coverage or the app’s ecosystem are what you give up.' },
+      no: { label: 'NOT REALLY', headline: 'Not really. Keep paying.', blurb: 'No agent we know of does the part that matters reliably.' },
+    },
+  },
 };
 
-export const KIND_ORDER: Kind[] = ['skills', 'mcp', 'plugins', 'prompts'];
+export const KIND_ORDER: Kind[] = ['skills', 'mcp', 'plugins', 'prompts', 'agents'];
 export const isKind = (s: string | undefined): s is Kind => !!s && s in KINDS;

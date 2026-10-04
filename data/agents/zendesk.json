@@ -1,0 +1,41 @@
+{
+  "slug": "zendesk",
+  "name": "Zendesk",
+  "domain": "zendesk.com",
+  "category": "support",
+  "priceMonthly": 19,
+  "priceNote": "Support Team, per agent, billed yearly (Suite Team with AI agents is $55)",
+  "pricingUrl": "https://www.zendesk.com/pricing/",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Fin",
+    "maker": "Intercom",
+    "url": "https://fin.ai/",
+    "price": "$0.99 per outcome (50/mo minimum); Intercom helpdesk from $29/seat/mo",
+    "pricingUrl": "https://fin.ai/pricing",
+    "autonomy": "autonomous",
+    "does": [
+      "Answers tickets across chat, email, WhatsApp and SMS",
+      "Runs multi-step procedures like refunds and account updates",
+      "Hands off to a human with full context",
+      "Learns from your help center and policies"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Fin does not list Zendesk as a supported helpdesk, so in practice you move to Intercom",
+    "Costs grow with ticket volume instead of staying flat per seat",
+    "You still need people for the tickets Fin cannot finish"
+  ],
+  "priorArt": [
+    {
+      "name": "Zammad",
+      "url": "https://github.com/zammad/zammad"
+    },
+    {
+      "name": "FreeScout",
+      "url": "https://github.com/freescout-help-desk/freescout"
+    }
+  ],
+  "notes": "Fin resolves a large share of routine tickets by itself. Replacing Zendesk really means switching to Fin on Intercom's own helpdesk."
+}

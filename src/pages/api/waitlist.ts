@@ -17,7 +17,7 @@ export const POST: APIRoute = async (ctx) => {
 
   const source = String(form.get('source') ?? '').slice(0, 120);
   const back = (status: string) => {
-    const path = /^(skills|mcp|plugins|prompts)(\/[a-z0-9-]+)?$/.test(source) ? `/${source}` : '/';
+    const path = /^(skills|mcp|plugins|prompts|agents)(\/[a-z0-9-]+)?$/.test(source) ? `/${source}` : '/';
     return ctx.redirect(`${path}?waitlist=${status}#waitlist`, 303);
   };
   const respond = (status: string, code = 200) => (asJson ? json({ ok: code < 400, status }, code) : back(status));

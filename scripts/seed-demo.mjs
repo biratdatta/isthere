@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 
 const weight = { yes: 220, kinda: 90, no: 25 };
 const rows = [];
-for (const kind of ['skills', 'mcp', 'plugins', 'prompts']) {
+for (const kind of ['skills', 'mcp', 'plugins', 'prompts', 'agents']) {
   const dir = path.resolve('data', kind);
   if (!fs.existsSync(dir)) continue;
   for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json'))) {

@@ -1,0 +1,37 @@
+{
+  "slug": "calendly",
+  "name": "Calendly",
+  "domain": "calendly.com",
+  "category": "scheduling",
+  "priceMonthly": 10,
+  "priceNote": "Standard, per seat, billed yearly",
+  "pricingUrl": "https://calendly.com/pricing",
+  "verdict": "yes",
+  "agent": {
+    "name": "Howie",
+    "maker": "3030 Labs",
+    "url": "https://howie.com/",
+    "price": "Team from $25/mo with $25 free credit",
+    "pricingUrl": "https://howie.com/#pricing",
+    "autonomy": "autonomous",
+    "does": [
+      "Schedules meetings over email and text threads",
+      "Follows up when people go quiet",
+      "Protects focus time and flags conflicts",
+      "Creates booking links when needed"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "A self-serve booking page as the main flow",
+    "Round-robin routing and team pools",
+    "Works with Gmail and Google Calendar; Outlook support isn't listed"
+  ],
+  "priorArt": [
+    {
+      "name": "Cal.diy",
+      "url": "https://github.com/calcom/cal.diy"
+    }
+  ],
+  "notes": "Howie acts like an assistant you CC, so nobody has to click a link. For small teams that schedule over email, it covers what Calendly does and more."
+}

@@ -11,6 +11,7 @@ const HOSTS = {
   isthereamcpforit: 'mcp',
   isthereapluginforit: 'plugins',
   isthereapromptforit: 'prompts',
+  isthereanagentforit: 'agents',
 };
 
 export default {

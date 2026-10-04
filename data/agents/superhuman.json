@@ -1,0 +1,37 @@
+{
+  "slug": "superhuman",
+  "name": "Superhuman",
+  "domain": "superhuman.com",
+  "category": "communication",
+  "priceMonthly": 25,
+  "priceNote": "Mail Starter, per member, billed yearly",
+  "pricingUrl": "https://superhuman.com/plans/mail",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Fyxer",
+    "maker": "Fyxer AI",
+    "url": "https://www.fyxer.com/",
+    "price": "Pro $37/person/mo billed yearly ($49 monthly); 14-day trial",
+    "pricingUrl": "https://www.fyxer.com/pricing",
+    "autonomy": "supervised",
+    "does": [
+      "Sorts and labels your Gmail or Outlook inbox",
+      "Drafts replies in your tone",
+      "Takes meeting notes and drafts follow-ups",
+      "Keeps a running follow-up list"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Superhuman's fast keyboard-driven mail client",
+    "Split inbox, snooze and send-later polish",
+    "Fyxer only drafts; you still send every email"
+  ],
+  "priorArt": [
+    {
+      "name": "Inbox Zero",
+      "url": "https://github.com/elie222/inbox-zero"
+    }
+  ],
+  "notes": "Fyxer works inside the inbox you already use and does the triage and drafting. If speed in the client itself is what you pay for, it is not a swap."
+}

@@ -1,0 +1,37 @@
+{
+  "slug": "browserstack",
+  "name": "BrowserStack",
+  "domain": "browserstack.com",
+  "category": "dev-tools",
+  "priceMonthly": 99,
+  "priceNote": "Automate Desktop, 1 parallel test, billed yearly",
+  "pricingUrl": "https://www.browserstack.com/pricing",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Momentic",
+    "maker": "Momentic",
+    "url": "https://momentic.ai/",
+    "price": "Free 2,000 credits/mo; pay as you go from $125/mo",
+    "pricingUrl": "https://momentic.ai/pricing",
+    "autonomy": "supervised",
+    "does": [
+      "Writes end-to-end tests from plain English steps",
+      "Self-heals tests when the UI changes",
+      "Triages failures as bug, flake or environment",
+      "Runs in CI with hosted browsers and mobile emulators"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Thousands of real device and browser combinations",
+    "Manual live testing on real phones",
+    "Use of your existing Selenium or Playwright suites"
+  ],
+  "priorArt": [
+    {
+      "name": "Playwright",
+      "url": "https://github.com/microsoft/playwright"
+    }
+  ],
+  "notes": "Momentic cuts the work of writing and maintaining tests. It does not replace BrowserStack's real-device coverage."
+}

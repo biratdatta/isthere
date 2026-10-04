@@ -10,9 +10,9 @@ import { KINDS, KIND_ORDER } from '../lib/kinds';
 import { SITE_TAGLINE, directoryItems, itemList } from '../lib/seo';
 
 const chips = KIND_ORDER.map((k) => ({ key: k, label: KINDS[k].plural, count: byKind(k).length, kind: k }));
-const rotate = ['skills', 'plugins', 'mcp', 'prompts'] as const;
-const title = 'Is there a skill for it? Skills, MCPs, plugins and prompts that replace SaaS';
-const description = `${ENTRIES.length} paid SaaS apps checked across four directories: is there a skill, an MCP server, a plugin or a one-shot prompt that replaces it? Honest verdicts and copy-paste installs for Claude Code, Codex and Cursor.`;
+const rotate = ['skills', 'plugins', 'mcp', 'prompts', 'agents'] as const;
+const title = 'Is there a skill for it? Skills, MCPs, plugins, prompts and agents that replace SaaS';
+const description = `${ENTRIES.length} paid SaaS apps checked across five directories: is there a skill, an MCP server, a plugin, a one-shot prompt or an AI agent that replaces it? Honest verdicts and copy-paste installs for Claude Code, Codex and Cursor.`;
 const site = Astro.site!;
 ---
 <Base title={title} description={description} path="/" home jsonld={[itemList(site, 'Directories', directoryItems())]}>
@@ -56,7 +56,7 @@ const site = Astro.site!;
   <section class="band dashed reveal" aria-labelledby="add-title">
     <div>
       <h2 id="add-title">Add your own is-there.</h2>
-      <p>Four directories, open to everyone. Reviewed before it goes live.</p>
+      <p>Five directories, open to everyone. Reviewed before it goes live.</p>
       <a href="/submit" class="btn btn-primary btn-lg" style="margin-top:20px">Submit one <Icon name="arrow" size={16} /></a>
     </div>
     <div class="pick4">

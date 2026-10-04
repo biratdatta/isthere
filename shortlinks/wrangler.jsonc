@@ -11,6 +11,7 @@
     { "pattern": "isthereanmcpforit.biratdatta.tech", "custom_domain": true },
     { "pattern": "isthereamcpforit.biratdatta.tech", "custom_domain": true },
     { "pattern": "isthereapluginforit.biratdatta.tech", "custom_domain": true },
-    { "pattern": "isthereapromptforit.biratdatta.tech", "custom_domain": true }
+    { "pattern": "isthereapromptforit.biratdatta.tech", "custom_domain": true },
+    { "pattern": "isthereanagentforit.biratdatta.tech", "custom_domain": true }
   ]
 }

@@ -1,0 +1,41 @@
+{
+  "slug": "ruby",
+  "name": "Ruby Receptionists",
+  "domain": "ruby.com",
+  "category": "communication",
+  "priceMonthly": 250,
+  "priceNote": "50 live receptionist minutes per month",
+  "pricingUrl": "https://www.ruby.com/plans-and-pricing/",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Retell AI",
+    "maker": "Retell AI",
+    "url": "https://www.retellai.com/",
+    "price": "Pay as you go, $0.07 to $0.31 per minute; $10 free credit",
+    "pricingUrl": "https://www.retellai.com/pricing",
+    "autonomy": "autonomous",
+    "does": [
+      "Answers calls 24/7 with a voice agent",
+      "Books appointments into your calendar",
+      "Transfers calls to a human when needed",
+      "Uses your knowledge base to answer questions"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "A real person's warmth and judgment on tricky calls",
+    "Done-for-you setup; Retell is a builder platform",
+    "Bilingual staff and payment handling without extra setup"
+  ],
+  "priorArt": [
+    {
+      "name": "Pipecat",
+      "url": "https://github.com/pipecat-ai/pipecat"
+    },
+    {
+      "name": "LiveKit Agents",
+      "url": "https://github.com/livekit/agents"
+    }
+  ],
+  "notes": "Per minute, Retell costs a small fraction of a live receptionist service. You or a developer must design and test the call flows."
+}

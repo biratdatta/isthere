@@ -70,7 +70,24 @@ export interface PluginEntry extends Base {
   };
 }
 
-export type Entry = PromptEntry | SkillEntry | McpEntry | PluginEntry;
+export interface AgentEntry extends Base {
+  kind: 'agents';
+  agent: {
+    name: string;
+    maker: string;
+    url: string;
+    /** Short pricing line, e.g. "$0.99 per resolution" or "Pro $20/mo". */
+    price: string;
+    pricingUrl?: string;
+    /** autonomous: runs on its own. supervised: you approve or review its steps. */
+    autonomy: 'autonomous' | 'supervised';
+    does: string[];
+    openSource?: boolean;
+    repoUrl?: string;
+  };
+}
+
+export type Entry = PromptEntry | SkillEntry | McpEntry | PluginEntry | AgentEntry;
 
 export const CATEGORIES: Record<string, { label: string; emoji: string }> = {
   documents: { label: 'Documents', emoji: '📄' },
@@ -136,10 +153,16 @@ function validate(raw: unknown, file: string, kind: Kind): Entry {
       fail('plugins need plugin {name, marketplace, marketplaceName, repoUrl, includes[]}');
     }
   }
+  if (kind === 'agents') {
+    const g = a.agent;
+    if (!g?.name || !g.maker || !/^https?:\/\//.test(g.url ?? '') || !g.price || !['autonomous', 'supervised'].includes(g.autonomy) || !Array.isArray(g.does)) {
+      fail('agents need agent {name, maker, url, price, autonomy autonomous|supervised, does[]}');
+    }
+  }
   return { ...a, kind } as Entry;
 }
 
-const modules = import.meta.glob('../../data/{skills,mcp,plugins,prompts}/*.json', { eager: true, import: 'default' });
+const modules = import.meta.glob('../../data/{skills,mcp,plugins,prompts,agents}/*.json', { eager: true, import: 'default' });
 
 export const ENTRIES: Entry[] = Object.entries(modules)
   .map(([file, mod]) => {
@@ -204,7 +227,7 @@ export function searchText(e: Entry): string {
   const c = CATEGORIES[e.category];
   const k = KINDS[e.kind];
   const extra =
-    e.kind === 'skills' ? [e.skill.name] : e.kind === 'plugins' ? [e.plugin.name] : e.kind === 'mcp' ? e.tools : [];
+    e.kind === 'skills' ? [e.skill.name] : e.kind === 'plugins' ? [e.plugin.name] : e.kind === 'mcp' ? e.tools : e.kind === 'agents' ? [e.agent.name, e.agent.maker] : [];
   return [e.name, e.slug, e.domain, c.label, k.word, k.plural, k.verdicts[e.verdict].label, ...e.priorArt.map((p) => p.name), ...extra]
     .join(' ')
     .toLowerCase();

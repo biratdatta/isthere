@@ -10,6 +10,9 @@ const EXTRA = {
   mcp: (a) =>
     (a.server && (a.server.transport === 'http' ? /^https?:\/\//.test(a.server.url ?? '') : a.server.transport === 'stdio' && a.server.command) && Array.isArray(a.tools)) ||
     'needs server {transport, url | command} and tools[]',
+  agents: (a) =>
+    (a.agent?.name && a.agent.maker && /^https?:\/\//.test(a.agent.url ?? '') && a.agent.price && ['autonomous', 'supervised'].includes(a.agent.autonomy) && Array.isArray(a.agent.does)) ||
+    'needs agent {name, maker, url, price, autonomy, does[]}',
   plugins: (a) =>
     (a.plugin?.name && a.plugin.marketplace && a.plugin.marketplaceName && a.plugin.repoUrl && Array.isArray(a.plugin.includes)) ||
     'needs plugin {name, marketplace, marketplaceName, repoUrl, includes[]}',

@@ -1,0 +1,41 @@
+{
+  "slug": "tableau",
+  "name": "Tableau",
+  "domain": "tableau.com",
+  "category": "analytics",
+  "priceMonthly": 75,
+  "priceNote": "Creator, Tableau Cloud Standard, billed yearly (Viewer is $15)",
+  "pricingUrl": "https://www.tableau.com/pricing/cloud",
+  "verdict": "kinda",
+  "agent": {
+    "name": "Julius",
+    "maker": "Julius AI",
+    "url": "https://julius.ai/",
+    "price": "Free tier; Plus $20/mo; Pro $45/mo",
+    "pricingUrl": "https://julius.ai/pricing",
+    "autonomy": "supervised",
+    "does": [
+      "Analyzes spreadsheets and databases in plain English",
+      "Builds charts, reports and dashboards",
+      "Connects to Postgres, BigQuery and Snowflake",
+      "Runs scheduled reports"
+    ],
+    "openSource": false
+  },
+  "whatYouLose": [
+    "Governed, certified data sources and a semantic layer",
+    "Highly interactive, finely designed dashboards",
+    "Enterprise permissions across many viewers"
+  ],
+  "priorArt": [
+    {
+      "name": "Metabase",
+      "url": "https://github.com/metabase/metabase"
+    },
+    {
+      "name": "Apache Superset",
+      "url": "https://github.com/apache/superset"
+    }
+  ],
+  "notes": "For a small team asking ad hoc questions, Julius replaces most Tableau work at a fraction of the cost. It is weaker as a shared, governed BI layer."
+}

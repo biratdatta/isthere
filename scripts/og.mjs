@@ -24,7 +24,7 @@ const VERDICT = { yes: ['YES', C.green], kinda: ['KINDA', C.amber], no: ['NOT RE
 
 // Brand mark (public/favicon.svg) for the cards, plus a PNG touch icon.
 const MARK_SVG = fs.readFileSync(path.join(root, 'public/favicon.svg'), 'utf8');
-const KIND_COLOR = { skills: '#4f7cff', mcp: '#2fbf71', plugins: '#f05252', prompts: '#f5a524' };
+const KIND_COLOR = { skills: '#4f7cff', mcp: '#2fbf71', plugins: '#f05252', prompts: '#f5a524', agents: '#9b6bff' };
 const markFor = (kind) => {
   const svg = kind ? MARK_SVG.replace(/fill="#(4f7cff|2fbf71|f05252|f5a524)"/g, `fill="${KIND_COLOR[kind]}"`) : MARK_SVG;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
@@ -65,6 +65,7 @@ const KINDS = {
   mcp: { word: 'MCP', article: 'an', top: (n) => ['Is there an MCP for', `${n}?`], labels: { yes: 'OFFICIAL', kinda: 'COMMUNITY', no: 'NOT YET' } },
   plugins: { word: 'plugin', article: 'a', top: (n) => ['Is there a plugin for', `${n}?`], labels: { yes: 'YES', kinda: 'KINDA', no: 'NOT REALLY' } },
   prompts: { word: 'prompt', article: 'a', top: (n) => ['Can you replace', `${n}?`], labels: { yes: 'YES', kinda: 'KINDA', no: 'NOT REALLY' } },
+  agents: { word: 'agent', article: 'an', top: (n) => ['Is there an agent for', `${n}?`], labels: { yes: 'YES', kinda: 'KINDA', no: 'NOT REALLY' } },
 };
 
 function appCard(app, kind) {
@@ -94,9 +95,9 @@ function appCard(app, kind) {
 
 function homeCard(count) {
   return frame([
-    h('div', { fontFamily: 'Bricolage Grotesque', fontSize: 84, fontWeight: 700, lineHeight: 1.04, letterSpacing: -3, color: C.text }, 'Is there a skill, an MCP, a plugin or a prompt for it?'),
+    h('div', { fontFamily: 'Bricolage Grotesque', fontSize: 84, fontWeight: 700, lineHeight: 1.04, letterSpacing: -3, color: C.text }, 'Is there a skill, an MCP, a plugin, a prompt or an agent for it?'),
     h('div', { justifyContent: 'space-between', alignItems: 'flex-end', fontSize: 28 }, [
-      h('div', { color: C.muted }, `${count} SaaS apps · 4 directories · honest verdicts`),
+      h('div', { color: C.muted }, `${count} SaaS apps · 5 directories · honest verdicts`),
       h('div', { color: C.primary, fontWeight: 700, fontSize: 34 }, 'isthere.biratdatta.tech'),
     ]),
   ]);
