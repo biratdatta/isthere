@@ -807,3 +807,19 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .ad-name { font: 800 20px/1.1 var(--display); letter-spacing: -0.02em; }
 .ad-line { font-size: 12px; line-height: 1.45; color: color-mix(in srgb, var(--ad-fg) 72%, transparent); }
 .ad-cta { margin-top: 2px; padding: 8px 12px; border-radius: 999px; background: var(--ad-fg); color: var(--ad-bg); font: 700 12px/1 var(--display); }
+
+/* ================= live counters ================= */
+.live-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 60%, transparent); animation: live-pulse 2s ease-out infinite; vertical-align: middle; }
+@keyframes live-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 55%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+.live-pill { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px; font: 600 13px/1 var(--mono); color: var(--text); white-space: nowrap; }
+.live-pill:hover { border-color: var(--green); color: var(--text); }
+@media (max-width: 1100px) { .live-pill { display: none; } }
+.live-bar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 24px; background: var(--surface); overflow: hidden; }
+.live-cell { display: flex; flex-direction: column; gap: 8px; padding: 18px 22px; border-left: 1px solid var(--line); min-width: 0; }
+.live-cell:first-child { border-left: 0; }
+.live-cell b { display: flex; align-items: center; gap: 2px; font: 700 30px/1 var(--display); letter-spacing: -0.02em; }
+.live-cell.now b { gap: 10px; color: var(--green); }
+.live-cell span:not(.odo):not(.odo *):not([data-live]) { font: 500 12px/1.2 var(--mono); color: var(--muted); }
+@container content (max-width: 860px) { .live-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); } .live-cell:nth-child(4) { border-left: 0; } .live-cell:nth-child(n + 4) { border-top: 1px solid var(--line); } }
+@container content (max-width: 520px) { .live-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); } .live-cell { border-left: 0; border-top: 1px solid var(--line); } .live-cell:nth-child(-n + 2) { border-top: 0; } .live-cell:nth-child(even) { border-left: 1px solid var(--line); } }

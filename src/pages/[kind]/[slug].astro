@@ -78,6 +78,7 @@ const price = e.priceMonthly;
       <ul class="stat-row" aria-label="At a glance">
         {isMrr && price !== null && price > 0 && <li><span>you’d save</span><b class="save">{formatPrice(price * 12)}/yr</b></li>}
         <li><span>{k.voted}</span><b><span data-count-key={key}>0</span> people</b></li>
+        <li><span>viewed</span><b><span data-live="views">0</span> times</b></li>
         <li><span>added</span><b>{fmtDate(addedOn(e))}</b></li>
         {e.checked && <li><span>price checked</span><b>{fmtDate(e.checked)}</b></li>}
       </ul>

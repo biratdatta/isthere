@@ -22,6 +22,7 @@ const { kind, current } = Astro.props;
       <a href="/advertise" aria-current={current === 'advertise' ? 'page' : undefined}>Advertise</a>
     </div>
     <div class="nav-actions">
+      <a class="live-pill" href="/stats" title="People on isthere in the last 2 minutes"><i class="live-dot" aria-hidden="true"></i><b data-live="online">1</b>&nbsp;online</a>
       <a class="icon-btn nav-search" href="/#q" aria-label="Search" data-search-jump><Icon name="search" size={18} /></a>
       <a class="icon-btn stack-link" href="/stack" aria-label="My stack" title="My stack"><Icon name="layers" size={18} /><span class="stack-dot" data-stack-badge hidden></span></a>
       <button type="button" class="icon-btn theme-toggle" data-theme-toggle aria-label="Toggle dark mode" title="Toggle theme (t)">

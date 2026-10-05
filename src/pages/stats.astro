@@ -22,6 +22,11 @@ const names = Object.fromEntries(ENTRIES.map((e) => [keyOf(e), { n: e.name, u: e
     <div class="card stat"><b data-stat="votes">0</b><span>votes all time</span></div>
     <div class="card stat"><b data-stat="votes24h">0</b><span>votes in 24h</span></div>
   </section>
+  <section class="stats">
+    <div class="card stat"><b><i class="live-dot" aria-hidden="true"></i> <span data-live="online">1</span></b><span>online right now</span></div>
+    <div class="card stat"><b data-live="visitsToday">0</b><span>visits today</span></div>
+    <div class="card stat"><b data-live="visitsTotal">0</b><span>visits all time</span></div>
+  </section>
 
   <section class="card pad stack">
     <h2 class="section-title">Votes in the last 14 days</h2>

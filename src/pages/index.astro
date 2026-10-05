@@ -5,7 +5,8 @@ import Ticker from '../components/Ticker.astro';
 import EntryList from '../components/EntryList.astro';
 import SearchBox from '../components/SearchBox.astro';
 import Chips from '../components/Chips.astro';
-import { ENTRIES, byKind } from '../lib/apps';
+import Odometer from '../components/Odometer.astro';
+import { ENTRIES, apps, byKind } from '../lib/apps';
 import { KINDS, KIND_ORDER } from '../lib/kinds';
 import { SITE_TAGLINE, directoryItems, itemList } from '../lib/seo';
 
@@ -25,6 +26,14 @@ const site = Astro.site!;
       <p class="lede">{SITE_TAGLINE} Honest verdicts, copy-paste installs, and what you actually give up.</p>
       <SearchBox action="/" placeholder={`Search ${ENTRIES.length} apps: notion, pdf, code review…`} />
     </div>
+  </section>
+
+  <section class="live-bar" aria-label="Live stats">
+    <div class="live-cell"><b>{apps().length}</b><span>apps checked</span></div>
+    <div class="live-cell"><b>$<span data-live="mrr"><Odometer value={0} label="0 dollars MRR destroyed" /></span></b><span>MRR destroyed / mo</span></div>
+    <div class="live-cell"><b data-live="votesToday"><Odometer value={0} label="0 votes today" /></b><span>replaced today</span></div>
+    <div class="live-cell"><b data-live="visitsToday"><Odometer value={0} label="0 visits today" /></b><span>visits today</span></div>
+    <div class="live-cell now"><b><i class="live-dot" aria-hidden="true"></i><span data-live="online"><Odometer value={1} label="1 online" /></span></b><span>online right now</span></div>
   </section>
 
   <section aria-label="Directories" class="dir-grid">

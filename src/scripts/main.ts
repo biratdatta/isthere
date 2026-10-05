@@ -595,10 +595,58 @@ $$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
   if (radio) radio.checked = true;
 }
 
-/* ---------- page counter ---------- */
+/* ---------- page counter + live counters ---------- */
 const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
-if (nav.doNotTrack !== '1' && !nav.globalPrivacyControl && 'sendBeacon' in navigator) {
-  navigator.sendBeacon('/api/hit', JSON.stringify({ p: location.pathname, r: document.referrer }));
+const counted = nav.doNotTrack !== '1' && !nav.globalPrivacyControl;
+// Random per-tab id (sessionStorage, not a cookie) so "online now" counts tabs, not page loads.
+const sid = (() => {
+  try {
+    let s = sessionStorage.getItem('sid');
+    if (!s) {
+      s = [...crypto.getRandomValues(new Uint8Array(8))].map((b) => b.toString(16).padStart(2, '0')).join('');
+      sessionStorage.setItem('sid', s);
+    }
+    return s;
+  } catch {
+    return '';
+  }
+})();
+if (counted && 'sendBeacon' in navigator) {
+  navigator.sendBeacon('/api/hit', JSON.stringify({ p: location.pathname, r: document.referrer, s: sid }));
+}
+
+type Live = { online: number; visitsToday: number; visitsTotal: number; votesToday: number; votesTotal: number; mrr: number; views: number };
+function applyLive(d: Partial<Live>) {
+  $$('[data-live]').forEach((el) => {
+    const v = d[el.dataset.live as keyof Live];
+    if (typeof v !== 'number') return;
+    const odo = $('[data-odometer]', el);
+    if (odo) setOdo(odo, v);
+    else el.textContent = fmt(v);
+  });
+}
+if ($('[data-live]')) {
+  const path = $('[data-live="views"]') ? `?path=${encodeURIComponent(location.pathname)}` : '';
+  const loadLive = async () => {
+    try {
+      const res = await fetch(`/api/live${path}`, { headers: { accept: 'application/json' } });
+      if (res.ok) applyLive(await res.json());
+    } catch {}
+  };
+  loadLive();
+  window.setInterval(() => !document.hidden && loadLive(), 30000);
+}
+// Heartbeat while the tab is visible, so "online now" stays accurate.
+if (counted && sid) {
+  const beat = async () => {
+    if (document.hidden) return;
+    try {
+      const res = await fetch('/api/presence', { method: 'POST', body: JSON.stringify({ s: sid }), headers: { 'content-type': 'text/plain' }, keepalive: true });
+      if (res.ok) applyLive(await res.json());
+    } catch {}
+  };
+  window.setInterval(beat, 60000);
+  document.addEventListener('visibilitychange', () => !document.hidden && beat());
 }
 
 /* ---------- agree / disagree with a verdict ---------- */

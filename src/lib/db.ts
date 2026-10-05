@@ -10,8 +10,9 @@ import schema1 from '../../migrations/0001_init.sql?raw';
 import schema2 from '../../migrations/0002_submissions.sql?raw';
 import schema3 from '../../migrations/0003_community.sql?raw';
 import schema4 from '../../migrations/0004_activity.sql?raw';
+import schema5 from '../../migrations/0005_presence.sql?raw';
 
-const schemaSql = `${schema1};\n${schema2};\n${schema3};\n${schema4}`;
+const schemaSql = `${schema1};\n${schema2};\n${schema3};\n${schema4};\n${schema5}`;
 
 // Minimal D1 typings so this file doesn't depend on generated worker types.
 interface D1Stmt {
@@ -372,5 +373,42 @@ export async function pulse() {
     hot: hot ? { key: hot.slug, n: hot.n } : null,
     recent: recent.results.map((r) => ({ key: r.key, c: r.country, ts: r.ts })),
     now: now(),
+  };
+}
+
+/* ---------- live counters: people online, visits, per-page views ---------- */
+
+const ONLINE_WINDOW = 120; // seconds since last heartbeat
+
+export async function touchPresence(sid: string) {
+  const d = await conn();
+  const stmts = [d.prepare('INSERT INTO presence (sid, ts) VALUES (?, ?) ON CONFLICT(sid) DO UPDATE SET ts = excluded.ts').bind(sid, now())];
+  if (Math.random() < 0.05) stmts.push(d.prepare('DELETE FROM presence WHERE ts < ?').bind(now() - 600));
+  await d.batch(stmts);
+}
+
+export async function onlineNow(): Promise<number> {
+  const row = await (await conn()).prepare('SELECT COUNT(*) AS n FROM presence WHERE ts > ?').bind(now() - ONLINE_WINDOW).first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
+export async function live(path: string | null) {
+  const d = await conn();
+  const today = new Date().toISOString().slice(0, 10);
+  const [online, visits, votesToday, views, snap] = await Promise.all([
+    onlineNow(),
+    d.prepare('SELECT COALESCE(SUM(n), 0) AS total, COALESCE(SUM(CASE WHEN day = ? THEN n END), 0) AS today FROM hits').bind(today).first<{ total: number; today: number }>(),
+    d.prepare('SELECT COUNT(*) AS n FROM vote_log WHERE ts > ?').bind(now() - 86400).first<{ n: number }>(),
+    path ? d.prepare('SELECT COALESCE(SUM(n), 0) AS n FROM hits WHERE path = ?').bind(path).first<{ n: number }>() : Promise.resolve(null),
+    snapshot(),
+  ]);
+  return {
+    online: Math.max(1, online),
+    visitsToday: visits?.today ?? 0,
+    visitsTotal: visits?.total ?? 0,
+    votesToday: votesToday?.n ?? 0,
+    votesTotal: snap.totals.all.votes,
+    mrr: snap.totals.all.mrr,
+    views: views?.n ?? 0,
   };
 }

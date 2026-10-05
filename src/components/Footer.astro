@@ -5,13 +5,12 @@
  */
 import Icon from './Icon.astro';
 import Mark from './Mark.astro';
-import { ENTRIES, addedOn, apps, keyOf } from '../lib/apps';
+import { ENTRIES, addedOn, keyOf } from '../lib/apps';
 import { KINDS } from '../lib/kinds';
 import { REPO_URL, entryPath } from '../lib/seo';
 import { repoStars } from '../lib/github';
 
 const stars = await repoStars;
-const appCount = apps().length;
 const lastAdded = ENTRIES.map(addedOn).sort().at(-1)!;
 const names = Object.fromEntries(ENTRIES.map((e) => [keyOf(e), { n: e.name, u: entryPath(e), w: KINDS[e.kind].word }]));
 ---
@@ -29,7 +28,7 @@ const names = Object.fromEntries(ENTRIES.map((e) => [keyOf(e), { n: e.name, u: e
   <section class="pulse" aria-label="Live numbers">
     <div class="pulse-stat"><b data-pulse="mrr">$0</b><span>MRR destroyed / mo</span></div>
     <div class="pulse-stat"><b data-pulse="votes">0</b><span>apps replaced</span></div>
-    <div class="pulse-stat"><b>{appCount}</b><span>apps checked</span></div>
+    <div class="pulse-stat"><b data-live="visitsTotal">0</b><span>visits</span></div>
     <a class="pulse-stat hot" href="/stats" data-pulse-hot><b>—</b><span>hot this week</span></a>
   </section>
 
