@@ -844,7 +844,7 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 
 /* ================= categories ================= */
 .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 14px; }
-.cat-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(200px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
+.cat-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(200px, 1fr); gap: 12px; overflow-x: auto; padding: 6px 4px 8px; margin: -6px -4px 0; scroll-snap-type: x proximity; scroll-padding-inline: 4px; }
 .cat-row > * { scroll-snap-align: start; }
 .cat-tile { display: flex; flex-direction: column; gap: 10px; padding: 20px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); transition: transform 0.2s var(--ease), border-color 0.2s; min-width: 0; }
 .cat-tile:hover { transform: translateY(-2px); border-color: var(--primary); color: var(--text); }
