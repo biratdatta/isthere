@@ -562,7 +562,6 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 
 /* margin rails: two stacked ad tiles per side (2 × 2 across the page) */
 .rail-box { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 8px; height: 600px; }
-.rail-head { display: flex; justify-content: space-between; padding: 0 4px; font: 500 11px/1 var(--mono); color: var(--muted); }
 .rail-grid { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px; flex: 1; }
 .rail-tile { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); transition: border-color 0.2s, transform 0.2s var(--ease); }
 .rail-tile:hover { border-color: var(--primary); color: var(--text); transform: translateY(-2px); }

@@ -9,7 +9,6 @@ const prefix = side === 'left' ? 'L' : 'R';
 ---
 <aside class="rail" aria-label="Advertising">
   <div class="rail-box">
-    <span class="rail-head"><span>AD</span><span>{side.toUpperCase()}</span></span>
     <div class="rail-grid">
       {[1, 2].map((n) => {
         const id = `${prefix}${n}` as 'L1' | 'L2' | 'R1' | 'R2';
