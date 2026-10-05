@@ -696,8 +696,6 @@ const globe = (() => {
 
   function renderTop() {
     const ol = $('[data-globe-top]');
-    const count = $('[data-globe-countries]');
-    if (count) count.textContent = String(geo.today.length);
     if (!ol) return;
     const online = new Set(geo.online.map((x) => x.c));
     ol.replaceChildren(
@@ -773,7 +771,7 @@ if (counted && 'sendBeacon' in navigator) {
 }
 
 type Geo = { online: { c: string; n: number }[]; today: { c: string; n: number }[] };
-type Live = { online: number; visitsToday: number; visitsTotal: number; votesToday: number; votesTotal: number; mrr: number; views: number; geo?: Geo };
+type Live = { online: number; countriesTotal: number; visitsToday: number; visitsTotal: number; votesToday: number; votesTotal: number; mrr: number; views: number; geo?: Geo };
 function applyLive(d: Partial<Live>) {
   if (d.geo) globe.update(d.geo);
   $$('[data-live]').forEach((el) => {

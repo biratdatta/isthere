@@ -407,7 +407,7 @@ export async function onlineNow(): Promise<number> {
 export async function live(path: string | null) {
   const d = await conn();
   const today = new Date().toISOString().slice(0, 10);
-  const [online, visits, votesToday, views, snap, geoOnline, geoToday] = await Promise.all([
+  const [online, visits, votesToday, views, snap, geoOnline, geoToday, countries] = await Promise.all([
     onlineNow(),
     d.prepare('SELECT COALESCE(SUM(n), 0) AS total, COALESCE(SUM(CASE WHEN day = ? THEN n END), 0) AS today FROM hits').bind(today).first<{ total: number; today: number }>(),
     d.prepare('SELECT COUNT(*) AS n FROM vote_log WHERE ts > ?').bind(now() - 86400).first<{ n: number }>(),
@@ -415,10 +415,12 @@ export async function live(path: string | null) {
     snapshot(),
     d.prepare('SELECT country AS c, COUNT(*) AS n FROM online WHERE ts > ? AND country IS NOT NULL GROUP BY country ORDER BY n DESC LIMIT 60').bind(now() - ONLINE_WINDOW).all<{ c: string; n: number }>(),
     d.prepare('SELECT country AS c, n FROM visits_geo WHERE day = ? ORDER BY n DESC LIMIT 120').bind(today).all<{ c: string; n: number }>(),
+    d.prepare('SELECT COUNT(DISTINCT country) AS n FROM visits_geo').first<{ n: number }>(),
   ]);
   return {
     geo: { online: geoOnline.results, today: geoToday.results },
     online: Math.max(1, online),
+    countriesTotal: countries?.n ?? 0,
     visitsToday: visits?.today ?? 0,
     visitsTotal: visits?.total ?? 0,
     votesToday: votesToday?.n ?? 0,
