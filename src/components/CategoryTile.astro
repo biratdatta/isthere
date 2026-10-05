@@ -1,0 +1,23 @@
+---
+/** One category tile: line icon, name, one-liner, app count, monthly spend, directory coverage dots. */
+import Icon from './Icon.astro';
+import { formatPrice, type categoryStats } from '../lib/apps';
+import { KIND_ORDER, KINDS } from '../lib/kinds';
+interface Props { c: ReturnType<typeof categoryStats>[number]; compact?: boolean }
+const { c, compact = false } = Astro.props;
+---
+<a href={`/category/${c.key}`} class={`cat-tile${compact ? ' compact' : ''}`} data-cat-keys={c.keys.join(',')}>
+  <span class="cat-top">
+    <span class="cat-ico"><Icon name={`c-${c.key}` as any} size={22} /></span>
+    <span class="cat-dots" aria-label={`Covered by ${c.kinds.map((k) => KINDS[k].plural).join(', ')}`}>
+      {KIND_ORDER.map((k) => <i class={`k-${k}${c.kinds.includes(k) ? ' on' : ''}`} title={KINDS[k].plural}></i>)}
+    </span>
+  </span>
+  <strong>{c.label}</strong>
+  {!compact && <span class="cat-desc">{c.desc}</span>}
+  <span class="cat-meta">
+    <span>{c.apps} {c.apps === 1 ? 'app' : 'apps'}</span>
+    {c.monthly > 0 && <span>{formatPrice(c.monthly)}/mo</span>}
+    {c.replaceable > 0 && <span class="yes">{c.replaceable} replaceable</span>}
+  </span>
+</a>

@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import CategoryTile from '../components/CategoryTile.astro';
+import { categoryStats, formatPrice } from '../lib/apps';
+import { breadcrumbs, itemList } from '../lib/seo';
+
+const site = Astro.site!;
+const cats = categoryStats();
+const total = cats.reduce((s, c) => s + c.monthly, 0);
+---
+<Base
+  title={`Browse by category: ${cats.length} kinds of SaaS, and what replaces them`}
+  description={`${cats.length} categories of paid software, from scheduling to security, each checked for a skill, MCP, plugin, prompt or AI agent that replaces it.`}
+  path="/categories"
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Categories', path: '/categories' }]), itemList(site, 'Categories', cats.map((c) => ({ name: c.label, path: `/category/${c.key}` })))]}
+>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Categories</li></ol></nav>
+  <section class="hero">
+    <div class="page-title">
+      <h1>Browse by <span class="hl">category</span></h1>
+      <p class="muted" style="font-size:18px;max-width:600px">{cats.length} kinds of paid software, about {formatPrice(Math.round(total))}/mo of entry-tier subscriptions, checked across all five directories.</p>
+    </div>
+    <div class="cat-legend" aria-hidden="true">
+      <span><i class="k-skills on"></i>Skills</span><span><i class="k-mcp on"></i>MCPs</span><span><i class="k-plugins on"></i>Plugins</span><span><i class="k-prompts on"></i>Prompts</span><span><i class="k-agents on"></i>Agents</span>
+    </div>
+  </section>
+  <section class="cat-grid" data-cat-grid>
+    {cats.map((c) => <CategoryTile c={c} />)}
+  </section>
+</Base>

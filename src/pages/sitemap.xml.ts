@@ -13,7 +13,7 @@ export const GET: APIRoute = ({ site }) => {
     ...Object.keys(CATEGORIES)
       .filter((c) => ENTRIES.some((e) => e.category === c))
       .map((c) => ({ loc: new URL(`/category/${c}`, base).href, priority: '0.7', changefreq: 'weekly' })),
-    ...['/cancel-culture', '/alternatives', '/new', '/stats', '/requests', '/contributors', '/queue', '/stack', '/submit', '/advertise'].map((p) => ({ loc: new URL(p, base).href, priority: '0.5', changefreq: 'daily' })),
+    ...['/categories', '/cancel-culture', '/alternatives', '/new', '/stats', '/requests', '/contributors', '/queue', '/stack', '/submit', '/advertise'].map((p) => ({ loc: new URL(p, base).href, priority: '0.5', changefreq: 'daily' })),
   ];
   const xml =
     '<?xml version="1.0" encoding="UTF-8"?>\n' +

@@ -1,52 +1,76 @@
 ---
 import Base from '../../layouts/Base.astro';
 import EntryCards from '../../components/EntryCards.astro';
+import EntryList from '../../components/EntryList.astro';
+import CategoryTile from '../../components/CategoryTile.astro';
 import Icon from '../../components/Icon.astro';
-import { CATEGORIES, ENTRIES, apps } from '../../lib/apps';
+import { CATEGORIES, apps, categoryStats, formatPrice } from '../../lib/apps';
 import { KINDS, KIND_ORDER } from '../../lib/kinds';
 import { breadcrumbs, entryPath, entryTitle, itemList } from '../../lib/seo';
 
 export function getStaticPaths() {
-  return Object.keys(CATEGORIES)
-    .filter((cat) => ENTRIES.some((e) => e.category === cat))
-    .map((cat) => ({ params: { cat } }));
+  return categoryStats().map((c) => ({ params: { cat: c.key } }));
 }
 const { cat } = Astro.params as { cat: string };
+const all = categoryStats();
+const s = all.find((x) => x.key === cat)!;
 const c = CATEGORIES[cat];
 const site = Astro.site!;
-const entries = ENTRIES.filter((e) => e.category === cat);
+const entries = s.entries;
 const appRows = apps().filter((a) => a.category === cat);
-const title = `Is there an AI replacement for ${c.label.toLowerCase()} tools? ${appRows.length} apps checked`;
-const description = `${appRows.length} paid ${c.label.toLowerCase()} apps checked for a skill, MCP server, plugin, prompt or AI agent that replaces them.`;
+const lc = c.label.toLowerCase();
+const title = `Is there an AI replacement for ${lc} tools? ${s.apps} apps checked`;
+const description = `${c.desc} ${s.apps} paid ${lc} apps (${formatPrice(s.monthly)}/mo combined), checked for a skill, MCP server, plugin, prompt or AI agent that replaces them.`;
+const others = all.filter((x) => x.key !== cat).slice(0, 8);
 ---
 <Base title={title} description={description} path={`/category/${cat}`}
-  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: c.label, path: `/category/${cat}` }]), itemList(site, c.label, entries.map((e) => ({ name: entryTitle(e), path: entryPath(e) })))]}>
-  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">{c.label}</li></ol></nav>
-  <section class="page-title">
-    <h1>{c.emoji} <span class="hl">{c.label}</span>, replaced?</h1>
-    <p class="muted" style="font-size:18px;max-width:640px">{appRows.length} paid {c.label.toLowerCase()} apps, checked across every directory.</p>
+  jsonld={[breadcrumbs(site, [{ name: 'Home', path: '/' }, { name: 'Categories', path: '/categories' }, { name: c.label, path: `/category/${cat}` }]), itemList(site, c.label, entries.map((e) => ({ name: entryTitle(e), path: entryPath(e) })))]}>
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/categories">Categories</a></li><li aria-current="page">{c.label}</li></ol></nav>
+
+  <section class="hero">
+    <div class="page-title">
+      <span class="cat-ico lg"><Icon name={`c-${cat}` as any} size={30} /></span>
+      <h1><span class="hl">{c.label}</span>, replaced?</h1>
+      <p class="muted" style="font-size:18px;max-width:560px">{c.desc}</p>
+    </div>
+    <div class="stats">
+      <div class="card stat"><b>{s.apps}</b><span>{s.apps === 1 ? 'app' : 'apps'} checked</span></div>
+      <div class="card stat"><b>{formatPrice(Math.round(s.monthly))}</b><span>a month in subscriptions</span></div>
+      <div class="tile stat" style="--k:var(--green)"><b>{s.replaceable}</b><span>replaceable today</span></div>
+    </div>
   </section>
-  <section class="card pad" style="overflow-x:auto">
-    <table class="cmp-table">
-      <thead><tr><th>App</th>{KIND_ORDER.map((k) => <th class={`k-${k}`}><Icon name={k} size={14} /> {KINDS[k].plural}</th>)}</tr></thead>
-      <tbody>
-        {appRows.map((a) => (
-          <tr>
-            <th><a href={`/compare/${a.slug}`}>{a.name}</a></th>
-            {KIND_ORDER.map((k) => {
-              const e = a.entries.find((x) => x.kind === k);
-              return <td>{e ? <a href={entryPath(e)} class={`pill v-${e.verdict}`}>{KINDS[k].verdicts[e.verdict].label}</a> : <span class="muted">—</span>}</td>;
-            })}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+
+  <section class="split">
+    <div class="card list-card" style="min-width:0">
+      <div class="list-head"><h2>Most replaced in {c.label}</h2><span class="muted mono" style="font-size:12px">live votes</span></div>
+      <EntryList entries={entries} filterBy="kind" limit={5} />
+    </div>
+    <div class="card pad" style="overflow-x:auto;min-width:0">
+      <h2 class="section-title" style="margin-bottom:12px">Every answer</h2>
+      <table class="cmp-table">
+        <thead><tr><th>App</th>{KIND_ORDER.map((k) => <th class={`k-${k}`}><Icon name={k} size={14} /></th>)}</tr></thead>
+        <tbody>
+          {appRows.map((a) => (
+            <tr>
+              <th><a href={`/compare/${a.slug}`}>{a.name}</a></th>
+              {KIND_ORDER.map((k) => {
+                const e = a.entries.find((x) => x.kind === k);
+                return <td>{e ? <a href={entryPath(e)} class={`pill v-${e.verdict}`}>{KINDS[k].verdicts[e.verdict].label}</a> : <span class="muted">—</span>}</td>;
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   </section>
+
   <section class="stack" style="gap:16px">
     <span class="eyebrow">All {entries.length} answers</span>
     <EntryCards entries={entries} />
   </section>
-  <section class="chips-row">
-    {Object.entries(CATEGORIES).filter(([k]) => k !== cat && ENTRIES.some((e) => e.category === k)).map(([k, x]) => <a class="chip" href={`/category/${k}`}>{x.emoji} {x.label}</a>)}
+
+  <section class="stack" style="gap:14px">
+    <div class="list-head" style="padding:0"><h2 class="section-title">Other categories</h2><a class="more-link" href="/categories">All categories <Icon name="arrow" size={14} /></a></div>
+    <div class="cat-row">{others.map((o) => <CategoryTile c={o} compact />)}</div>
   </section>
 </Base>

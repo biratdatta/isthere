@@ -7,7 +7,8 @@ import SearchBox from '../components/SearchBox.astro';
 import Chips from '../components/Chips.astro';
 import Odometer from '../components/Odometer.astro';
 import LiveGlobe from '../components/LiveGlobe.astro';
-import { ENTRIES, apps, byKind } from '../lib/apps';
+import CategoryTile from '../components/CategoryTile.astro';
+import { ENTRIES, apps, byKind, categoryStats } from '../lib/apps';
 import { KINDS, KIND_ORDER } from '../lib/kinds';
 import { SITE_TAGLINE, directoryItems, itemList } from '../lib/seo';
 
@@ -64,6 +65,16 @@ const site = Astro.site!;
       </div>
       <EntryList entries={ENTRIES} filterBy="kind" limit={20} />
       <a class="see-all" href="/cancel-culture" data-see-all><span data-see-all-label>See the full list · all {ENTRIES.length}</span><Icon name="arrow" size={15} /></a>
+    </div>
+  </section>
+
+  <section class="stack reveal" aria-labelledby="cats-title" style="gap:16px">
+    <div class="list-head" style="padding:0">
+      <h2 id="cats-title" class="section-title">Browse by category</h2>
+      <a class="more-link" href="/categories">All {categoryStats().length} categories <Icon name="arrow" size={14} /></a>
+    </div>
+    <div class="cat-row">
+      {categoryStats().slice(0, 10).map((c) => <CategoryTile c={c} compact />)}
     </div>
   </section>
 

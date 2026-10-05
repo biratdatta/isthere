@@ -2,7 +2,7 @@
   "slug": "sentry",
   "name": "Sentry",
   "domain": "sentry.io",
-  "category": "dev-tools",
+  "category": "monitoring",
   "priceMonthly": 26,
   "priceNote": "Team plan, flat per organization, billed annually",
   "pricingUrl": "https://sentry.io/pricing/",

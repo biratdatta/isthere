@@ -841,3 +841,24 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .globe-top li { display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--ink-fg) 5%, transparent); }
 .globe-top li.on b { color: #4fd18b; }
 .globe-top b { font: 600 12px/1.4 var(--mono); }
+
+/* ================= categories ================= */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 14px; }
+.cat-row { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(200px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
+.cat-row > * { scroll-snap-align: start; }
+.cat-tile { display: flex; flex-direction: column; gap: 10px; padding: 20px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); transition: transform 0.2s var(--ease), border-color 0.2s; min-width: 0; }
+.cat-tile:hover { transform: translateY(-2px); border-color: var(--primary); color: var(--text); }
+.cat-tile.compact { padding: 16px; gap: 8px; }
+.cat-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cat-ico { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; background: color-mix(in srgb, var(--primary) 9%, var(--surface)); color: var(--primary); flex: none; }
+.cat-ico.lg { width: 60px; height: 60px; border-radius: 16px; }
+.cat-tile strong { font: 700 19px/1.2 var(--display); }
+.cat-tile.compact strong { font-size: 16px; }
+.cat-desc { font-size: 13px; line-height: 1.5; color: var(--muted); flex: 1; }
+.cat-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 500 12px/1.3 var(--mono); color: var(--muted); }
+.cat-meta .yes { color: var(--green); }
+.cat-dots { display: inline-flex; gap: 4px; }
+.cat-dots i, .cat-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 3px; background: var(--line); }
+.cat-dots i.on, .cat-legend i.on { background: var(--k); }
+.cat-legend { display: flex; flex-wrap: wrap; gap: 10px 16px; align-self: end; font: 500 12px/1 var(--mono); color: var(--muted); }
+.cat-legend span { display: inline-flex; align-items: center; gap: 6px; }

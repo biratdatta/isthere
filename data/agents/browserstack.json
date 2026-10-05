@@ -2,7 +2,7 @@
   "slug": "browserstack",
   "name": "BrowserStack",
   "domain": "browserstack.com",
-  "category": "dev-tools",
+  "category": "testing",
   "priceMonthly": 99,
   "priceNote": "Automate Desktop, 1 parallel test, billed yearly",
   "pricingUrl": "https://www.browserstack.com/pricing",

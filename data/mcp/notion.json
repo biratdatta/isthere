@@ -2,7 +2,7 @@
   "slug": "notion",
   "name": "Notion",
   "domain": "notion.so",
-  "category": "productivity",
+  "category": "notes",
   "priceMonthly": 10,
   "priceNote": "Plus, likely the yearly-billing price",
   "pricingUrl": "https://www.notion.com/pricing",

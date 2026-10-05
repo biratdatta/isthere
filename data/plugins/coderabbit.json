@@ -2,7 +2,7 @@
   "slug": "coderabbit",
   "name": "CodeRabbit",
   "domain": "coderabbit.ai",
-  "category": "dev-tools",
+  "category": "code-review",
   "priceMonthly": 24,
   "priceNote": "Essentials, per developer, billed annually",
   "pricingUrl": "https://www.coderabbit.ai/pricing",

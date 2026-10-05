@@ -239,7 +239,7 @@ function capLists() {
 
 /* ---------- live search + category chips ---------- */
 const list = $('[data-list]');
-if (list) {
+if (list && $('[data-search]')) {
   const input = $<HTMLInputElement>('[data-search]')!;
   const rows = $$('[data-list] > li');
   const chips = $$('[data-chip]');

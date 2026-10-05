@@ -105,29 +105,36 @@ export interface AgentEntry extends Base {
 
 export type Entry = PromptEntry | SkillEntry | McpEntry | PluginEntry | AgentEntry;
 
-export const CATEGORIES: Record<string, { label: string; emoji: string }> = {
-  documents: { label: 'Documents', emoji: '📄' },
-  presentations: { label: 'Presentations', emoji: '📽️' },
-  design: { label: 'Design', emoji: '🎨' },
-  writing: { label: 'Writing', emoji: '✍️' },
-  marketing: { label: 'Marketing', emoji: '📣' },
-  sales: { label: 'Sales', emoji: '🤝' },
-  support: { label: 'Support', emoji: '🎧' },
-  legal: { label: 'Legal', emoji: '⚖️' },
-  data: { label: 'Data', emoji: '📈' },
-  'dev-tools': { label: 'Dev tools', emoji: '🛠️' },
-  'project-management': { label: 'Project management', emoji: '📌' },
-  payments: { label: 'Payments', emoji: '💳' },
-  scheduling: { label: 'Scheduling', emoji: '📅' },
-  forms: { label: 'Forms', emoji: '📋' },
-  web: { label: 'Web & Links', emoji: '🔗' },
-  productivity: { label: 'Productivity', emoji: '🗂️' },
-  analytics: { label: 'Analytics', emoji: '📊' },
-  monitoring: { label: 'Monitoring', emoji: '🚨' },
-  communication: { label: 'Communication', emoji: '💬' },
-  automation: { label: 'Automation', emoji: '⚙️' },
-  finance: { label: 'Finance', emoji: '💸' },
-  security: { label: 'Security', emoji: '🔐' },
+export const CATEGORIES: Record<string, { label: string; desc: string }> = {
+  productivity: { label: "Productivity", desc: "Calendars, timers, whiteboards and the apps that run your day." },
+  notes: { label: "Notes & wikis", desc: "Docs, wikis and second brains." },
+  'project-management': { label: "Projects & tasks", desc: "Boards, issues, to-dos and sprints." },
+  marketing: { label: "Marketing", desc: "Copy, campaigns and content at scale." },
+  seo: { label: "SEO", desc: "Rankings, backlinks and site audits." },
+  social: { label: "Social media", desc: "Scheduling and posting to social networks." },
+  'email-marketing': { label: "Email marketing", desc: "Newsletters, lists and automations." },
+  sales: { label: "Sales", desc: "Prospecting, outreach and pipeline." },
+  support: { label: "Support", desc: "Help desks, tickets and live chat." },
+  communication: { label: "Communication", desc: "Email, calls, video and messaging." },
+  scheduling: { label: "Scheduling", desc: "Booking links and meeting times." },
+  writing: { label: "Writing", desc: "Grammar, tone and editing." },
+  documents: { label: "Documents", desc: "PDFs, e-signatures and file sharing." },
+  presentations: { label: "Presentations", desc: "Slides and decks." },
+  design: { label: "Design", desc: "Graphics, UI and brand assets." },
+  web: { label: "Websites & links", desc: "Site builders, link shorteners and bio pages." },
+  forms: { label: "Forms", desc: "Surveys, quizzes and sign-ups." },
+  analytics: { label: "Analytics", desc: "Traffic, dashboards and product analytics." },
+  data: { label: "Data & research", desc: "Spreadsheets, BI and company data." },
+  automation: { label: "Automation", desc: "Zaps, workflows and glue between apps." },
+  'dev-tools': { label: "Dev tools", desc: "Code hosting, contractors and developer services." },
+  'code-review': { label: "Code review", desc: "Automated pull-request review." },
+  testing: { label: "Testing & QA", desc: "Browser, device and end-to-end testing." },
+  'internal-tools': { label: "Internal tools", desc: "Admin panels and dashboards for your team." },
+  monitoring: { label: "Monitoring", desc: "Uptime, errors and status pages." },
+  security: { label: "Security", desc: "Passwords, secrets and vulnerability scans." },
+  finance: { label: "Finance", desc: "Bookkeeping, invoicing and expenses." },
+  payments: { label: "Payments", desc: "Checkout, billing and subscriptions." },
+  legal: { label: "Legal", desc: "Contracts, compliance and legal docs." },
 };
 
 /* ---------------- validation ---------------- */
@@ -288,4 +295,30 @@ export function freeAlternatives(slug: string): PriorArt[] {
   const seen = new Map<string, PriorArt>();
   for (const e of ENTRIES.filter((x) => x.slug === slug)) for (const p of e.priorArt) if (!seen.has(p.url)) seen.set(p.url, p);
   return [...seen.values()];
+}
+
+/** Per-category summary for the hub, the home row and category pages. Sorted by how much is covered. */
+export function categoryStats() {
+  return Object.entries(CATEGORIES)
+    .map(([key, c]) => {
+      const entries = ENTRIES.filter((e) => e.category === key);
+      const bySlug = new Map<string, Entry[]>();
+      for (const e of entries) bySlug.set(e.slug, [...(bySlug.get(e.slug) ?? []), e]);
+      const appsList = [...bySlug.values()];
+      const monthly = appsList.reduce((s, list) => s + (list.find((e) => e.priceMonthly !== null)?.priceMonthly ?? 0), 0);
+      // "Replaceable" = a YES in a directory that replaces the app (MCP's OFFICIAL means it connects, not replaces).
+      const replaceable = appsList.filter((list) => list.some((e) => e.verdict === 'yes' && KINDS[e.kind].metric === 'mrr')).length;
+      return {
+        key,
+        ...c,
+        entries,
+        apps: appsList.length,
+        monthly: Math.round(monthly * 100) / 100,
+        replaceable,
+        kinds: KIND_ORDER.filter((k) => entries.some((e) => e.kind === k)),
+        keys: entries.map(keyOf),
+      };
+    })
+    .filter((c) => c.entries.length > 0)
+    .sort((a, b) => b.entries.length - a.entries.length || b.monthly - a.monthly || a.label.localeCompare(b.label));
 }
