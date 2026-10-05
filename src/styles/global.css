@@ -798,3 +798,12 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .see-all:hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 6%, var(--surface)); }
 .see-all[hidden] { display: none; }
 .rows[data-limit='20']:not([data-capped]) > li:nth-child(n + 21) { display: none; }
+/* booked rail tile */
+.rail-tile.booked { align-items: center; text-align: center; gap: 10px; padding: 14px 12px; background: var(--ad-bg); color: var(--ad-fg); border-color: color-mix(in srgb, var(--ad-fg) 18%, var(--ad-bg)); }
+.rail-tile.booked:hover { color: var(--ad-fg); border-color: color-mix(in srgb, var(--ad-fg) 45%, var(--ad-bg)); }
+.rail-tile.booked .id { align-self: flex-start; color: color-mix(in srgb, var(--ad-fg) 55%, transparent); }
+.ad-art { display: grid; place-items: center; flex: 1; width: 100%; }
+.ad-art img { width: 64px; height: 64px; border-radius: 14px; }
+.ad-name { font: 800 20px/1.1 var(--display); letter-spacing: -0.02em; }
+.ad-line { font-size: 12px; line-height: 1.45; color: color-mix(in srgb, var(--ad-fg) 72%, transparent); }
+.ad-cta { margin-top: 2px; padding: 8px 12px; border-radius: 999px; background: var(--ad-fg); color: var(--ad-bg); font: 700 12px/1 var(--display); }

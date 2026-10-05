@@ -1,5 +1,6 @@
 ---
 /** A margin rail with two stacked ad tiles (160 × 290 each): 4 tiles per page, 2 per side. Hidden below 1320px. */
+import { ADS } from '../lib/ads';
 interface Props {
   side: 'left' | 'right';
 }
@@ -10,13 +11,25 @@ const prefix = side === 'left' ? 'L' : 'R';
   <div class="rail-box">
     <span class="rail-head"><span>AD</span><span>{side.toUpperCase()}</span></span>
     <div class="rail-grid">
-      {[1, 2].map((n) => (
-        <a href="/advertise?slot=tile" class="rail-tile" aria-label={`Ad tile ${prefix}${n}: advertise here`}>
-          <span class="id">{prefix}{n}</span>
-          <span class="art">160 × 290<br />your creative</span>
-          <span class="p">Advertise here</span>
-        </a>
-      ))}
+      {[1, 2].map((n) => {
+        const id = `${prefix}${n}` as 'L1' | 'L2' | 'R1' | 'R2';
+        const ad = ADS[id];
+        return ad ? (
+          <a href={ad.url} class="rail-tile booked" target="_blank" rel="sponsored noopener" style={`--ad-bg:${ad.bg};--ad-fg:${ad.fg}`} aria-label={`Sponsored: ${ad.name}. ${ad.line}`}>
+            <span class="id">Sponsored</span>
+            <span class="ad-art"><img src={ad.image} width="64" height="64" alt="" loading="lazy" decoding="async" /></span>
+            <strong class="ad-name">{ad.name}</strong>
+            <span class="ad-line">{ad.line}</span>
+            <span class="ad-cta">{ad.cta} ↗</span>
+          </a>
+        ) : (
+          <a href="/advertise?slot=tile" class="rail-tile" aria-label={`Ad tile ${id}: advertise here`}>
+            <span class="id">{id}</span>
+            <span class="art">160 × 290<br />your creative</span>
+            <span class="p">Advertise here</span>
+          </a>
+        );
+      })}
     </div>
   </div>
 </aside>
