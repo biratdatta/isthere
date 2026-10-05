@@ -842,4 +842,3 @@ a.rot:hover { color: var(--primary); filter: brightness(1.1); }
 .globe-top li { display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border-radius: 10px; background: color-mix(in srgb, var(--ink-fg) 5%, transparent); }
 .globe-top li.on b { color: #4fd18b; }
 .globe-top b { font: 600 12px/1.4 var(--mono); }
-.globe-note { font: 500 11px/1.4 var(--mono); color: var(--f-muted); }
