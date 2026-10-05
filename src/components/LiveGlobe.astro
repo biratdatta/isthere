@@ -1,0 +1,18 @@
+---
+/** Live card: people online now, visits today, and a rotating dotted globe with a pulse per country. Data from /api/live (geo). */
+---
+<div class="globe-card" data-globe>
+  <div class="globe-head">
+    <span class="eyebrow"><i class="live-dot" aria-hidden="true"></i> Live right now</span>
+  </div>
+  <div class="globe-stats">
+    <div><b data-live="online">1</b><span>online</span></div>
+    <div><b data-live="visitsToday">0</b><span>visitors today</span></div>
+    <div><b data-globe-countries>0</b><span>countries today</span></div>
+  </div>
+  <div class="globe-wrap">
+    <canvas data-globe-canvas aria-label="Globe showing where visitors are right now" role="img"></canvas>
+  </div>
+  <ol class="globe-top" data-globe-top aria-label="Top countries today"></ol>
+  <span class="globe-note">Country only, from Cloudflare. No IPs, no cookies. Drag to spin.</span>
+</div>

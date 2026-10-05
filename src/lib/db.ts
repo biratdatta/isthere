@@ -11,8 +11,9 @@ import schema2 from '../../migrations/0002_submissions.sql?raw';
 import schema3 from '../../migrations/0003_community.sql?raw';
 import schema4 from '../../migrations/0004_activity.sql?raw';
 import schema5 from '../../migrations/0005_presence.sql?raw';
+import schema6 from '../../migrations/0006_geo.sql?raw';
 
-const schemaSql = `${schema1};\n${schema2};\n${schema3};\n${schema4};\n${schema5}`;
+const schemaSql = `${schema1};\n${schema2};\n${schema3};\n${schema4};\n${schema5};\n${schema6}`;
 
 // Minimal D1 typings so this file doesn't depend on generated worker types.
 interface D1Stmt {
@@ -380,29 +381,43 @@ export async function pulse() {
 
 const ONLINE_WINDOW = 120; // seconds since last heartbeat
 
-export async function touchPresence(sid: string) {
+const cc = (c: string | null | undefined) => (c && /^[A-Z]{2}$/.test(c) && c !== 'XX' && c !== 'T1' ? c : null);
+
+export async function touchPresence(sid: string, country: string | null = null) {
   const d = await conn();
-  const stmts = [d.prepare('INSERT INTO presence (sid, ts) VALUES (?, ?) ON CONFLICT(sid) DO UPDATE SET ts = excluded.ts').bind(sid, now())];
-  if (Math.random() < 0.05) stmts.push(d.prepare('DELETE FROM presence WHERE ts < ?').bind(now() - 600));
+  const stmts = [d.prepare('INSERT INTO online (sid, country, ts) VALUES (?, ?, ?) ON CONFLICT(sid) DO UPDATE SET ts = excluded.ts, country = COALESCE(excluded.country, online.country)').bind(sid, cc(country), now())];
+  if (Math.random() < 0.05) stmts.push(d.prepare('DELETE FROM online WHERE ts < ?').bind(now() - 600));
   await d.batch(stmts);
 }
 
+export async function recordVisitCountry(country: string | null) {
+  const c = cc(country);
+  if (!c) return;
+  await (await conn())
+    .prepare('INSERT INTO visits_geo (day, country, n) VALUES (?, ?, 1) ON CONFLICT(day, country) DO UPDATE SET n = n + 1')
+    .bind(new Date().toISOString().slice(0, 10), c)
+    .run();
+}
+
 export async function onlineNow(): Promise<number> {
-  const row = await (await conn()).prepare('SELECT COUNT(*) AS n FROM presence WHERE ts > ?').bind(now() - ONLINE_WINDOW).first<{ n: number }>();
+  const row = await (await conn()).prepare('SELECT COUNT(*) AS n FROM online WHERE ts > ?').bind(now() - ONLINE_WINDOW).first<{ n: number }>();
   return row?.n ?? 0;
 }
 
 export async function live(path: string | null) {
   const d = await conn();
   const today = new Date().toISOString().slice(0, 10);
-  const [online, visits, votesToday, views, snap] = await Promise.all([
+  const [online, visits, votesToday, views, snap, geoOnline, geoToday] = await Promise.all([
     onlineNow(),
     d.prepare('SELECT COALESCE(SUM(n), 0) AS total, COALESCE(SUM(CASE WHEN day = ? THEN n END), 0) AS today FROM hits').bind(today).first<{ total: number; today: number }>(),
     d.prepare('SELECT COUNT(*) AS n FROM vote_log WHERE ts > ?').bind(now() - 86400).first<{ n: number }>(),
     path ? d.prepare('SELECT COALESCE(SUM(n), 0) AS n FROM hits WHERE path = ?').bind(path).first<{ n: number }>() : Promise.resolve(null),
     snapshot(),
+    d.prepare('SELECT country AS c, COUNT(*) AS n FROM online WHERE ts > ? AND country IS NOT NULL GROUP BY country ORDER BY n DESC LIMIT 60').bind(now() - ONLINE_WINDOW).all<{ c: string; n: number }>(),
+    d.prepare('SELECT country AS c, n FROM visits_geo WHERE day = ? ORDER BY n DESC LIMIT 120').bind(today).all<{ c: string; n: number }>(),
   ]);
   return {
+    geo: { online: geoOnline.results, today: geoToday.results },
     online: Math.max(1, online),
     visitsToday: visits?.today ?? 0,
     visitsTotal: visits?.total ?? 0,

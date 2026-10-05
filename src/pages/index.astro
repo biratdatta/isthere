@@ -6,6 +6,7 @@ import EntryList from '../components/EntryList.astro';
 import SearchBox from '../components/SearchBox.astro';
 import Chips from '../components/Chips.astro';
 import Odometer from '../components/Odometer.astro';
+import LiveGlobe from '../components/LiveGlobe.astro';
 import { ENTRIES, apps, byKind } from '../lib/apps';
 import { KINDS, KIND_ORDER } from '../lib/kinds';
 import { SITE_TAGLINE, directoryItems, itemList } from '../lib/seo';
@@ -49,7 +50,10 @@ const site = Astro.site!;
   </section>
 
   <section id="list" class="board">
-    <Ticker scope="all" metric="mrr" />
+    <div class="board-side">
+      <Ticker scope="all" metric="mrr" />
+      <LiveGlobe />
+    </div>
     <div class="card list-card reveal" style="min-width: 0">
       <div class="list-head">
         <h2>Cancel Culture</h2>

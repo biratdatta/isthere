@@ -595,6 +595,163 @@ $$<HTMLFormElement>('form[data-ajax-form]').forEach((form) => {
   if (radio) radio.checked = true;
 }
 
+/* ---------- live globe (canvas, orthographic projection, no libraries) ---------- */
+const globe = (() => {
+  const card = $('[data-globe]');
+  const canvas = $<HTMLCanvasElement>('[data-globe-canvas]');
+  let world: { dots: [number, number][]; cents: Record<string, [number, number]> } | null = null;
+  let geo: Geo = { online: [], today: [] };
+  let lon0 = -20;
+  const lat0 = 18;
+  let dragging = false;
+  let lastX = 0;
+  let raf = 0;
+  const rad = Math.PI / 180;
+  const names = (() => {
+    try {
+      return new Intl.DisplayNames(['en'], { type: 'region' });
+    } catch {
+      return null;
+    }
+  })();
+  const flag = (c: string) => String.fromCodePoint(...[...c].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65));
+
+  function project(lon: number, lat: number, R: number, cx: number, cy: number) {
+    const l = (lon - lon0) * rad;
+    const p = lat * rad;
+    const t = lat0 * rad;
+    const cosc = Math.sin(t) * Math.sin(p) + Math.cos(t) * Math.cos(p) * Math.cos(l);
+    return { x: cx + R * Math.cos(p) * Math.sin(l), y: cy - R * (Math.cos(t) * Math.sin(p) - Math.sin(t) * Math.cos(p) * Math.cos(l)), z: cosc };
+  }
+
+  function draw(time: number) {
+    if (!canvas || !world) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    if (canvas.width !== w * dpr) {
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+    }
+    const ctx = canvas.getContext('2d')!;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    const R = Math.min(w, h) / 2 - 6;
+    const cx = w / 2;
+    const cy = h / 2;
+    // sphere
+    const g = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+    g.addColorStop(0, 'rgba(79,124,255,0.20)');
+    g.addColorStop(1, 'rgba(79,124,255,0.04)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(220,225,234,0.14)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // land dots
+    for (const [lon, lat] of world.dots) {
+      const p = project(lon, lat, R, cx, cy);
+      if (p.z <= 0) continue;
+      ctx.fillStyle = `rgba(220,225,234,${0.18 + p.z * 0.5})`;
+      ctx.fillRect(p.x - 0.9, p.y - 0.9, 1.8, 1.8);
+    }
+    // visitors: today (amber) and online now (green, pulsing)
+    const max = Math.max(1, ...geo.today.map((x) => x.n));
+    for (const { c, n } of geo.today) {
+      const at = world.cents[c];
+      if (!at) continue;
+      const p = project(at[0], at[1], R, cx, cy);
+      if (p.z <= 0.05) continue;
+      ctx.fillStyle = `rgba(245,165,36,${0.35 + 0.5 * p.z})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2 + 4 * Math.sqrt(n / max), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const pulse = reduced ? 0.5 : (time / 1600) % 1;
+    for (const { c, n } of geo.online) {
+      const at = world.cents[c];
+      if (!at) continue;
+      const p = project(at[0], at[1], R, cx, cy);
+      if (p.z <= 0.05) continue;
+      const r = 3 + Math.min(5, n);
+      ctx.strokeStyle = `rgba(47,191,113,${(1 - pulse) * 0.9})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r + pulse * 14, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = '#2fbf71';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function loop(time: number) {
+    if (!dragging && !reduced && !document.hidden) lon0 += 0.08;
+    draw(time);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function renderTop() {
+    const ol = $('[data-globe-top]');
+    const count = $('[data-globe-countries]');
+    if (count) count.textContent = String(geo.today.length);
+    if (!ol) return;
+    const online = new Set(geo.online.map((x) => x.c));
+    ol.replaceChildren(
+      ...geo.today.slice(0, 5).map(({ c, n }) => {
+        const li = document.createElement('li');
+        const name = document.createElement('span');
+        name.textContent = `${flag(c)} ${names?.of(c) ?? c}`;
+        const v = document.createElement('b');
+        v.textContent = fmt(n);
+        if (online.has(c)) li.className = 'on';
+        li.append(name, v);
+        return li;
+      })
+    );
+  }
+
+  if (card && canvas) {
+    const start = () => {
+      if (world) return;
+      fetch('/geo/world.json')
+        .then((r) => r.json())
+        .then((w) => {
+          world = w;
+          // Face the busiest country first.
+          const top = geo.online[0]?.c ?? geo.today[0]?.c;
+          if (top && w.cents[top]) lon0 = w.cents[top][0];
+          raf = requestAnimationFrame(loop);
+        })
+        .catch(() => {});
+    };
+    new IntersectionObserver((es) => es.some((e) => e.isIntersecting) && start(), { rootMargin: '200px' }).observe(card);
+    canvas.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      lon0 -= (e.clientX - lastX) * 0.4;
+      lastX = e.clientX;
+    });
+    const stop = () => (dragging = false);
+    canvas.addEventListener('pointerup', stop);
+    canvas.addEventListener('pointercancel', stop);
+  }
+  return {
+    update(g: Geo) {
+      geo = g;
+      renderTop();
+      if (!raf && world) draw(performance.now());
+    },
+  };
+})();
+
 /* ---------- page counter + live counters ---------- */
 const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
 const counted = nav.doNotTrack !== '1' && !nav.globalPrivacyControl;
@@ -615,8 +772,10 @@ if (counted && 'sendBeacon' in navigator) {
   navigator.sendBeacon('/api/hit', JSON.stringify({ p: location.pathname, r: document.referrer, s: sid }));
 }
 
-type Live = { online: number; visitsToday: number; visitsTotal: number; votesToday: number; votesTotal: number; mrr: number; views: number };
+type Geo = { online: { c: string; n: number }[]; today: { c: string; n: number }[] };
+type Live = { online: number; visitsToday: number; visitsTotal: number; votesToday: number; votesTotal: number; mrr: number; views: number; geo?: Geo };
 function applyLive(d: Partial<Live>) {
+  if (d.geo) globe.update(d.geo);
   $$('[data-live]').forEach((el) => {
     const v = d[el.dataset.live as keyof Live];
     if (typeof v !== 'number') return;

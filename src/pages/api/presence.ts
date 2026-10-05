@@ -8,7 +8,8 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { s } = JSON.parse(await request.text()) as { s?: string };
-    if (typeof s === 'string' && /^[a-f0-9]{16,32}$/.test(s)) await touchPresence(s);
+    const country = (request as Request & { cf?: { country?: string } }).cf?.country ?? request.headers.get('cf-ipcountry');
+    if (typeof s === 'string' && /^[a-f0-9]{16,32}$/.test(s)) await touchPresence(s, country);
   } catch {}
   return json({ online: Math.max(1, await onlineNow()) });
 };

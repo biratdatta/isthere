@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { recordHit, touchPresence } from '../../lib/db';
+import { recordHit, recordVisitCountry, touchPresence } from '../../lib/db';
 import { SITE_HOST } from '../../lib/seo';
 
 export const prerender = false;
@@ -22,8 +22,9 @@ export const POST: APIRoute = async ({ request }) => {
         if (host && host !== SITE_HOST) ref = host;
       } catch {}
     }
-    await recordHit(p, ref);
-    if (typeof body.s === 'string' && /^[a-f0-9]{16,32}$/.test(body.s)) await touchPresence(body.s);
+    const country = (request as Request & { cf?: { country?: string } }).cf?.country ?? request.headers.get('cf-ipcountry');
+    await Promise.all([recordHit(p, ref), recordVisitCountry(country)]);
+    if (typeof body.s === 'string' && /^[a-f0-9]{16,32}$/.test(body.s)) await touchPresence(body.s, country);
   } catch {}
   return new Response(null, { status: 204 });
 };
